@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Wallet</string>
+
+    <!-- Top bar -->
+    <string name="hello">Hello,</string>
+
+    <!-- Balance card -->
+    <string name="total_balance">Total Balance</string>
+    <string name="income">Income</string>
+    <string name="expense">Expense</string>
+    <string name="this_month">This Month: %s</string>
+
+    <!-- Wallets section -->
+    <string name="my_wallets">My Wallets</string>
+    <string name="show_more">Show More</string>
+    <string name="show_less">Show Less</string>
+
+    <!-- Transactions section -->
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="view_all">View All</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="earlier">Earlier</string>
+
+    <!-- Empty states -->
+    <string name="no_wallets_title">No Wallets Yet</string>
+    <string name="no_wallets_message">Add your first wallet to start tracking</string>
+    <string name="no_transactions_title">No Transactions Yet</string>
+    <string name="no_transactions_message">Tap + to add your first transaction</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_statistics">Statistics</string>
+    <string name="nav_categories">Categories</string>
+    <string name="nav_more">More</string>
+
+    <!-- Common -->
+    <string name="add">Add</string>
+    <string name="search">Search</string>
+</resources>

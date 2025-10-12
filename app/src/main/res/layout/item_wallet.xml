@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:padding="@dimen/padding_standard"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Wallet Icon -->
+    <FrameLayout
+        android:layout_width="@dimen/icon_size_medium"
+        android:layout_height="@dimen/icon_size_medium"
+        android:background="@drawable/category_icon_bg_blue">
+
+        <ImageView
+            android:id="@+id/ivWalletIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@android:drawable/ic_menu_myplaces"
+            app:tint="@color/text_white"/>
+    </FrameLayout>
+
+    <!-- Wallet Name -->
+    <TextView
+        android:id="@+id/tvWalletName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Personal"
+        android:textColor="@color/text_white"
+        android:textSize="@dimen/text_size_medium"
+        android:textStyle="bold"
+        android:layout_marginStart="@dimen/padding_standard"/>
+
+    <!-- Wallet Balance -->
+    <TextView
+        android:id="@+id/tvWalletBalance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$1,200.00"
+        android:textColor="@color/text_white"
+        android:textSize="@dimen/text_size_medium"
+        android:textStyle="bold"/>
+
+</LinearLayout>
