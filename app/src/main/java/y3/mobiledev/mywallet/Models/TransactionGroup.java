@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet;
+package y3.mobiledev.mywallet.Models;
 
 import java.util.List;
 

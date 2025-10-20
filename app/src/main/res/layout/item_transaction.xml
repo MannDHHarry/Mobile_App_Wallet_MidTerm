@@ -3,91 +3,106 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="@dimen/padding_standard"
-    android:gravity="center_vertical"
-    android:background="?attr/selectableItemBackground">
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical">
 
-    <!-- Category Icon -->
-    <FrameLayout
-        android:layout_width="@dimen/icon_size_medium"
-        android:layout_height="@dimen/icon_size_medium"
-        android:layout_gravity="top">
+    <!-- Your Original Layout Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/padding_standard">
 
-        <View
-            android:id="@+id/vIconBackground"
+        <!-- Category Icon -->
+        <FrameLayout
             android:layout_width="@dimen/icon_size_medium"
             android:layout_height="@dimen/icon_size_medium"
-            android:background="@drawable/category_icon_bg_orange" />
+            android:layout_gravity="top">
 
-        <ImageView
-            android:id="@+id/ivCategoryIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            android:src="@android:drawable/ic_dialog_info"
-            app:tint="@color/text_white" />
-    </FrameLayout>
+            <View
+                android:id="@+id/vIconBackground"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                android:background="@drawable/category_icon_bg_orange" />
 
-    <!-- Transaction Details (2 rows) -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginStart="@dimen/padding_standard">
+            <ImageView
+                android:id="@+id/ivCategoryIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/transactionhee"
+                app:tint="@color/text_white" />
+        </FrameLayout>
 
-        <!-- Row 1: Category Name -->
-        <TextView
-            android:id="@+id/tvCategory"
-            android:layout_width="wrap_content"
+        <!-- Transaction Details (2 rows) -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Utilities"
-            android:textColor="@color/text_white"
-            android:textSize="@dimen/text_size_medium"
-            android:textStyle="bold"
-            android:maxLines="1"
-            android:ellipsize="end"/>
+            android:layout_marginStart="@dimen/padding_standard"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <!-- Row 2: Notes -->
-        <TextView
-            android:id="@+id/tvDescription"
+            <!-- Row 1: Category Name -->
+            <TextView
+                android:id="@+id/tvCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Utilities"
+                android:textColor="@color/text_black"
+                android:textSize="@dimen/text_size_medium"
+                android:textStyle="bold" />
+
+            <!-- Row 2: Notes -->
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="paid wifi bill"
+                android:textColor="@color/colorDarkPurple"
+                android:textSize="@dimen/text_size_small" />
+        </LinearLayout>
+
+        <!-- Amount and Date -->
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="paid wifi bill"
-            android:textColor="@color/text_gray"
-            android:textSize="@dimen/text_size_small"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:layout_marginTop="2dp"/>
+            android:layout_height="40dp"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <!-- Row 1: Amount -->
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-$23.00"
+                android:textColor="#EF7867"
+                android:textSize="@dimen/text_size_medium"
+                android:textStyle="bold" />
+
+            <!-- Row 2: Date -->
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="12 Jan"
+                android:textColor="@color/text_gray"
+                android:textSize="@dimen/text_size_small" />
+        </LinearLayout>
+
     </LinearLayout>
 
-    <!-- Amount and Date -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="end">
-
-        <!-- Row 1: Amount -->
-        <TextView
-            android:id="@+id/tvAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-$23.00"
-            android:textColor="@color/expense_red"
-            android:textSize="@dimen/text_size_medium"
-            android:textStyle="bold"/>
-
-        <!-- Row 2: Date -->
-        <TextView
-            android:id="@+id/tvDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="12 Jan"
-            android:textColor="@color/text_gray"
-            android:textSize="@dimen/text_size_small"
-            android:layout_marginTop="2dp"/>
-    </LinearLayout>
+    <!-- THE DIVIDER VIEW -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="72dp"
+        android:background="?android:attr/listDivider" />
 
 </LinearLayout>

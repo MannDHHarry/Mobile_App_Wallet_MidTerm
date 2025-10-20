@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="Today"
-    android:textColor="@color/text_gray"
-    android:textSize="@dimen/text_size_small"
+    android:textColor="@color/colorDark"
+    android:textSize="@dimen/text_size_medium"
     android:textStyle="bold"
     android:paddingStart="@dimen/padding_standard"
     android:paddingEnd="@dimen/padding_standard"
     android:paddingTop="@dimen/padding_standard"
     android:paddingBottom="@dimen/padding_small"
-    android:background="@color/background_dark"/>
+    android:background="?attr/selectableItemBackground"/>
