@@ -212,7 +212,7 @@ public class AddTransactionFragment extends Fragment {
 
         Transaction newTransaction = new Transaction(
                 newId, userId, selectedCategory.getName(), notes, amount,
-                selectedDate, isExpense, selectedCategory.getIconResId(), selectedCategory.getColorResId()
+                selectedDate, isExpense, android.R.drawable.ic_dialog_info, selectedCategory.getColorResId()
         );
 
         viewModel.addTransaction(newTransaction);

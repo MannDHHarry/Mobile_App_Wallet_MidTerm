@@ -32,8 +32,8 @@
     <!-- Bottom navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_statistics">Statistics</string>
-    <string name="nav_categories">Categories</string>
-    <string name="nav_more">More</string>
+    <string name="nav_management">Management</string>
+    <string name="nav_transition_History">History</string>
 
     <!-- Common -->
     <string name="add">Add</string>

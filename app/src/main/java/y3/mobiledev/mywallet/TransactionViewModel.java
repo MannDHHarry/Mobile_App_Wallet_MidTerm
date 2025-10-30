@@ -132,10 +132,11 @@ public class TransactionViewModel extends ViewModel {
 
         List<Wallet> allWallets_list = new ArrayList<>(allWallets.getValue() != null ?
                 allWallets.getValue() : new ArrayList<>());
+        Double updatedBalance = null;
         for (Wallet w : allWallets_list) {
             if (w.getWalletId() == walletId && w.getUserId() == userId) {
-                double newBalance = isExpense ? w.getBalance() - amount : w.getBalance() + amount;
-                w.setBalance(newBalance);
+                updatedBalance = isExpense ? w.getBalance() - amount : w.getBalance() + amount;
+                w.setBalance(updatedBalance);
                 break;
             }
         }
@@ -143,11 +144,13 @@ public class TransactionViewModel extends ViewModel {
 
         List<Wallet> userWallets_list = new ArrayList<>(wallets.getValue() != null ?
                 wallets.getValue() : new ArrayList<>());
-        for (Wallet w : userWallets_list) {
-            if (w.getWalletId() == walletId) {
-                double newBalance = isExpense ? w.getBalance() - amount : w.getBalance() + amount;
-                w.setBalance(newBalance);
-                break;
+        if (updatedBalance != null) {
+            for (Wallet w : userWallets_list) {
+                if (w.getWalletId() == walletId) {
+                    // Apply the same computed balance to avoid double subtraction/addition
+                    w.setBalance(updatedBalance);
+                    break;
+                }
             }
         }
         wallets.setValue(userWallets_list);

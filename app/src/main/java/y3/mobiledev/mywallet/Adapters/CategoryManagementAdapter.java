@@ -54,7 +54,7 @@ public class CategoryManagementAdapter extends RecyclerView.Adapter<CategoryMana
 
         // Set icon
         if (category.getIconResId() != 0) {
-            holder.ivIcon.setImageResource(category.getIconResId());
+            holder.ivIcon.setImageResource(R.drawable.lines);
             holder.ivIcon.setColorFilter(ContextCompat.getColor(context, category.getColorResId()));
         }
 
