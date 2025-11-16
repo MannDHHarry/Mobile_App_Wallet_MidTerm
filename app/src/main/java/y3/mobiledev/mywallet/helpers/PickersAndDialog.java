@@ -56,7 +56,8 @@ public class CategoryWalletDialog {
                 new ItemDialogAdapter.ItemProvider() {
                     @Override
                     public int getIconResId(Object item) {
-                        return item instanceof Category ? ((Category) item).getIconResId() : 0;
+                        return item instanceof Category ? R.drawable.lines : 0;
+
                     }
 
                     @Override
@@ -108,12 +109,12 @@ public class CategoryWalletDialog {
                 new ItemDialogAdapter.ItemProvider() {
                     @Override
                     public int getIconResId(Object item) {
-                        return item instanceof Wallet ? ((Wallet) item).getIconResId() : 0;
+                        return item instanceof Wallet ? R.drawable.purse : 0;
                     }
 
                     @Override
                     public int getColorResId(Object item) {
-                        return R.color.colorPrimary;
+                        return R.color.colorDarkPurple;
                     }
 
                     @Override
