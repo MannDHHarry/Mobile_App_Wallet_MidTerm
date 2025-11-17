@@ -1,7 +1,7 @@
-package y3.mobiledev.mywallet.Helpers;
+package y3.mobiledev.mywallet.helpers;
 
-import y3.mobiledev.mywallet.Models.Transaction;
-import y3.mobiledev.mywallet.Models.TransactionGroup;
+import y3.mobiledev.mywallet.models.Transaction;
+import y3.mobiledev.mywallet.models.TransactionGroup;
 
 import java.util.ArrayList;
 import java.util.Comparator;

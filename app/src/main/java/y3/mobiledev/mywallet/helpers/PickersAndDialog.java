@@ -1,5 +1,5 @@
 // ========== CategoryWalletManager.java (Simplified) ==========
-package y3.mobiledev.mywallet.Helpers;
+package y3.mobiledev.mywallet.helpers;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,16 +12,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import y3.mobiledev.mywallet.Adapters.ItemDialogAdapter;
-import y3.mobiledev.mywallet.Models.Category;
-import y3.mobiledev.mywallet.Models.Wallet;
+import y3.mobiledev.mywallet.adapters.ItemDialogAdapter;
+import y3.mobiledev.mywallet.models.Category;
+import y3.mobiledev.mywallet.models.Wallet;
 import y3.mobiledev.mywallet.R;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class CategoryWalletDialog {
+public class PickersAndDialog {
 
     public interface OnSelectionListener {
         void onItemSelected(Object item);

@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import y3.mobiledev.mywallet.Fragments.LoginFragment;
+import y3.mobiledev.mywallet.fragments.LoginFragment;
 
 public class AuthActivity extends AppCompatActivity {
 

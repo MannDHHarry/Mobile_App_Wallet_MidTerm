@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet.Fragments;
+package y3.mobiledev.mywallet.fragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -28,8 +28,8 @@ import java.util.Map;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import y3.mobiledev.mywallet.Models.Transaction;
-import y3.mobiledev.mywallet.Models.TransactionGroup;
+import y3.mobiledev.mywallet.models.Transaction;
+import y3.mobiledev.mywallet.models.TransactionGroup;
 import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.TransactionViewModel;
 

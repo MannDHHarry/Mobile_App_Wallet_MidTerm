@@ -1,9 +1,9 @@
 package y3.mobiledev.mywallet;
 
 import android.util.Log;
-import y3.mobiledev.mywallet.Models.Category;
-import y3.mobiledev.mywallet.Models.Transaction;
-import y3.mobiledev.mywallet.Models.Wallet;
+import y3.mobiledev.mywallet.models.Category;
+import y3.mobiledev.mywallet.models.Transaction;
+import y3.mobiledev.mywallet.models.Wallet;
 
 import java.util.ArrayList;
 import java.util.Calendar;

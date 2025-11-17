@@ -1,7 +1,6 @@
-package y3.mobiledev.mywallet.Fragments;
+package y3.mobiledev.mywallet.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +15,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import y3.mobiledev.mywallet.Adapters.TransactionAdapter;
-import y3.mobiledev.mywallet.Adapters.WalletAdapter;
-import y3.mobiledev.mywallet.Helpers.CategoryWalletDialog;
-import y3.mobiledev.mywallet.Helpers.DateManager;
-import y3.mobiledev.mywallet.Models.Transaction;
-import y3.mobiledev.mywallet.Models.TransactionGroup;
-import y3.mobiledev.mywallet.Models.Wallet;
+import y3.mobiledev.mywallet.adapters.TransactionAdapter;
+import y3.mobiledev.mywallet.adapters.WalletAdapter;
+import y3.mobiledev.mywallet.helpers.CategoryWalletManager;
+import y3.mobiledev.mywallet.helpers.DateManager;
+import y3.mobiledev.mywallet.models.Transaction;
+import y3.mobiledev.mywallet.models.TransactionGroup;
+import y3.mobiledev.mywallet.models.Wallet;
 import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.TransactionViewModel;
 
@@ -60,6 +59,7 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    //Init Views by signing them to variables
     private void initViews(View view) {
         tvTotalBalance = view.findViewById(R.id.tvTotalBalance);
         tvIncome = view.findViewById(R.id.tvIncome);
@@ -75,42 +75,57 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupRecyclerViews() {
+
+        //Setting Up Wallet RecyclerView
         displayedWallets = new ArrayList<>();
+
         walletAdapter = new WalletAdapter(requireContext(), displayedWallets, wallet ->
                 Toast.makeText(requireContext(), "Clicked: " + wallet.getName(), Toast.LENGTH_SHORT).show());
         rvWallets.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvWallets.setAdapter(walletAdapter);
         rvWallets.setNestedScrollingEnabled(false);
 
+        //Setting up Transaction RecyclerView
+
         transactionAdapter = new TransactionAdapter(requireContext(), new ArrayList<>(), transaction ->
                 Toast.makeText(requireContext(), "Clicked: " + transaction.getCategory(), Toast.LENGTH_SHORT).show());
         rvTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvTransactions.setAdapter(transactionAdapter);
         rvTransactions.setNestedScrollingEnabled(false);
+
     }
 
+    //setting up onClickListeners
+
+    private void setupListeners() {
+        btnAddWallet.setOnClickListener(v -> onAddWallet());
+        btnShowMoreWallets.setOnClickListener(v -> toggleWalletDisplay());
+        btnViewAllTransactions.setOnClickListener(v -> Toast.makeText(requireContext(), "View All Transactions", Toast.LENGTH_SHORT).show());
+
+        View btnAddFirstWallet = emptyStateWallets.findViewById(R.id.btnAddFirstWallet);
+        if (btnAddFirstWallet != null) {
+            btnAddFirstWallet.setOnClickListener(v -> onAddWallet());
+        }
+    }
+
+    //Data Observation in Live Data
     private void observeData() {
+
         viewModel.getWallets().observe(getViewLifecycleOwner(), wallets -> {
-            Log.d("HomeFragment", "Observer fired - Wallets: " + (wallets != null ? wallets.size() : "null"));
 
             if (wallets == null || wallets.isEmpty()) {
-                Log.d("HomeFragment", "Wallets is null or empty");
                 displayedWallets.clear();
                 walletAdapter.updateWallets(displayedWallets);
                 updateWalletVisibility(wallets);
                 return;
             }
 
-            Log.d("HomeFragment", "Before clear - displayedWallets size: " + displayedWallets.size());
             displayedWallets.clear();
-            Log.d("HomeFragment", "After clear - displayedWallets size: " + displayedWallets.size());
 
             for (int i = 0; i < Math.min(MAX_INITIAL_WALLETS, wallets.size()); i++) {
                 displayedWallets.add(wallets.get(i));
-                Log.d("HomeFragment", "Added wallet #" + i + ": " + wallets.get(i).getName());
             }
 
-            Log.d("HomeFragment", "Final displayedWallets size: " + displayedWallets.size());
             walletAdapter.updateWallets(displayedWallets);
             updateWalletVisibility(wallets);
             updateBalanceCard();
@@ -123,7 +138,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
-
+  // Balance Card Amounts
     private void updateBalanceCard() {
         List<Wallet> wallets = viewModel.getWallets().getValue();
         List<TransactionGroup> groups = viewModel.getTransactionGroups().getValue();
@@ -161,6 +176,7 @@ public class HomeFragment extends Fragment {
         tvTimePeriod.setText(getString(R.string.this_month, currentMonth));
     }
 
+    //Display all wallet of just 3
     private void toggleWalletDisplay() {
         List<Wallet> allWallets = viewModel.getWallets().getValue();
         if (allWallets == null) return;
@@ -181,6 +197,7 @@ public class HomeFragment extends Fragment {
         updateWalletVisibility(allWallets);
     }
 
+    //if there is no wallet no Recycler View
     private void updateWalletVisibility(List<Wallet> wallets) {
         if (wallets == null || wallets.isEmpty()) {
             rvWallets.setVisibility(View.GONE);
@@ -193,30 +210,19 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    //if there is no Transaction there is no Transaction Recycler
     private void updateTransactionVisibility(List<TransactionGroup> groups) {
         rvTransactions.setVisibility(groups == null || groups.isEmpty() ? View.GONE : View.VISIBLE);
         emptyStateTransactions.setVisibility(groups == null || groups.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
-    private void setupListeners() {
-        btnAddWallet.setOnClickListener(v -> showAddWalletDialog());
-        btnShowMoreWallets.setOnClickListener(v -> toggleWalletDisplay());
-        btnViewAllTransactions.setOnClickListener(v -> Toast.makeText(requireContext(), "View All Transactions", Toast.LENGTH_SHORT).show());
 
-        View btnAddFirstWallet = emptyStateWallets.findViewById(R.id.btnAddFirstWallet);
-        if (btnAddFirstWallet != null) {
-            btnAddFirstWallet.setOnClickListener(v -> showAddWalletDialog());
-        }
-    }
-
-    private void showAddWalletDialog() {
-        int userId = viewModel.getCurrentUser().getValue().getUserId();
-
-        CategoryWalletDialog.showAddWalletDialog(requireContext(), userId, wallet -> {
-            List<Wallet> currentWallets = new ArrayList<>(viewModel.getAllWallets());
-            currentWallets.add(wallet);
-            viewModel.addWalletDirect(currentWallets);
-        });
+    private void onAddWallet() {
+        CategoryWalletManager.callAddWalletDialog(
+                requireContext(),
+                viewModel,
+                getViewLifecycleOwner(),
+                null);
     }
 
 }

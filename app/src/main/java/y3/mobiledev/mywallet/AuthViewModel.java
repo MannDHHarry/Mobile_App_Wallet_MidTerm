@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import y3.mobiledev.mywallet.Models.User;
+import y3.mobiledev.mywallet.models.User;
 
 public class AuthViewModel extends ViewModel {
     private final MutableLiveData<User> currentUser = new MutableLiveData<>();

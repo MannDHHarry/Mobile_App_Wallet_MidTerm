@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet.Adapters;
+package y3.mobiledev.mywallet.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -60,7 +60,7 @@ public class ItemDialogAdapter extends RecyclerView.Adapter<ItemDialogAdapter.It
         if (item instanceof String) {
             // "+ Add New" item
             String itemText = (String) item;
-            holder.iconView.setImageResource(R.drawable.ic_launcher_foreground);
+            holder.iconView.setImageResource(R.drawable.lines);
             holder.iconView.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
             holder.nameView.setText(itemText);
             holder.nameView.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));

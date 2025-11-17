@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet.Fragments;
+package y3.mobiledev.mywallet.fragments;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -20,14 +20,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import y3.mobiledev.mywallet.Adapters.TransactionAdapter;
-import y3.mobiledev.mywallet.Helpers.DateManager;
-import y3.mobiledev.mywallet.Helpers.TransactionManager;
-import y3.mobiledev.mywallet.Models.Category;
-import y3.mobiledev.mywallet.Models.Transaction;
-import y3.mobiledev.mywallet.Models.TransactionGroup;
+import y3.mobiledev.mywallet.adapters.TransactionAdapter;
+import y3.mobiledev.mywallet.helpers.DateManager;
+import y3.mobiledev.mywallet.helpers.TransactionManager;
+import y3.mobiledev.mywallet.models.Category;
+import y3.mobiledev.mywallet.models.Transaction;
+import y3.mobiledev.mywallet.models.TransactionGroup;
 import y3.mobiledev.mywallet.R;
-import y3.mobiledev.mywallet.SampleDataProvider;
 import y3.mobiledev.mywallet.TransactionViewModel;
 
 import java.util.ArrayList;
@@ -70,6 +69,7 @@ public class TransactionHistoryFragment extends Fragment {
         rvTransactions = view.findViewById(R.id.rvTransactions);
     }
 
+    //Setting up RV for Transactions
     private void setupRecyclerView() {
         transactionAdapter = new TransactionAdapter(
                 requireContext(),
@@ -81,7 +81,9 @@ public class TransactionHistoryFragment extends Fragment {
         rvTransactions.setNestedScrollingEnabled(false);
     }
 
+    //setting up 3 filterSpinners Date , Category and Payment Type
     private void setupFilterSpinners() {
+
         // Date Range Spinner
         String[] dateRanges = {"All Time", "Today", "This Week", "This Month", "This Year"};
         ArrayAdapter<String> dateAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, dateRanges);
@@ -151,6 +153,7 @@ public class TransactionHistoryFragment extends Fragment {
         });
     }
 
+    //Searching the transactions with text input
     private void setupSearchListener() {
         btnClearSearch.setOnClickListener(v -> {
             etSearchTransaction.setText("");
@@ -174,10 +177,6 @@ public class TransactionHistoryFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {}
         });
-    }
-
-    private void observeData() {
-        viewModel.getTransactions().observe(getViewLifecycleOwner(), transactions -> applyFilters());
     }
 
     private void applyFilters() {
@@ -218,5 +217,10 @@ public class TransactionHistoryFragment extends Fragment {
     private void onTransactionClick(Transaction transaction) {
         Toast.makeText(requireContext(), "Clicked: " + transaction.getCategory(), Toast.LENGTH_SHORT).show();
         // TODO: Show transaction detail dialog or navigate to detail fragment
+    }
+
+    //Observing Live Datas
+    private void observeData() {
+        viewModel.getTransactions().observe(getViewLifecycleOwner(), transactions -> applyFilters());
     }
 }

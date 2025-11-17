@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import y3.mobiledev.mywallet.Helpers.TransactionManager;
-import y3.mobiledev.mywallet.Models.Category;
-import y3.mobiledev.mywallet.Models.Transaction;
-import y3.mobiledev.mywallet.Models.TransactionGroup;
-import y3.mobiledev.mywallet.Models.User;
-import y3.mobiledev.mywallet.Models.Wallet;
+import y3.mobiledev.mywallet.helpers.TransactionManager;
+import y3.mobiledev.mywallet.models.Category;
+import y3.mobiledev.mywallet.models.Transaction;
+import y3.mobiledev.mywallet.models.TransactionGroup;
+import y3.mobiledev.mywallet.models.User;
+import y3.mobiledev.mywallet.models.Wallet;
 
 public class TransactionViewModel extends ViewModel {
     // All app data
@@ -130,24 +130,32 @@ public class TransactionViewModel extends ViewModel {
     public void updateWalletBalance(int walletId, double amount, boolean isExpense) {
         int userId = currentUser.getValue().getUserId();
 
+        // 1. Copy allWallets
         List<Wallet> allWallets_list = new ArrayList<>(allWallets.getValue() != null ?
                 allWallets.getValue() : new ArrayList<>());
+
+        Double updatedBalance = null;
+
+        // 2. Update in allWallets (with userId check)
         for (Wallet w : allWallets_list) {
             if (w.getWalletId() == walletId && w.getUserId() == userId) {
-                double newBalance = isExpense ? w.getBalance() - amount : w.getBalance() + amount;
-                w.setBalance(newBalance);
+                updatedBalance = isExpense ? w.getBalance() - amount : w.getBalance() + amount;
+                w.setBalance(updatedBalance);
                 break;
             }
         }
         allWallets.setValue(allWallets_list);
 
+        // 3. Update in userWallets — using SAME updatedBalance
         List<Wallet> userWallets_list = new ArrayList<>(wallets.getValue() != null ?
                 wallets.getValue() : new ArrayList<>());
-        for (Wallet w : userWallets_list) {
-            if (w.getWalletId() == walletId) {
-                double newBalance = isExpense ? w.getBalance() - amount : w.getBalance() + amount;
-                w.setBalance(newBalance);
-                break;
+
+        if (updatedBalance != null) {
+            for (Wallet w : userWallets_list) {
+                if (w.getWalletId() == walletId) {
+                    w.setBalance(updatedBalance);  // ← SAME value, no recalculation!
+                    break;
+                }
             }
         }
         wallets.setValue(userWallets_list);

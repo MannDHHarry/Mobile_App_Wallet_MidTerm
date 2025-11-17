@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet.Fragments;
+package y3.mobiledev.mywallet.fragments;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -17,11 +17,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import y3.mobiledev.mywallet.Helpers.CategoryWalletDialog;
-import y3.mobiledev.mywallet.Helpers.TransactionManager;
-import y3.mobiledev.mywallet.Models.Category;
-import y3.mobiledev.mywallet.Models.Transaction;
-import y3.mobiledev.mywallet.Models.Wallet;
+import y3.mobiledev.mywallet.helpers.PickersAndDialog;
+import y3.mobiledev.mywallet.helpers.CategoryWalletManager;
+import y3.mobiledev.mywallet.helpers.TransactionManager;
+import y3.mobiledev.mywallet.models.Category;
+import y3.mobiledev.mywallet.models.Transaction;
+import y3.mobiledev.mywallet.models.Wallet;
 import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.TransactionViewModel;
 
@@ -57,7 +58,6 @@ public class AddTransactionFragment extends Fragment {
         initViews(view);
         setupListeners();
         observeData();
-
         selectedDate = new Date();
         updateDateDisplay();
         etAmount.requestFocus();
@@ -65,6 +65,8 @@ public class AddTransactionFragment extends Fragment {
         return view;
     }
 
+
+    //Init Views by signing them to variables
     private void initViews(View view) {
         btnSave = view.findViewById(R.id.btnSaveTransaction);
         etAmount = view.findViewById(R.id.etAmount);
@@ -78,103 +80,26 @@ public class AddTransactionFragment extends Fragment {
         tvSelectedDate = view.findViewById(R.id.tvSelectedDate);
     }
 
+    //Setting up ClickListeners
     private void setupListeners() {
+
+        //Save Transaction
         btnSave.setOnClickListener(v -> saveTransaction());
 
+        //Radio Group for Income or Expense
         rgTransactionType.setOnCheckedChangeListener((group, checkedId) -> {
             isExpense = checkedId == R.id.rbExpense;
             selectedCategory = null;
             tvSelectedCategory.setText("Select Category");
         });
 
-        layoutCategoryPicker.setOnClickListener(v -> showCategoryPicker());
-        layoutWalletPicker.setOnClickListener(v -> showWalletPicker());
+        //Category , Wallet and Date pickers
+        layoutCategoryPicker.setOnClickListener(v -> onCategoryPicker());
+        layoutWalletPicker.setOnClickListener(v -> onWalletPicker());
         layoutDatePicker.setOnClickListener(v -> showDatePicker());
     }
 
-    private void observeData() {
-        viewModel.getWallets().observe(getViewLifecycleOwner(), walletList -> {
-            if (walletList != null) {
-                wallets = new ArrayList<>(walletList);
-            }
-        });
-    }
-
-    private void showCategoryPicker() {
-        List<Category> categoriesToShow = isExpense ?
-                viewModel.getExpenseCategories().getValue() :
-                viewModel.getIncomeCategories().getValue();
-
-        if (categoriesToShow == null) {
-            categoriesToShow = new ArrayList<>();
-        }
-
-        CategoryWalletDialog.showCategoryPicker(requireContext(), categoriesToShow, isExpense,
-                item -> {
-                    if (item instanceof String) {
-                        showAddCategoryDialog();  // "+ Add New" clicked
-                    } else if (item instanceof Category) {
-                        selectedCategory = (Category) item;
-                        tvSelectedCategory.setText(selectedCategory.getName());
-                    }
-                });
-    }
-
-    private void showWalletPicker() {
-        CategoryWalletDialog.showWalletPicker(requireContext(), wallets,
-                item -> {
-                    if (item instanceof String) {
-                        showAddWalletDialog();  // "+ Add New Wallet" clicked
-                    } else if (item instanceof Wallet) {
-                        selectedWallet = (Wallet) item;
-                        tvSelectedWallet.setText(selectedWallet.getName());
-                    }
-                });
-    }
-
-    private void showDatePicker() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(selectedDate);
-
-        new DatePickerDialog(requireContext(),
-                (view, year, month, dayOfMonth) -> {
-                    Calendar cal = Calendar.getInstance();
-                    cal.set(year, month, dayOfMonth);
-                    selectedDate = cal.getTime();
-                    updateDateDisplay();
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-        ).show();
-    }
-
-    private void updateDateDisplay() {
-        Calendar today = Calendar.getInstance();
-        resetTime(today);
-
-        Calendar selectedCal = Calendar.getInstance();
-        selectedCal.setTime(selectedDate);
-        resetTime(selectedCal);
-
-        String dateText;
-        if (selectedCal.equals(today)) {
-            SimpleDateFormat format = new SimpleDateFormat("MMM d", Locale.US);
-            dateText = "Today, " + format.format(selectedDate);
-        } else {
-            SimpleDateFormat format = new SimpleDateFormat("EEE, MMM d", Locale.US);
-            dateText = format.format(selectedDate);
-        }
-        tvSelectedDate.setText(dateText);
-    }
-
-    private void resetTime(Calendar cal) {
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-    }
-
+    //Save Transaction with Input Validation
     private void saveTransaction() {
         String amountStr = etAmount.getText().toString().trim();
 
@@ -212,7 +137,7 @@ public class AddTransactionFragment extends Fragment {
 
         Transaction newTransaction = new Transaction(
                 newId, userId, selectedCategory.getName(), notes, amount,
-                selectedDate, isExpense, selectedCategory.getIconResId(), selectedCategory.getColorResId()
+                selectedDate, isExpense, android.R.drawable.ic_dialog_info, selectedCategory.getColorResId()
         );
 
         viewModel.addTransaction(newTransaction);
@@ -222,27 +147,120 @@ public class AddTransactionFragment extends Fragment {
         getParentFragmentManager().popBackStack();
     }
 
-    private void showAddCategoryDialog() {
-        CategoryWalletDialog.showAddCategoryDialog(requireContext(), (categoryName, isIncome) -> {
-            Category newCategory = isIncome ?
-                    viewModel.addIncomeCategory(categoryName, R.color.category_orange, android.R.drawable.ic_dialog_info) :
-                    viewModel.addExpenseCategory(categoryName, R.color.category_orange, android.R.drawable.ic_dialog_info);
+    //Three Pickers Category , Wallet and Date
 
-                selectedCategory = newCategory;
-                tvSelectedCategory.setText(newCategory.getName());
-                Toast.makeText(requireContext(), "Category added: " + categoryName, Toast.LENGTH_SHORT).show();
+    private void onCategoryPicker() {
+        List<Category> categoriesToShow = isExpense ?
+                viewModel.getExpenseCategories().getValue() :
+                viewModel.getIncomeCategories().getValue();
 
-        });
+        if (categoriesToShow == null) {
+            categoriesToShow = new ArrayList<>();
+        }
+
+        PickersAndDialog.showCategoryPicker(requireContext(), categoriesToShow, isExpense,
+                item -> {
+                    if (item instanceof String) {
+                        onAddCategory();  // "+ Add New" clicked
+                    } else if (item instanceof Category) {
+                        selectedCategory = (Category) item;
+                        tvSelectedCategory.setText(selectedCategory.getName());
+                    }
+                });
     }
 
-    private void showAddWalletDialog() {
-        int userId = viewModel.getCurrentUser().getValue().getUserId();
+    private void onWalletPicker() {
+        PickersAndDialog.showWalletPicker(requireContext(), wallets,
+                item -> {
+                    if (item instanceof String) {
+                        onAddWallet();  // "+ Add New Wallet" clicked
+                    } else if (item instanceof Wallet) {
+                        selectedWallet = (Wallet) item;
+                        tvSelectedWallet.setText(selectedWallet.getName());
+                    }
+                });
+    }
 
-        CategoryWalletDialog.showAddWalletDialog(requireContext(), userId, wallet -> {
-            selectedWallet = wallet;
-            tvSelectedWallet.setText(selectedWallet.getName());
-            viewModel.addWalletDirect(wallets);
-            Toast.makeText(requireContext(), "Wallet added", Toast.LENGTH_SHORT).show();
+    private void showDatePicker() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(selectedDate);
+
+        new DatePickerDialog(requireContext(),
+                (view, year, month, dayOfMonth) -> {
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(year, month, dayOfMonth);
+                    selectedDate = cal.getTime();
+                    updateDateDisplay();
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        ).show();
+    }
+
+    //Calling Dialogs for new Category and new Wallet
+    private void onAddCategory() {
+        CategoryWalletManager.callAddCategoryDialog(
+                requireContext(),
+                viewModel,
+                isExpense,
+                () -> {
+                    // pick the newly created category (last in the list)
+                    List<Category> list = isExpense
+                            ? viewModel.getExpenseCategories().getValue()
+                            : viewModel.getIncomeCategories().getValue();
+                    if (list != null && !list.isEmpty()) {
+                        selectedCategory = list.get(list.size() - 1);
+                        tvSelectedCategory.setText(selectedCategory.getName());
+                    }
+                });
+    }
+    private void onAddWallet() {
+        CategoryWalletManager.callAddWalletDialog(
+                requireContext(),
+                viewModel,
+                getViewLifecycleOwner(),
+                () -> {
+                    selectedWallet = viewModel.getAllWallets().get(viewModel.getAllWallets().size() - 1);
+                    tvSelectedWallet.setText(selectedWallet.getName());
+                });
+    }
+
+    //Helpers
+    private void updateDateDisplay() {
+        Calendar today = Calendar.getInstance();
+        resetTime(today);
+
+        Calendar selectedCal = Calendar.getInstance();
+        selectedCal.setTime(selectedDate);
+        resetTime(selectedCal);
+
+        String dateText;
+        if (selectedCal.equals(today)) {
+            SimpleDateFormat format = new SimpleDateFormat("MMM d", Locale.US);
+            dateText = "Today, " + format.format(selectedDate);
+        } else {
+            SimpleDateFormat format = new SimpleDateFormat("EEE, MMM d", Locale.US);
+            dateText = format.format(selectedDate);
+        }
+        tvSelectedDate.setText(dateText);
+    }
+
+    private void resetTime(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+    }
+
+
+
+    //Live Data Observer
+    private void observeData() {
+        viewModel.getWallets().observe(getViewLifecycleOwner(), walletList -> {
+            if (walletList != null) {
+                wallets = new ArrayList<>(walletList);
+            }
         });
     }
 

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -15,11 +14,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import y3.mobiledev.mywallet.Fragments.AddTransactionFragment;
-import y3.mobiledev.mywallet.Fragments.CategoriesFragment;
-import y3.mobiledev.mywallet.Fragments.HomeFragment;
-import y3.mobiledev.mywallet.Fragments.StatisticsFragment;
-import y3.mobiledev.mywallet.Fragments.TransactionHistoryFragment;
+import y3.mobiledev.mywallet.fragments.AddTransactionFragment;
+import y3.mobiledev.mywallet.fragments.CategoriesFragment;
+import y3.mobiledev.mywallet.fragments.HomeFragment;
+import y3.mobiledev.mywallet.fragments.StatisticsFragment;
+import y3.mobiledev.mywallet.fragments.TransactionHistoryFragment;
 
 public class MainActivity extends AppCompatActivity {
 

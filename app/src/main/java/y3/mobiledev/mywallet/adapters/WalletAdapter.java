@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet.Adapters;
+package y3.mobiledev.mywallet.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import y3.mobiledev.mywallet.Models.Wallet;
+import y3.mobiledev.mywallet.models.Wallet;
 import y3.mobiledev.mywallet.R;
 
 import java.util.List;

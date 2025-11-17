@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet.Adapters;
+package y3.mobiledev.mywallet.adapters;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
@@ -11,9 +11,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import y3.mobiledev.mywallet.Helpers.TransactionManager;
-import y3.mobiledev.mywallet.Models.Transaction;
-import y3.mobiledev.mywallet.Models.TransactionGroup;
+import y3.mobiledev.mywallet.helpers.TransactionManager;
+import y3.mobiledev.mywallet.models.Transaction;
+import y3.mobiledev.mywallet.models.TransactionGroup;
 import y3.mobiledev.mywallet.R;
 
 

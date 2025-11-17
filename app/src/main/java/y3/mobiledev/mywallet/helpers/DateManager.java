@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet.Helpers;
+package y3.mobiledev.mywallet.helpers;
 
 import java.util.Calendar;
 import java.util.Date;

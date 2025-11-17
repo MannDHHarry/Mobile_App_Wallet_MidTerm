@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet.Adapters;
+package y3.mobiledev.mywallet.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import y3.mobiledev.mywallet.Models.Category;
+import y3.mobiledev.mywallet.models.Category;
 import y3.mobiledev.mywallet.R;
 
 import java.util.List;
@@ -54,7 +54,7 @@ public class CategoryManagementAdapter extends RecyclerView.Adapter<CategoryMana
 
         // Set icon
         if (category.getIconResId() != 0) {
-            holder.ivIcon.setImageResource(category.getIconResId());
+            holder.ivIcon.setImageResource(R.drawable.lines);
             holder.ivIcon.setColorFilter(ContextCompat.getColor(context, category.getColorResId()));
         }
 

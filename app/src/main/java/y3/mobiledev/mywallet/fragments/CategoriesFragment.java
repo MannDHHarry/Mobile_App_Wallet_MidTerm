@@ -1,12 +1,11 @@
 // ========== CategoriesFragment.java ==========
-package y3.mobiledev.mywallet.Fragments;
+package y3.mobiledev.mywallet.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,11 +14,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import y3.mobiledev.mywallet.Adapters.CategoryManagementAdapter;
-import y3.mobiledev.mywallet.Adapters.WalletManagementAdapter;
-import y3.mobiledev.mywallet.Helpers.CategoryWalletDialog;
-import y3.mobiledev.mywallet.Models.Category;
-import y3.mobiledev.mywallet.Models.Wallet;
+import y3.mobiledev.mywallet.adapters.CategoryManagementAdapter;
+import y3.mobiledev.mywallet.adapters.WalletManagementAdapter;
+import y3.mobiledev.mywallet.helpers.CategoryWalletManager;
+import y3.mobiledev.mywallet.models.Category;
+import y3.mobiledev.mywallet.models.Wallet;
 import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.TransactionViewModel;
 
@@ -53,6 +52,8 @@ public class CategoriesFragment extends Fragment {
         return view;
     }
 
+
+    //Init Views by signing them to variables
     private void initViews(View view) {
         rvExpenseCategories = view.findViewById(R.id.rvExpenseCategories);
         rvIncomeCategories = view.findViewById(R.id.rvIncomeCategories);
@@ -62,24 +63,39 @@ public class CategoriesFragment extends Fragment {
 
     }
 
+    //Setting Up Recycler Views for wallet , expense categories and income categories management
     private void setupRecyclerViews() {
+
         // Initialize with empty lists
+        wallets = new ArrayList<>();
         expenseCategories = new ArrayList<>();
         incomeCategories = new ArrayList<>();
-        wallets = new ArrayList<>();
 
-        // Expense Categories Adapter
+        // Wallets RV with custom WalletManagementAdapter
+        walletAdapter = new WalletManagementAdapter(
+                requireContext(),
+                wallets,
+                wallet -> onEditWallet(wallet),
+                wallet -> onDeleteWallet(wallet)
+        );
+        rvWallets.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rvWallets.setAdapter(walletAdapter);
+        rvWallets.setNestedScrollingEnabled(false);
+
+        // Expense Categories RV with custom CategoryManagement Adapter
+
         expenseCategoriesAdapter = new CategoryManagementAdapter(
                 requireContext(),
                 expenseCategories,
                 category -> onEditCategory(category),
                 category -> onDeleteCategory(category, true)
         );
+
         rvExpenseCategories.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvExpenseCategories.setAdapter(expenseCategoriesAdapter);
         rvExpenseCategories.setNestedScrollingEnabled(false);
 
-        // Income Categories Adapter
+        // Income Categories RV with custom CategoryManagement Adapter
         incomeCategoriesAdapter = new CategoryManagementAdapter(
                 requireContext(),
                 incomeCategories,
@@ -90,23 +106,61 @@ public class CategoriesFragment extends Fragment {
         rvIncomeCategories.setAdapter(incomeCategoriesAdapter);
         rvIncomeCategories.setNestedScrollingEnabled(false);
 
-        // Wallets Adapter
-        walletAdapter = new WalletManagementAdapter(
-                requireContext(),
-                wallets,
-                wallet -> onEditWallet(wallet),
-                wallet -> onDeleteWallet(wallet)
-        );
-        rvWallets.setLayoutManager(new LinearLayoutManager(requireContext()));
-        rvWallets.setAdapter(walletAdapter);
-        rvWallets.setNestedScrollingEnabled(false);
     }
 
     private void setupListeners() {
-        btnAddWallet.setOnClickListener(v -> showAddWalletDialog());
-        btnAddCategory.setOnClickListener(v -> showAddCategoryDialog());
+        btnAddWallet.setOnClickListener(v -> onAddWallet());
+        btnAddCategory.setOnClickListener(v -> onAddCategory());
     }
 
+    //Calling Dialogs from the Management Dialogs
+    private void onAddCategory() {
+        // The dialog itself decides income/expense → we just pass a dummy flag
+        CategoryWalletManager.callAddCategoryDialog(
+                requireContext(),
+                viewModel,
+                true,          // flag is ignored inside the manager
+                null);
+    }
+
+    private void onEditCategory(Category category) {
+        CategoryWalletManager.callEditCategoryDialog(
+                requireContext(),
+                category,
+                viewModel,
+                null);
+    }
+
+    private void onDeleteCategory(Category category, boolean isExpense) {
+        CategoryWalletManager.callDeleteCategoryDialog(
+                requireContext(),
+                category,
+                isExpense,
+                viewModel,
+                null);
+    }
+
+    private void onAddWallet() {
+        CategoryWalletManager.callAddWalletDialog( requireContext(), viewModel, getViewLifecycleOwner(), null);
+    }
+    private void onEditWallet(Wallet wallet) {
+        CategoryWalletManager.callEditWalletDialog(
+                requireContext(),
+                wallet,
+                viewModel,
+                null);
+    }
+
+    private void onDeleteWallet(Wallet wallet) {
+        CategoryWalletManager.callDeleteWalletDialog(
+                requireContext(),
+                wallet,
+                viewModel,
+                null);
+    }
+
+
+    //Live Data Observers
     private void observeCategories() {
         viewModel.getExpenseCategories().observe(getViewLifecycleOwner(), categories -> {
             if (categories != null) {
@@ -126,67 +180,6 @@ public class CategoriesFragment extends Fragment {
             if (walletList != null) {
                 walletAdapter.updateWallets(walletList);
             }
-        });
-    }
-
-    private void showAddCategoryDialog() {
-        CategoryWalletDialog.showAddCategoryDialog(requireContext(), (categoryName, isIncome) -> {
-            Category newCategory = isIncome ?
-                    viewModel.addIncomeCategory(categoryName, R.color.category_orange, android.R.drawable.ic_dialog_info) :
-                    viewModel.addExpenseCategory(categoryName, R.color.category_orange, android.R.drawable.ic_dialog_info);
-
-            if (newCategory != null) {
-                Toast.makeText(requireContext(), "Category added: " + categoryName, Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(requireContext(), "Category already exists", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void onEditCategory(Category category) {
-        CategoryWalletDialog.showEditCategoryDialog(requireContext(), category, () -> {
-            viewModel.updateCategory(category);
-        });
-    }
-
-    private void onDeleteCategory(Category category, boolean isExpense) {
-        List<Category> categoryList = isExpense ?
-                viewModel.getExpenseCategories().getValue() :
-                viewModel.getIncomeCategories().getValue();
-
-        if (categoryList == null) {
-            categoryList = new ArrayList<>();
-        }
-
-        CategoryWalletDialog.showDeleteCategoryDialog(requireContext(), category, categoryList, () -> {
-            viewModel.deleteCategory(category);
-        });
-    }
-
-    private void onEditWallet(Wallet wallet) {
-        CategoryWalletDialog.showEditWalletDialog(requireContext(), wallet, () -> {
-            viewModel.updateWallet(wallet);
-        });
-    }
-
-    private void onDeleteWallet(Wallet wallet) {
-        List<Wallet> walletList = viewModel.getWallets().getValue();
-        if (walletList == null) {
-            walletList = new ArrayList<>();
-        }
-
-        CategoryWalletDialog.showDeleteWalletDialog(requireContext(), wallet, walletList, () -> {
-            viewModel.deleteWallet(wallet);
-        });
-    }
-
-    private void showAddWalletDialog() {
-        int userId = viewModel.getCurrentUser().getValue().getUserId();
-
-        CategoryWalletDialog.showAddWalletDialog(requireContext(), userId, wallet -> {
-            List<Wallet> currentWallets = new ArrayList<>(viewModel.getAllWallets());
-            currentWallets.add(wallet);
-            viewModel.addWalletDirect(currentWallets);
         });
     }
 }

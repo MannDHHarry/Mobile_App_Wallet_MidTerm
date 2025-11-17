@@ -1,7 +1,4 @@
-package y3.mobiledev.mywallet.Models;
-
-import android.os.Parcel;
-import android.os.Parcelable;
+package y3.mobiledev.mywallet.models;
 
 public class Wallet {
     private int walletId;

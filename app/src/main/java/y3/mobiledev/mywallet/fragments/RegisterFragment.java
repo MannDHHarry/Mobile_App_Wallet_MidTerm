@@ -1,4 +1,4 @@
-package y3.mobiledev.mywallet.Fragments;
+package y3.mobiledev.mywallet.fragments;
 
 
 import android.os.Bundle;
