@@ -21,6 +21,7 @@ import y3.mobiledev.mywallet.helpers.CategoryWalletManager;
 import y3.mobiledev.mywallet.helpers.DateManager;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
+import y3.mobiledev.mywallet.models.TransactionWithCategory;
 import y3.mobiledev.mywallet.models.Wallet;
 import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.TransactionViewModel;
@@ -110,9 +111,7 @@ public class HomeFragment extends Fragment {
 
     //Data Observation in Live Data
     private void observeData() {
-
         viewModel.getWallets().observe(getViewLifecycleOwner(), wallets -> {
-
             if (wallets == null || wallets.isEmpty()) {
                 displayedWallets.clear();
                 walletAdapter.updateWallets(displayedWallets);
@@ -121,7 +120,6 @@ public class HomeFragment extends Fragment {
             }
 
             displayedWallets.clear();
-
             for (int i = 0; i < Math.min(MAX_INITIAL_WALLETS, wallets.size()); i++) {
                 displayedWallets.add(wallets.get(i));
             }
@@ -131,6 +129,7 @@ public class HomeFragment extends Fragment {
             updateBalanceCard();
         });
 
+        // ✅ CHANGED - Observe TransactionGroups from ViewModel
         viewModel.getTransactionGroups().observe(getViewLifecycleOwner(), groups -> {
             transactionAdapter.updateTransactions(groups);
             updateTransactionVisibility(groups);
@@ -138,37 +137,62 @@ public class HomeFragment extends Fragment {
         });
     }
 
-  // Balance Card Amounts
+    // ✅ UPDATED - Now works with TransactionWithCategory
     private void updateBalanceCard() {
         List<Wallet> wallets = viewModel.getWallets().getValue();
-        List<TransactionGroup> groups = viewModel.getTransactionGroups().getValue();
+
         double totalBalance = 0;
         if (wallets != null) {
             for (Wallet wallet : wallets) {
                 totalBalance += wallet.getBalance();
             }
         }
+
         double totalIncome = 0;
         double totalExpense = 0;
         Calendar firstDayOfMonth = DateManager.getTodayMidnight();
         firstDayOfMonth.set(Calendar.DAY_OF_MONTH, 1);
+
+        // ✅ Get transaction groups and calculate income/expense
+        List<TransactionGroup> groups = viewModel.getTransactionGroups().getValue();
         if (groups != null) {
             for (TransactionGroup group : groups) {
-                for (Transaction transaction : group.getTransactions()) {
-                    if (transaction.getDate().after(firstDayOfMonth.getTime())) {
-                        if (transaction.isExpense()) {
-                            totalExpense += transaction.getAmount();
+                for (Object transaction : group.getTransactions()) {
+                    // Handle both Transaction and TransactionWithCategory
+                    long transactionDate;
+                    boolean isExpense;
+                    double amount;
+
+                    if (transaction instanceof TransactionWithCategory) {
+                        TransactionWithCategory twc = (TransactionWithCategory) transaction;
+                        transactionDate = twc.getDate();
+                        isExpense = twc.isExpense();
+                        amount = twc.getAmount();
+                    } else {
+                        // Fallback for regular Transaction
+                        y3.mobiledev.mywallet.models.Transaction t =
+                                (y3.mobiledev.mywallet.models.Transaction) transaction;
+                        transactionDate = t.getDate();
+                        isExpense = t.isExpense();
+                        amount = t.getAmount();
+                    }
+
+                    if (new Date(transactionDate).after(firstDayOfMonth.getTime())) {
+                        if (isExpense) {
+                            totalExpense += amount;
                         } else {
-                            totalIncome += transaction.getAmount();
+                            totalIncome += amount;
                         }
                     }
                 }
             }
         }
+
         tvTotalBalance.setText(String.format(Locale.US, "$%,.2f", totalBalance));
         tvIncome.setText(String.format(Locale.US, "$%,.0f", totalIncome));
         tvExpense.setText(String.format(Locale.US, "$%,.0f", totalExpense));
     }
+
 
     private void updateTimePeriod() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_MONTH_YEAR, Locale.US);

@@ -28,8 +28,10 @@ import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
 import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.TransactionViewModel;
+import y3.mobiledev.mywallet.models.TransactionWithCategory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -180,28 +182,31 @@ public class TransactionHistoryFragment extends Fragment {
     }
 
     private void applyFilters() {
-        List<Transaction> transactions = viewModel.getTransactions().getValue();
+        List<TransactionWithCategory> transactions = viewModel.getTransactionsWithCategory().getValue();
         if (transactions == null) {
             transactionAdapter.updateTransactions(new ArrayList<>());
             return;
         }
-        List<Transaction> filtered = new ArrayList<>(transactions);
+
+        List<TransactionWithCategory> filtered = new ArrayList<>(transactions);
 
         // Filter by search text
         if (!currentSearchText.isEmpty()) {
-            filtered.removeIf(t -> !t.getCategory().toLowerCase().contains(currentSearchText) &&
-                    !t.getDescription().toLowerCase().contains(currentSearchText) &&
-                    !String.format(Locale.US, "%.2f", t.getAmount()).contains(currentSearchText));
+            filtered.removeIf(t ->
+                    !t.getCategoryName().toLowerCase().contains(currentSearchText) &&
+                            !t.getDescription().toLowerCase().contains(currentSearchText) &&
+                            !String.format(Locale.US, "%.2f", t.getAmount()).contains(currentSearchText)
+            );
         }
 
         // Filter by date range
         if (!currentDateFilter.equals("All Time")) {
-            filtered.removeIf(t -> !DateManager.isWithinDateRange(t.getDate(), currentDateFilter));
+            filtered.removeIf(t -> !DateManager.isWithinDateRange(new Date(t.getDate()), currentDateFilter));
         }
 
         // Filter by category
         if (!currentCategoryFilter.equals("All Categories")) {
-            filtered.removeIf(t -> !t.getCategory().equals(currentCategoryFilter));
+            filtered.removeIf(t -> !t.getCategoryName().equals(currentCategoryFilter));
         }
 
         // Filter by payment type
@@ -210,9 +215,11 @@ public class TransactionHistoryFragment extends Fragment {
             filtered.removeIf(t -> t.isExpense() != isExpenseFilter);
         }
 
-        List<TransactionGroup> filteredGroups = TransactionManager.groupTransactionsByDate(filtered);
+
+        List<TransactionGroup> filteredGroups = TransactionManager.groupByDateRich(filtered);
         transactionAdapter.updateTransactions(filteredGroups);
     }
+
 
     private void onTransactionClick(Transaction transaction) {
         Toast.makeText(requireContext(), "Clicked: " + transaction.getCategory(), Toast.LENGTH_SHORT).show();
@@ -221,6 +228,10 @@ public class TransactionHistoryFragment extends Fragment {
 
     //Observing Live Datas
     private void observeData() {
-        viewModel.getTransactions().observe(getViewLifecycleOwner(), transactions -> applyFilters());
+        viewModel.getTransactionsWithCategory().observe(getViewLifecycleOwner(), transactions -> applyFilters());
+        //viewModel.getTransactionGroups().observe(getViewLifecycleOwner(), groups -> applyFilters());
     }
+
+
+
 }

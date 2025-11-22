@@ -15,9 +15,7 @@ import y3.mobiledev.mywallet.TransactionViewModel;
 
 public final class CategoryWalletManager {
 
-    private CategoryWalletManager() {}
-
-    /* -------------------  ADD WALLET ------------------- */
+   //------Wallet Related Operations still don't have edit balance yet
     public static void callAddWalletDialog(
             Context ctx,
             TransactionViewModel vm,
@@ -27,72 +25,13 @@ public final class CategoryWalletManager {
         int userId = vm.getCurrentUser().getValue().getUserId();
 
         PickersAndDialog.showAddWalletDialog(ctx, userId, wallet -> {
-            List<Wallet> all = new ArrayList<>(vm.getAllWallets());
-            all.add(wallet);
-            vm.addWalletDirect(all);
+            // ✅ UPDATED - Use new ViewModel method
+            vm.addWallet(wallet.getName(), wallet.getIconResId(), wallet.getBalance());
             toast(ctx, "Wallet created successfully!");
             if (onAdded != null) onAdded.run();
         });
     }
 
-    /* -------------------  ADD CATEGORY ------------------- */
-    public static void callAddCategoryDialog(
-            Context ctx,
-            TransactionViewModel vm,
-            boolean isIncome,
-            Runnable onAdded) {
-
-        PickersAndDialog.showAddCategoryDialog(ctx, (name, incomeFlag) -> {
-            // incomeFlag comes from the dialog – we ignore the outer flag if you want the dialog to decide
-            Category c = incomeFlag
-                    ? vm.addIncomeCategory(name, R.color.category_orange, android.R.drawable.ic_dialog_info)
-                    : vm.addExpenseCategory(name, R.color.category_orange, android.R.drawable.ic_dialog_info);
-
-            if (c != null) {
-                toast(ctx, "Category added: " + name);
-                if (onAdded != null) onAdded.run();
-            } else {
-                toast(ctx, "Category already exists");
-            }
-        });
-    }
-
-    /* -------------------  EDIT CATEGORY ------------------- */
-    public static void callEditCategoryDialog(
-            Context ctx,
-            Category category,
-            TransactionViewModel vm,
-            Runnable onUpdated) {
-
-        PickersAndDialog.showEditCategoryDialog(ctx, category, () -> {
-            vm.updateCategory(category);
-            toast(ctx, "Category updated");
-            if (onUpdated != null) onUpdated.run();
-        });
-    }
-
-    /* -------------------  DELETE CATEGORY ------------------- */
-    public static void callDeleteCategoryDialog(
-            Context ctx,
-            Category category,
-            boolean isExpense,
-            TransactionViewModel vm,
-            Runnable onDeleted) {
-
-        List<Category> list = isExpense
-                ? vm.getExpenseCategories().getValue()
-                : vm.getIncomeCategories().getValue();
-
-        if (list == null) list = new ArrayList<>();
-
-        PickersAndDialog.showDeleteCategoryDialog(ctx, category, list, () -> {
-            vm.deleteCategory(category);
-            toast(ctx, "Category deleted");
-            if (onDeleted != null) onDeleted.run();
-        });
-    }
-
-    /* -------------------  EDIT WALLET ------------------- */
     public static void callEditWalletDialog(
             Context ctx,
             Wallet wallet,
@@ -106,7 +45,6 @@ public final class CategoryWalletManager {
         });
     }
 
-    /* -------------------  DELETE WALLET ------------------- */
     public static void callDeleteWalletDialog(
             Context ctx,
             Wallet wallet,
@@ -116,14 +54,96 @@ public final class CategoryWalletManager {
         List<Wallet> list = vm.getWallets().getValue();
         if (list == null) list = new ArrayList<>();
 
+        // Check if it's the last wallet
+        if (list.size() <= 1) {
+            toast(ctx, "Cannot delete the last wallet. Create another wallet first.");
+            return;
+        }
+
         PickersAndDialog.showDeleteWalletDialog(ctx, wallet, list, () -> {
-            vm.deleteWallet(wallet);
-            toast(ctx, "Wallet deleted");
-            if (onDeleted != null) onDeleted.run();
+            // ✅ UPDATED - deleteWallet now returns boolean
+            boolean deleted = vm.deleteWallet(wallet);
+            if (deleted) {
+                toast(ctx, "Wallet deleted");
+                if (onDeleted != null) onDeleted.run();
+            } else {
+                toast(ctx, "Cannot delete wallet");
+            }
         });
     }
 
-    /* -------------------  TOAST ------------------- */
+
+    /* -------------------  ADD CATEGORY ------------------- */
+    public static void callAddCategoryDialog(
+            Context ctx,
+            TransactionViewModel vm,
+            boolean isIncome,
+            Runnable onAdded) {
+
+        PickersAndDialog.showAddCategoryDialog(ctx, (name, incomeFlag) -> {
+            // UPDATED - Use new ViewModel methods that return Long
+            Long categoryId = incomeFlag
+                    ? vm.addIncomeCategory(name, android.R.drawable.ic_dialog_info, R.color.category_green)
+                    : vm.addExpenseCategory(name, android.R.drawable.ic_dialog_info, R.color.category_orange);
+
+            if (categoryId != null && categoryId > 0) {
+                toast(ctx, "Category added: " + name);
+                if (onAdded != null) onAdded.run();
+            } else {
+                toast(ctx, "Category already exists or failed to create");
+            }
+        });
+    }
+
+    public static void callEditCategoryDialog(
+            Context ctx,
+            Category category,
+            TransactionViewModel vm,
+            Runnable onUpdated) {
+
+        PickersAndDialog.showEditCategoryDialog(ctx, category, () -> {
+            // ✅ Same - updateCategory still works
+            vm.updateCategory(category);
+            toast(ctx, "Category updated");
+            if (onUpdated != null) onUpdated.run();
+        });
+    }
+
+    public static void callDeleteCategoryDialog(
+            Context ctx,
+            Category category,
+            boolean isExpense,
+            TransactionViewModel vm,
+            Runnable onDeleted) {
+
+        // Get active categories (non-archived)
+        List<Category> list = isExpense
+                ? vm.getExpenseCategories().getValue()
+                : vm.getIncomeCategories().getValue();
+
+        if (list == null) list = new ArrayList<>();
+
+        // Check if category has transactions first
+        int transactionCount = vm.getCategoryTransactionCount(category.getCategoryId());
+
+        if (transactionCount > 0) {
+            // Category has transactions - show archive confirmation
+            PickersAndDialog.showArchiveCategoryDialog(ctx, category, transactionCount, () -> {
+                // Archive instead of delete
+                vm.archiveCategory(category.getCategoryId());
+                toast(ctx, "Category archived (transaction history preserved)");
+                if (onDeleted != null) onDeleted.run();
+            });
+        } else {
+            // No transactions - safe to delete
+            PickersAndDialog.showDeleteCategoryDialog(ctx, category, list, () -> {
+                vm.deleteCategory(category.getCategoryId());
+                toast(ctx, "Category deleted");
+                if (onDeleted != null) onDeleted.run();
+            });
+        }
+    }
+
     private static void toast(Context ctx, String msg) {
         Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
     }

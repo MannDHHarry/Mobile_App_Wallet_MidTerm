@@ -233,6 +233,25 @@ public class PickersAndDialog {
         builder.show();
     }
 
+    public static void showArchiveCategoryDialog(
+            Context context,
+            Category category,
+            int transactionCount,
+            Runnable onConfirmed) {
+
+        new AlertDialog.Builder(context)
+                .setTitle("Archive Category?")
+                .setMessage(category.getName() + " has " + transactionCount +
+                        " transaction(s). Archiving will hide it from selection but preserve your transaction history.\n\n" +
+                        "Continue?")
+                .setPositiveButton("Archive", (dialog, which) -> {
+                    if (onConfirmed != null) onConfirmed.run();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+
 
 
     // ===== WALLET OPERATIONS =====

@@ -131,24 +131,24 @@ public class AddTransactionFragment extends Fragment {
             return;
         }
 
-        int userId = viewModel.getCurrentUser().getValue().getUserId();
-        String notes = TransactionManager.truncateToWords(etNotes.getText().toString().trim(), MAX_NOTE_WORDS,false);
-        int newId = (int) System.currentTimeMillis();
+        String notes = TransactionManager.truncateToWords(etNotes.getText().toString().trim(), MAX_NOTE_WORDS, false);
 
-        Transaction newTransaction = new Transaction(
-                newId, userId, selectedCategory.getName(), notes, amount,
-                selectedDate, isExpense, android.R.drawable.ic_dialog_info, selectedCategory.getColorResId()
+        // Call the addTransaction from View Model
+        viewModel.addTransaction(
+                selectedWallet.getWalletId(),
+                selectedCategory.getCategoryId(),  // ← Now using categoryId instead of name
+                notes,
+                amount,
+                selectedDate.getTime(),  // ← Convert Date to long timestamp
+                isExpense
         );
 
-        viewModel.addTransaction(newTransaction);
-        viewModel.updateWalletBalance(selectedWallet.getWalletId(), amount, isExpense);
 
         Toast.makeText(requireContext(), "Transaction saved!", Toast.LENGTH_SHORT).show();
         getParentFragmentManager().popBackStack();
     }
 
     //Three Pickers Category , Wallet and Date
-
     private void onCategoryPicker() {
         List<Category> categoriesToShow = isExpense ?
                 viewModel.getExpenseCategories().getValue() :
@@ -221,8 +221,12 @@ public class AddTransactionFragment extends Fragment {
                 viewModel,
                 getViewLifecycleOwner(),
                 () -> {
-                    selectedWallet = viewModel.getAllWallets().get(viewModel.getAllWallets().size() - 1);
-                    tvSelectedWallet.setText(selectedWallet.getName());
+                    // After wallet is added, observe LiveData to get the new wallet
+                    List<Wallet> currentWallets = wallets;
+                    if (currentWallets != null && !currentWallets.isEmpty()) {
+                        selectedWallet = currentWallets.get(currentWallets.size() - 1);
+                        tvSelectedWallet.setText(selectedWallet.getName());
+                    }
                 });
     }
 

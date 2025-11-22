@@ -28,10 +28,8 @@ public class LoginFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-
         viewModel = new ViewModelProvider(requireActivity()).get(AuthViewModel.class);
 
         initViews(view);
@@ -52,30 +50,74 @@ public class LoginFragment extends Fragment {
     private void setupListeners() {
         btnLogin.setOnClickListener(v -> performLogin());
         tvRegister.setOnClickListener(v -> navigateToRegister());
+
+        // Clear error when user starts typing
+        etEmail.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.clearError();
+            }
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+
+        etPassword.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.clearError();
+            }
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
     }
 
     private void observeViewModel() {
+        // Observe loading state
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-            btnLogin.setEnabled(!isLoading);
+            if (isLoading != null) {
+                progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+                btnLogin.setEnabled(!isLoading);
+                etEmail.setEnabled(!isLoading);
+                etPassword.setEnabled(!isLoading);
+            }
         });
 
+        // Observe error messages
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
                 Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Note: Login success navigation is handled in AuthActivity
     }
 
     private void performLogin() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+        // Basic client-side validation
+        if (email.isEmpty()) {
+            etEmail.setError("Email is required");
+            etEmail.requestFocus();
             return;
         }
 
+        if (password.isEmpty()) {
+            etPassword.setError("Password is required");
+            etPassword.requestFocus();
+            return;
+        }
+
+        // Clear errors
+        etEmail.setError(null);
+        etPassword.setError(null);
+
+        // Perform login (validation happens in ViewModel)
         viewModel.login(email, password);
     }
 
@@ -85,5 +127,12 @@ public class LoginFragment extends Fragment {
                 .replace(R.id.fragmentContainer, new RegisterFragment())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Clear any error messages when leaving the screen
+        viewModel.clearError();
     }
 }

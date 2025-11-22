@@ -1,54 +1,68 @@
 package y3.mobiledev.mywallet.helpers;
 
+import android.util.Log;
+
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
+import y3.mobiledev.mywallet.models.TransactionWithCategory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class TransactionManager {
 
-    public static List<TransactionGroup> groupTransactionsByDate(List<Transaction> transactions) {
-        List<Transaction> todayTransactions = new ArrayList<>();
-        List<Transaction> yesterdayTransactions = new ArrayList<>();
-        List<Transaction> earlierTransactions = new ArrayList<>();
+    public static final String TAG = "TRANSACTION_DEBUG";
 
-        for (Transaction transaction : transactions) {
-            String groupHeader = DateManager.getGroupHeader(transaction.getDate());
-            switch (groupHeader) {
+    public static List<TransactionGroup> groupTransactionsByDate(List<Transaction> transactions) {
+        Log.e(TAG, "OLD BROKEN METHOD CALLED — THIS SHOULD NOT HAPPEN!");
+        return new ArrayList<>(); // force empty
+    }
+
+
+    public static List<TransactionGroup> groupByDateRich(List<TransactionWithCategory> transactions) {
+
+        Log.e(TAG, "groupByDateRich CALLED — CORRECT METHOD! Count: "
+                + (transactions != null ? transactions.size() : "NULL"));
+        if (transactions == null || transactions.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+
+        List<TransactionWithCategory> today = new ArrayList<>();
+        List<TransactionWithCategory> yesterday = new ArrayList<>();
+        List<TransactionWithCategory> earlier = new ArrayList<>();
+
+        for (TransactionWithCategory t : transactions) {
+            String header = DateManager.getGroupHeader(new Date(t.getDate()));
+            switch (header) {
                 case "Today":
-                    todayTransactions.add(transaction);
+                    today.add(t);
                     break;
                 case "Yesterday":
-                    yesterdayTransactions.add(transaction);
+                    yesterday.add(t);
                     break;
                 case "Earlier":
-                    earlierTransactions.add(transaction);
+                    earlier.add(t);
                     break;
             }
         }
 
-        // Sort transactions within each group by date (newest first)
-        Comparator<Transaction> dateComparator = (t1, t2) -> t2.getDate().compareTo(t1.getDate());
-        todayTransactions.sort(dateComparator);
-        yesterdayTransactions.sort(dateComparator);
-        earlierTransactions.sort(dateComparator);
+        // Sort newest first
+        Comparator<TransactionWithCategory> desc = (a, b) -> Long.compare(b.getDate(), a.getDate());
+        today.sort(desc);
+        yesterday.sort(desc);
+        earlier.sort(desc);
 
         List<TransactionGroup> groups = new ArrayList<>();
-        if (!todayTransactions.isEmpty()) {
-            groups.add(new TransactionGroup("Today", todayTransactions));
-        }
-        if (!yesterdayTransactions.isEmpty()) {
-            groups.add(new TransactionGroup("Yesterday", yesterdayTransactions));
-        }
-        if (!earlierTransactions.isEmpty()) {
-            groups.add(new TransactionGroup("Earlier", earlierTransactions));
-        }
+        if (!today.isEmpty())     groups.add(new TransactionGroup("Today", today));
+        if (!yesterday.isEmpty()) groups.add(new TransactionGroup("Yesterday", yesterday));
+        if (!earlier.isEmpty())   groups.add(new TransactionGroup("Earlier", earlier));
 
+        Log.e(TAG, "groupByDateRich returning " + groups.size() + " groups");
         return groups;
     }
-
     public static String truncateToWords(String text, int maxWords, boolean addEllipsis) {
         if (text == null || text.isEmpty()) {
             return text;
@@ -70,34 +84,5 @@ public class TransactionManager {
 
 
 
-    public static void addTransactionToGroups(Transaction newTransaction, List<TransactionGroup> transactionGroups) {
-        String groupHeader = DateManager.getGroupHeader(newTransaction.getDate());
 
-        TransactionGroup targetGroup = null;
-        for (TransactionGroup group : transactionGroups) {
-            if (group.getHeader().equals(groupHeader)) {
-                targetGroup = group;
-                break;
-            }
-        }
-
-        if (targetGroup == null) {
-            List<Transaction> newList = new ArrayList<>();
-            newList.add(newTransaction);
-            targetGroup = new TransactionGroup(groupHeader, newList);
-            if (groupHeader.equals("Today")) {
-                transactionGroups.add(0, targetGroup);
-            } else if (groupHeader.equals("Yesterday")) {
-                int insertIndex = transactionGroups.stream()
-                        .anyMatch(g -> g.getHeader().equals("Today")) ? 1 : 0;
-                transactionGroups.add(insertIndex, targetGroup);
-            } else {
-                transactionGroups.add(targetGroup);
-            }
-        } else {
-            targetGroup.getTransactions().add(newTransaction);
-            // Re-sort group to maintain newest-first order
-            targetGroup.getTransactions().sort((t1, t2) -> t2.getDate().compareTo(t1.getDate()));
-        }
-    }
 }

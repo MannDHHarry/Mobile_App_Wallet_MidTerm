@@ -4,9 +4,9 @@ import java.util.List;
 
 public class TransactionGroup {
     private String header; // "Today", "Yesterday", "Earlier"
-    private List<Transaction> transactions;
+    private List<TransactionWithCategory> transactions;
 
-    public TransactionGroup(String header, List<Transaction> transactions) {
+    public TransactionGroup(String header, List<TransactionWithCategory> transactions) {
         this.header = header;
         this.transactions = transactions;
     }
@@ -15,7 +15,7 @@ public class TransactionGroup {
         return header;
     }
 
-    public List<Transaction> getTransactions() {
+    public List<TransactionWithCategory> getTransactions() {
         return transactions;
     }
 
@@ -23,7 +23,7 @@ public class TransactionGroup {
         this.header = header;
     }
 
-    public void setTransactions(List<Transaction> transactions) {
+    public void setTransactions(List<TransactionWithCategory> transactions) {
         this.transactions = transactions;
     }
 }

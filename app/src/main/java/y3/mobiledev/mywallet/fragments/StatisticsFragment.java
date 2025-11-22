@@ -22,14 +22,17 @@ import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import y3.mobiledev.mywallet.Converters;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
+import y3.mobiledev.mywallet.models.TransactionWithCategory;
 import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.TransactionViewModel;
 
@@ -69,7 +72,6 @@ public class StatisticsFragment extends Fragment {
         rbExpense = view.findViewById(R.id.rbExpense);
         rbIncome = view.findViewById(R.id.rbIncome);
 
-        // Month navigation only
         btnPreviousMonth = view.findViewById(R.id.btnPreviousMonth);
         btnNextMonth = view.findViewById(R.id.btnNextMonth);
         tvMonthYear = view.findViewById(R.id.tvMonthYear);
@@ -99,12 +101,10 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void setupDatePickers() {
-        // Initialize current month
         currentMonthCalendar = Calendar.getInstance();
         setCurrentMonthDates();
         updateMonthDisplay();
 
-        // Previous month button
         btnPreviousMonth.setOnClickListener(v -> {
             currentMonthCalendar.add(Calendar.MONTH, -1);
             setCurrentMonthDates();
@@ -112,7 +112,6 @@ public class StatisticsFragment extends Fragment {
             observeData();
         });
 
-        // Next month button
         btnNextMonth.setOnClickListener(v -> {
             currentMonthCalendar.add(Calendar.MONTH, 1);
             setCurrentMonthDates();
@@ -140,6 +139,7 @@ public class StatisticsFragment extends Fragment {
         tvMonthYear.setText(format.format(currentMonthCalendar.getTime()));
     }
 
+    // Observe TransactionGroups
     private void observeData() {
         viewModel.getTransactionGroups().observe(getViewLifecycleOwner(), groups -> {
             if (groups != null) {
@@ -183,14 +183,12 @@ public class StatisticsFragment extends Fragment {
             totalAmount += amount;
         }
 
-        // Update summary title with current month
         SimpleDateFormat format = new SimpleDateFormat("MMMM yyyy", Locale.US);
         String dateRange = "(" + format.format(currentMonthCalendar.getTime()) + ")";
 
         tvSummaryTitle.setText((isExpense ? "Expense" : "Income") + " Summary " + dateRange);
         tvTotalAmount.setText(String.format(Locale.US, "Total: Rs. %.2f", totalAmount));
 
-        // Build category breakdown
         if (totalAmount == 0) {
             tvCategoryBreakdown.setText("No transactions in this period");
             return;
@@ -206,24 +204,47 @@ public class StatisticsFragment extends Fragment {
         tvCategoryBreakdown.setText(breakdown.toString());
     }
 
+    // Helper that calculate the amount for each category
     private Map<String, Float> calculateCategoryAmounts(List<TransactionGroup> groups) {
         Map<String, Float> categoryAmounts = new HashMap<>();
         long startTime = startDate.getTimeInMillis();
         long endTime = endDate.getTimeInMillis();
 
         for (TransactionGroup group : groups) {
-            for (Transaction transaction : group.getTransactions()) {
-                long transactionTime = transaction.getDate().getTime();
+            for (Object transactionObj : group.getTransactions()) {
+
+                // Handle both Transaction and TransactionWithCategory
+                String category;
+                double amount;
+                long transactionTime;
+                boolean isTransactionExpense;
+
+                if (transactionObj instanceof TransactionWithCategory) {
+                    TransactionWithCategory twc = (TransactionWithCategory) transactionObj;
+                    category = twc.getCategoryName();
+                    amount = twc.getAmount();
+                    transactionTime = twc.getDate(); // Already a long
+                    isTransactionExpense = twc.isExpense();
+
+                } else if (transactionObj instanceof Transaction) {
+                    Transaction transaction = (Transaction) transactionObj;
+                    category = transaction.getCategory();
+                    amount = transaction.getAmount();
+                    transactionTime = transaction.getDate(); // Already a long
+                    isTransactionExpense = transaction.isExpense();
+
+                } else {
+                    continue; // Skip unknown types
+                }
 
                 // Filter by expense type and date range
-                if (transaction.isExpense() == isExpense &&
+                if (isTransactionExpense == isExpense &&
                         transactionTime >= startTime &&
                         transactionTime <= endTime) {
 
-                    String category = transaction.getCategory();
-                    float amount = (float) transaction.getAmount();
+                    float floatAmount = (float) amount;
                     categoryAmounts.put(category,
-                            categoryAmounts.getOrDefault(category, 0f) + amount);
+                            categoryAmounts.getOrDefault(category, 0f) + floatAmount);
                 }
             }
         }

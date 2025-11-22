@@ -1,12 +1,23 @@
 package y3.mobiledev.mywallet;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import y3.mobiledev.mywallet.models.User;
+import y3.mobiledev.mywallet.repository.UserRepository;
 
-public class AuthViewModel extends ViewModel {
+public class AuthViewModel extends AndroidViewModel {
+
+    private UserRepository userRepository;
+    private final ExecutorService executorService;
+
     private final MutableLiveData<User> currentUser = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoggedIn = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
@@ -16,9 +27,13 @@ public class AuthViewModel extends ViewModel {
     private static User staticUser = null;
     private static boolean staticLoggedIn = false;
 
-    private int nextUserId = 100;
+    public AuthViewModel(@NonNull Application application) {
+        super(application);
 
-    public AuthViewModel() {
+        // Initialize repository
+        userRepository = new UserRepository(application);
+        executorService = Executors.newSingleThreadExecutor();
+
         // Restore from static holder
         if (staticUser != null) {
             currentUser.setValue(staticUser);
@@ -26,50 +41,106 @@ public class AuthViewModel extends ViewModel {
         }
     }
 
+    // Getters
     public LiveData<User> getCurrentUser() { return currentUser; }
     public LiveData<Boolean> getIsLoggedIn() { return isLoggedIn; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
     public LiveData<Boolean> getIsLoading() { return isLoading; }
 
+    // User Log In
     public void login(String email, String password) {
         isLoading.setValue(true);
-
-        User user = null;
-        if (email.equals("user1@test.com") && password.equals("password")) {
-            user = new User(1, email, "Demo User", password);
-        } else if (email.equals("user2@test.com") && password.equals("password")) {
-            user = new User(2, email, "Test User", password);
-        } else {
-            errorMessage.setValue("Invalid email or password");
-            isLoading.setValue(false);
-            return;
-        }
-
-        // Save to static holder
-        staticUser = user;
-        staticLoggedIn = true;
-
-        currentUser.setValue(user);
-        isLoggedIn.setValue(true);
         errorMessage.setValue(null);
 
-        isLoading.setValue(false);
+        executorService.execute(() -> {
+            try {
+
+                if (email == null || email.trim().isEmpty()) {
+                    postError("Email cannot be empty");
+                    return;
+                }
+
+                if (password == null || password.trim().isEmpty()) {
+                    postError("Password cannot be empty");
+                    return;
+                }
+
+                // Authenticate with database
+                User user = userRepository.loginUser(email.trim(), password);
+
+                if (user != null) {
+                    // Login successful - save to static holder
+                    staticUser = user;
+                    staticLoggedIn = true;
+                    currentUser.postValue(user);
+                    isLoggedIn.postValue(true);
+                    errorMessage.postValue(null);
+                } else {
+
+                    postError("Invalid email or password");
+                }
+            } catch (Exception e) {
+                postError("Login failed: " + e.getMessage());
+            } finally {
+                isLoading.postValue(false);
+            }
+        });
     }
 
+   // Register New User
     public void register(String email, String password, String name) {
         isLoading.setValue(true);
+        errorMessage.setValue(null);
 
-        int newUserId = nextUserId++;
-        User newUser = new User(newUserId, email, name, password);
+        executorService.execute(() -> {
+            try {
+                // Validate inputs
+                if (email == null || email.trim().isEmpty()) {
+                    postError("Email cannot be empty");
+                    return;
+                }
 
-        // Save to static holder
-        staticUser = newUser;
-        staticLoggedIn = true;
+                if (password == null || password.trim().isEmpty()) {
+                    postError("Password cannot be empty");
+                    return;
+                }
 
-        currentUser.setValue(newUser);
-        isLoggedIn.setValue(true);
+                if (name == null || name.trim().isEmpty()) {
+                    postError("Name cannot be empty");
+                    return;
+                }
 
-        isLoading.setValue(false);
+                if (password.length() < 6) {
+                    postError("Password must be at least 6 characters");
+                    return;
+                }
+
+                // Check if email already exists
+                if (userRepository.checkEmailExists(email.trim())) {
+                    postError("Email already registered");
+                    return;
+                }
+
+                // Register new user and Create Default Categories for this User
+                User newUser = userRepository.registerUser(email.trim(), name.trim(), password);
+
+                if (newUser != null) {
+                    // Registration successful - save to static holder
+                    staticUser = newUser;
+                    staticLoggedIn = true;
+
+                    currentUser.postValue(newUser);
+                    isLoggedIn.postValue(true);
+                    errorMessage.postValue(null);
+                } else {
+                    postError("Registration failed. Please try again.");
+                }
+            } catch (Exception e) {
+                postError("Registration failed: " + e.getMessage());
+            } finally {
+                isLoading.postValue(false);
+            }
+        });
     }
 
     public void logout() {
@@ -80,5 +151,21 @@ public class AuthViewModel extends ViewModel {
         currentUser.setValue(null);
         isLoggedIn.setValue(false);
         errorMessage.setValue(null);
+    }
+
+    public void clearError() {
+        errorMessage.setValue(null);
+    }
+
+    //Helpers
+    private void postError(String message) {
+        errorMessage.postValue(message);
+        isLoading.postValue(false);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        executorService.shutdown();
     }
 }

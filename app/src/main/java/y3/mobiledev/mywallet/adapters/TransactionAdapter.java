@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import y3.mobiledev.mywallet.Converters;
 import y3.mobiledev.mywallet.helpers.TransactionManager;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
+import y3.mobiledev.mywallet.models.TransactionWithCategory;
 import y3.mobiledev.mywallet.R;
-
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -65,7 +66,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         throw new IllegalArgumentException("Invalid position " + position + " in TransactionAdapter");
     }
 
-
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -74,7 +74,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             return new HeaderViewHolder(view);
         } else {
             View view = LayoutInflater.from(context).inflate(R.layout.item_transaction, parent, false);
-            return new TransactionViewHolder(view,listener);
+            return new TransactionViewHolder(view, listener);
         }
     }
 
@@ -88,9 +88,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
         } else if (holder instanceof TransactionViewHolder) {
             TransactionViewHolder transactionHolder = (TransactionViewHolder) holder;
-            Transaction transaction = getTransactionForPosition(position);
-            if (transaction != null) {
-                bindTransaction(transactionHolder, transaction);
+
+            // ✅ NEW - Get transaction (could be Transaction or TransactionWithCategory)
+            Object transactionObj = getTransactionForPosition(position);
+            if (transactionObj != null) {
+                bindTransaction(transactionHolder, transactionObj);
             }
         }
     }
@@ -108,7 +110,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return count;
     }
 
-    /// ---- ViewHolder Classes ----
+    // ---- ViewHolder Classes ----
     public static class HeaderViewHolder extends RecyclerView.ViewHolder {
         TextView tvSectionHeader;
 
@@ -134,23 +136,95 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvAmount = itemView.findViewById(R.id.tvAmount);
             tvDate = itemView.findViewById(R.id.tvDate);
+
             itemView.setOnClickListener(v -> {
                 if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
-                    listener.onTransactionClick((Transaction) itemView.getTag());
+                    Object tag = itemView.getTag();
+
+                    // ✅ Handle both Transaction and TransactionWithCategory
+                    if (tag instanceof TransactionWithCategory) {
+                        listener.onTransactionClick(((TransactionWithCategory) tag).toTransaction());
+                    } else if (tag instanceof Transaction) {
+                        listener.onTransactionClick((Transaction) tag);
+                    }
                 }
             });
         }
     }
 
     // ---- Data Binding ----
-    private void bindTransaction(TransactionViewHolder holder, Transaction transaction) {
-        holder.itemView.setTag(transaction); // Store transaction for click listener
+
+    /**
+     * ✅ NEW - Handles both Transaction and TransactionWithCategory
+     */
+    private void bindTransaction(TransactionViewHolder holder, Object transactionObj) {
+        holder.itemView.setTag(transactionObj); // Store for click listener
+
+        if (transactionObj instanceof TransactionWithCategory) {
+            TransactionWithCategory twc = (TransactionWithCategory) transactionObj;
+            bindTransactionWithCategory(holder, twc);
+        } else if (transactionObj instanceof Transaction) {
+            Transaction transaction = (Transaction) transactionObj;
+            bindRegularTransaction(holder, transaction);
+        }
+    }
+
+    /**
+     * ✅ NEW - Bind TransactionWithCategory (preferred - has category details)
+     */
+    private void bindTransactionWithCategory(TransactionViewHolder holder, TransactionWithCategory twc) {
+        // Category name (from JOIN)
+        holder.tvCategory.setText(twc.getCategoryName());
+
+        // Description with truncation
+        String description = TransactionManager.truncateToWords(
+                twc.getDescription(),
+                15,
+                true
+        );
+        if (description.isEmpty()) {
+            description = "";
+        } else if (description.split("\\s+").length >= 15) {
+            description += "...";
+        }
+        holder.tvDescription.setText(description);
+
+        // Date - ✅ Use Converter to convert long to Date
+        Date transactionDate = Converters.fromTimestamp(twc.getDate());
+        holder.tvDate.setText(formatDate(transactionDate));
+
+        // Amount with color
+        String amountText;
+        if (twc.isExpense()) {
+            amountText = String.format(Locale.US, "-$%,.2f", twc.getAmount());
+            holder.tvAmount.setTextColor(ContextCompat.getColor(context, R.color.expense_red));
+        } else {
+            amountText = String.format(Locale.US, "+$%,.2f", twc.getAmount());
+            holder.tvAmount.setTextColor(ContextCompat.getColor(context, R.color.income_green));
+        }
+        holder.tvAmount.setText(amountText);
+
+        // Icon and background (from JOIN)
+        holder.ivCategoryIcon.setImageResource(twc.getCategoryIcon());
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.OVAL);
+        drawable.setColor(ContextCompat.getColor(context, twc.getCategoryColor()));
+        holder.vIconBackground.setBackground(drawable);
+    }
+
+    /**
+     * ✅ NEW - Bind regular Transaction (backward compatibility)
+     */
+    private void bindRegularTransaction(TransactionViewHolder holder, Transaction transaction) {
+        // Use old methods for backward compatibility
         setCategoryText(holder, transaction);
         setDescriptionText(holder, transaction);
         setDateText(holder, transaction);
         setAmountText(holder, transaction);
         setIconAndBackground(holder, transaction);
     }
+
+    // ---- OLD METHODS (kept for backward compatibility) ----
 
     private void setCategoryText(TransactionViewHolder holder, Transaction transaction) {
         holder.tvCategory.setText(transaction.getCategory());
@@ -172,7 +246,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     private void setDateText(TransactionViewHolder holder, Transaction transaction) {
-        holder.tvDate.setText(formatDate(transaction.getDate()));
+        // ✅ Use Converter to convert long to Date
+        Date transactionDate = Converters.fromTimestamp(transaction.getDate());
+        holder.tvDate.setText(formatDate(transactionDate));
     }
 
     private void setAmountText(TransactionViewHolder holder, Transaction transaction) {
@@ -196,7 +272,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     // ---- Helper Methods ----
+
     private String formatDate(Date date) {
+        if (date == null) return "";
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         Calendar now = Calendar.getInstance();
@@ -219,7 +298,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return null;
     }
 
-    private Transaction getTransactionForPosition(int position) {
+    /**
+     * ✅ UPDATED - Returns Object (can be Transaction or TransactionWithCategory)
+     */
+    private Object getTransactionForPosition(int position) {
         int currentPos = 0;
         for (TransactionGroup group : transactionGroups) {
             if (position == currentPos) {
@@ -234,7 +316,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
         return null;
     }
-
 
     // ---- Data Updates ----
     public void updateTransactions(List<TransactionGroup> newGroups) {
