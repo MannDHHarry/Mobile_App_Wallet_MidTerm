@@ -82,7 +82,105 @@ public class TransactionManager {
         return addEllipsis ? result + "..." : result;
     }
 
+   //New Methods for Notificaton System
+   public static TransactionGroup getTodayGroup(List<TransactionGroup> groups) {
+       if (groups == null || groups.isEmpty()) {
+           Log.d(TAG, "getTodayGroup: groups is null or empty");
+           return null;
+       }
 
+       for (TransactionGroup group : groups) {
+           if (group != null && "Today".equals(group.getHeader())) {
+               Log.d(TAG, "getTodayGroup: Found Today group with " +
+                       group.getTransactions().size() + " transactions");
+               return group;
+           }
+       }
 
+       Log.d(TAG, "getTodayGroup: No Today group found");
+       return null;
+   }
+
+    public static DailySummary calculateDailySummary(TransactionGroup todayGroup) {
+        double totalIncome = 0.0;
+        double totalExpense = 0.0;
+        int incomeCount = 0;
+        int expenseCount = 0;
+
+        if (todayGroup == null || todayGroup.getTransactions() == null) {
+            Log.d(TAG, "calculateDailySummary: No transactions for today");
+            return new DailySummary(0, 0, 0, 0);
+        }
+
+        for (TransactionWithCategory transaction : todayGroup.getTransactions()) {
+            if (transaction.isExpense()) {
+                totalExpense += transaction.getAmount();
+                expenseCount++;
+            } else {
+                totalIncome += transaction.getAmount();
+                incomeCount++;
+            }
+        }
+
+//        Log.d(TAG, "calculateDailySummary: Income=$" + totalIncome +
+//                " (" + incomeCount + "), Expense=$" + totalExpense +
+//                " (" + expenseCount + ")");
+
+        return new DailySummary(totalIncome, totalExpense, incomeCount, expenseCount);
+    }
+
+    public static class DailySummary {
+        private final double totalIncome;
+        private final double totalExpense;
+        private final int incomeCount;
+        private final int expenseCount;
+
+        public DailySummary(double totalIncome, double totalExpense,
+                            int incomeCount, int expenseCount) {
+            this.totalIncome = totalIncome;
+            this.totalExpense = totalExpense;
+            this.incomeCount = incomeCount;
+            this.expenseCount = expenseCount;
+        }
+
+        public double getTotalIncome() {
+            return totalIncome;
+        }
+
+        public double getTotalExpense() {
+            return totalExpense;
+        }
+
+        public int getIncomeCount() {
+            return incomeCount;
+        }
+
+        public int getExpenseCount() {
+            return expenseCount;
+        }
+
+        public double getNetAmount() {
+            return totalIncome - totalExpense;
+        }
+
+        public boolean hasTransactions() {
+            return (incomeCount + expenseCount) > 0;
+        }
+
+        public int getTotalTransactionCount() {
+            return incomeCount + expenseCount;
+        }
+
+        @Override
+        public String toString() {
+            return "DailySummary{" +
+                    "income=$" + totalIncome +
+                    ", expense=$" + totalExpense +
+                    ", incomeCount=" + incomeCount +
+                    ", expenseCount=" + expenseCount +
+                    ", net=$" + getNetAmount() +
+                    '}';
+        }
+    }
 
 }

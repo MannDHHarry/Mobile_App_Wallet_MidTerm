@@ -1,13 +1,19 @@
 package y3.mobiledev.mywallet;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -19,6 +25,13 @@ import y3.mobiledev.mywallet.fragments.CategoriesFragment;
 import y3.mobiledev.mywallet.fragments.HomeFragment;
 import y3.mobiledev.mywallet.fragments.StatisticsFragment;
 import y3.mobiledev.mywallet.fragments.TransactionHistoryFragment;
+
+//Notification Import
+import y3.mobiledev.mywallet.helpers.NotificationHelper;
+import y3.mobiledev.mywallet.helpers.NotificationScheduler;
+import y3.mobiledev.mywallet.helpers.NotificationDataManager;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,6 +45,19 @@ public class MainActivity extends AppCompatActivity {
     private TransactionViewModel viewModel;
     private AuthViewModel authViewModel;
     private boolean isInitialized = false;
+
+
+    //Permission Request laucher for notification
+
+    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    Log.d("MainActivity", "Notification permission granted");
+                    scheduleNotificationIfNeeded();
+                } else {
+                    Log.w("MainActivity", "Notification permission denied");
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         initViews();
         setupListeners();
         setupBottomNavigation();
+
+        requestNotificationPermission();
 
         // Always observe for changes
         authViewModel.getCurrentUser().observe(this, user -> {
@@ -83,6 +111,8 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setSelectedItemId(R.id.nav_home);
 
         Log.d("MainActivity", "HomeFragment loaded");
+        scheduleNotificationIfNeeded();
+
     }
 
     private void initViews() {
@@ -144,6 +174,13 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Logout")
                 .setMessage("Are you sure you want to logout?")
                 .setPositiveButton("Yes", (dialog, which) -> {
+
+
+                    NotificationScheduler.cancelDailyNotification(this);
+                    NotificationDataManager.clearData(this);
+                    Log.d("MainActivity", "Notifications cancelled and data cleared");
+
+
                     // Clear user data
                     viewModel.clearUserData();
                     authViewModel.logout();
@@ -163,5 +200,33 @@ public class MainActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    //Notif helper function
+    private void scheduleNotificationIfNeeded() {
+        // Create notification channel (safe to call multiple times)
+        NotificationHelper.createNotificationChannel(this);
+
+        // Check if already scheduled
+        if (!NotificationScheduler.isNotificationScheduled(this)) {
+            NotificationScheduler.scheduleDailyNotification(this);
+            Log.d("MainActivity", "Daily notification scheduled for: " +
+                    NotificationScheduler.getNextScheduledTimeString(this));
+        } else {
+            Log.d("MainActivity", "Notification already scheduled for: " +
+                    NotificationScheduler.getNextScheduledTimeString(this));
+        }
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                Log.d("MainActivity", "Requesting notification permission");
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            } else {
+                Log.d("MainActivity", "Notification permission already granted");
+            }
+        }
     }
 }

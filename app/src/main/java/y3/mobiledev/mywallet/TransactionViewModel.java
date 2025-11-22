@@ -24,6 +24,7 @@ import y3.mobiledev.mywallet.repository.CategoryRepository;
 import y3.mobiledev.mywallet.repository.TransactionRepository;
 import y3.mobiledev.mywallet.repository.UserRepository;
 import y3.mobiledev.mywallet.repository.WalletRepository;
+import y3.mobiledev.mywallet.helpers.NotificationDataManager;
 
 public class TransactionViewModel extends AndroidViewModel {
 
@@ -47,6 +48,8 @@ public class TransactionViewModel extends AndroidViewModel {
 
     // Grouped transactions for UI
     private LiveData<List<TransactionGroup>> transactionGroups;
+
+    private Observer<List<TransactionGroup>> transactionGroupsObserver;
 
     public TransactionViewModel(@NonNull Application application) {
         super(application);
@@ -75,16 +78,62 @@ public class TransactionViewModel extends AndroidViewModel {
             }
             return new MutableLiveData<>(TransactionManager.groupByDateRich(list));
         });
+
+        setupNotificationDataSync(user);
+    }
+
+    private void setupNotificationDataSync(User user) {
+        // Remove existing observer if any
+        if (transactionGroupsObserver != null && transactionGroups != null) {
+            transactionGroups.removeObserver(transactionGroupsObserver);
+        }
+
+        // Create new observer
+        transactionGroupsObserver = groups -> {
+            if (groups != null && user != null) {
+                Log.d("TransactionViewModel", "Saving " + groups.size() +
+                        " transaction groups for notifications");
+
+                NotificationDataManager.saveTransactionGroups(
+                        getApplication().getApplicationContext(),
+                        groups,
+                        user.getUserId()
+                );
+            }
+        };
+
+        // Observe forever (not lifecycle-aware, but we manage it manually)
+        if (transactionGroups != null) {
+            transactionGroups.observeForever(transactionGroupsObserver);
+        }
     }
 
     //Clear data when user log out
     public void clearUserData() {
+
+        //Remove Observer before clearing
+        if (transactionGroupsObserver != null && transactionGroups != null) {
+            transactionGroups.removeObserver(transactionGroupsObserver);
+            transactionGroupsObserver = null;
+        }
+
+        NotificationDataManager.clearData(getApplication().getApplicationContext());
+        Log.d("TransactionViewModel", "Notification data cleared on logout");
+
         currentUser.setValue(null);
         wallets = null;
         expenseCategories = null;
         incomeCategories = null;
         transactionsWithCategory = null;
         transactionGroups = null;
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if (transactionGroupsObserver != null && transactionGroups != null) {
+            transactionGroups.removeObserver(transactionGroupsObserver);
+        }
     }
 
     // Transaction Related Methods
