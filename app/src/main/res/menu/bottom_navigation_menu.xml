@@ -22,4 +22,5 @@
         android:id="@+id/nav_more"
         android:icon="@drawable/user"
         android:title="@string/nav_statistics"/>
+
 </menu>

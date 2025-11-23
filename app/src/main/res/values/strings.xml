@@ -38,4 +38,8 @@
     <!-- Common -->
     <string name="add">Add</string>
     <string name="search">Search</string>
+    <string name="logout">Logout</string>
+    <string name="profile">Profile</string>
+    <string name="user_name">User Name</string>
+    <string name="user_email">user@example.com</string>
 </resources>

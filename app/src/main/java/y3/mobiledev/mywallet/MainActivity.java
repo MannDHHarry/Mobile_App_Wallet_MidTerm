@@ -7,18 +7,24 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 
 import y3.mobiledev.mywallet.fragments.AddTransactionFragment;
 import y3.mobiledev.mywallet.fragments.CategoriesFragment;
@@ -30,17 +36,22 @@ import y3.mobiledev.mywallet.fragments.TransactionHistoryFragment;
 import y3.mobiledev.mywallet.helpers.NotificationHelper;
 import y3.mobiledev.mywallet.helpers.NotificationScheduler;
 import y3.mobiledev.mywallet.helpers.NotificationDataManager;
+import y3.mobiledev.mywallet.models.User;
 
 
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private TextView tvUserName;
-    private ImageButton btnLogOut;
     private FloatingActionButton fabAddTransaction;
     private BottomNavigationView bottomNavigation;
 
     private Fragment currentFragment;
+
+    //Drawer Layout
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+
+    private ImageButton btnMenu;
 
     private TransactionViewModel viewModel;
     private AuthViewModel authViewModel;
@@ -76,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         initViews();
         setupListeners();
         setupBottomNavigation();
-
         requestNotificationPermission();
 
         // Always observe for changes
@@ -99,12 +109,23 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("MainActivity", "initializeAndShow called");
 
+        User user = authViewModel.getCurrentUser().getValue();
+        if (user == null) {
+            Log.e("MainActivity", "User is null in initializeAndShow!");
+            redirectToAuth();
+            return;
+        }
+
         // FIRST: Initialize data
-        viewModel.initializeUserData(authViewModel.getCurrentUser().getValue());
+        viewModel.initializeUserData(user);
         Log.d("MainActivity", "Data initialized");
 
         // SECOND: Update UI
         tvUserName.setText(authViewModel.getCurrentUser().getValue().getName().toUpperCase());
+
+        setupDrawer();
+        updateNavHeader(user);
+        btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
         // THIRD: Load fragment AFTER data is ready
         loadFragment(new HomeFragment());
@@ -117,10 +138,34 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
         tvUserName = findViewById(R.id.tvUserName);
-        btnLogOut = findViewById(R.id.btnLogout);
         fabAddTransaction = findViewById(R.id.fabAddTransaction);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        btnMenu = findViewById(R.id.btnMenu);
+        drawerLayout = findViewById(R.id.drawerLayout);
+        navigationView = findViewById(R.id.navigationView);
+
+
     }
+
+    private void setupDrawer() {
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void updateNavHeader(User user) {
+        View headerView = navigationView.getHeaderView(0);
+        if (headerView != null) {
+            TextView tvNavUserName = headerView.findViewById(R.id.tvNavUserName);
+            TextView tvNavUserEmail = headerView.findViewById(R.id.tvNavUserEmail);
+
+            if (tvNavUserName != null) {
+                tvNavUserName.setText(user.getName());
+            }
+            if (tvNavUserEmail != null) {
+                tvNavUserEmail.setText(user.getEmail());
+            }
+        }
+    }
+
 
     private void setupBottomNavigation() {
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
@@ -158,8 +203,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-
-        btnLogOut.setOnClickListener(v -> showLogoutConfirmation());
         fabAddTransaction.setOnClickListener(v -> {
             getSupportFragmentManager()
                     .beginTransaction()
@@ -229,4 +272,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.nav_home) {
+            loadFragment(new HomeFragment());
+            bottomNavigation.setSelectedItemId(R.id.nav_home);
+        } else if (id == R.id.nav_profile) {
+            // TODO: Open profile fragment or activity
+            // loadFragment(new ProfileFragment());
+        } else if (id == R.id.nav_logout) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            showLogoutConfirmation();
+            return true;
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 }
+
