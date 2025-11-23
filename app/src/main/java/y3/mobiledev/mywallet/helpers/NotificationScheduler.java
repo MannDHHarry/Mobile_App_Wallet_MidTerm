@@ -19,7 +19,7 @@ public class NotificationScheduler {
     private static final int REQUEST_CODE = 2001;
 
     // 10:30 PM daily
-    private static final int TARGET_HOUR = 10;
+    private static final int TARGET_HOUR = 22;
     private static final int TARGET_MINUTE = 30;
 
     private static final String TIME_PATTERN = "EEE, MMM d 'at' h:mm a z";

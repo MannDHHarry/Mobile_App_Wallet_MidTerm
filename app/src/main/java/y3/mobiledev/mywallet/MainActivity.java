@@ -89,6 +89,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupBottomNavigation();
         requestNotificationPermission();
 
+        if (NotificationDataManager.hasData(this)) {
+            Log.d("MainActivity", "App restarted - rescheduling notification");
+            NotificationScheduler.scheduleDailyNotification(this);
+        }
+
         // Always observe for changes
         authViewModel.getCurrentUser().observe(this, user -> {
             Log.d("MainActivity", "Observer fired - user: " + (user != null ? user.getName() : "null"));
