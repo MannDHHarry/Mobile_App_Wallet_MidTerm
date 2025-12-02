@@ -48,6 +48,14 @@
         android:hint="Confirm Password"
         android:inputType="textPassword"
         android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <CheckBox
+        android:id="@+id/cbRememberMe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remember Me"
+        android:checked="true"
         android:layout_marginBottom="24dp" />
 
     <Button

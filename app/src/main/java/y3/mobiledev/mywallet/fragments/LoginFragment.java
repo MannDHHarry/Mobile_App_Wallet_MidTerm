@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ public class LoginFragment extends Fragment {
     private EditText etEmail, etPassword;
     private Button btnLogin;
     private TextView tvRegister;
+    private CheckBox cbRememberMe;
     private ProgressBar progressBar;
     private AuthViewModel viewModel;
 
@@ -44,6 +46,7 @@ public class LoginFragment extends Fragment {
         etPassword = view.findViewById(R.id.etPassword);
         btnLogin = view.findViewById(R.id.btnLogin);
         tvRegister = view.findViewById(R.id.tvRegister);
+        cbRememberMe = view.findViewById(R.id.cbRememberMe);
         progressBar = view.findViewById(R.id.progressBar);
     }
 
@@ -99,6 +102,7 @@ public class LoginFragment extends Fragment {
     private void performLogin() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
+        boolean rememberMe = cbRememberMe.isChecked();
 
         // Basic client-side validation
         if (email.isEmpty()) {
@@ -118,7 +122,7 @@ public class LoginFragment extends Fragment {
         etPassword.setError(null);
 
         // Perform login (validation happens in ViewModel)
-        viewModel.login(email, password);
+        viewModel.login(email, password, rememberMe);
     }
 
     private void navigateToRegister() {

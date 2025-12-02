@@ -90,6 +90,25 @@ public class UserRepository {
     }
 
     /**
+     * Get user by ID synchronously (for session restoration)
+     */
+    public User getUserByIdSync(int userId) {
+        Future<User> future = AppDatabase.databaseWriteExecutor.submit(new Callable<User>() {
+            @Override
+            public User call() throws Exception {
+                return userDao.getUserByIdSync(userId);
+            }
+        });
+
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Update user
      */
     public void updateUser(User user) {

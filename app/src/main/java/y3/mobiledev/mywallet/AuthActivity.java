@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import y3.mobiledev.mywallet.helpers.SessionManager;
 import y3.mobiledev.mywallet.fragments.LoginFragment;
 import y3.mobiledev.mywallet.models.User;
 
@@ -37,9 +38,16 @@ public class AuthActivity extends AppCompatActivity {
             }
         });
 
-        // Load login fragment by default
+        // Check for saved session on startup
         if (savedInstanceState == null) {
-            loadFragment(new LoginFragment());
+            if (SessionManager.isSessionSaved(this)) {
+                // Session exists, try to restore it
+                Log.d(TAG, "Found saved session, attempting to restore...");
+                authViewModel.restoreSession();
+            } else {
+                // No saved session, show login fragment
+                loadFragment(new LoginFragment());
+            }
         }
     }
 

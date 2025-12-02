@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ public class RegisterFragment extends Fragment {
 
     private EditText etName, etEmail, etPassword, etConfirmPassword;
     private Button btnRegister, btnBackToLogin;
+    private CheckBox cbRememberMe;
     private ProgressBar progressBar;
     private AuthViewModel viewModel;
 
@@ -44,6 +46,7 @@ public class RegisterFragment extends Fragment {
         etConfirmPassword = view.findViewById(R.id.etConfirmPassword);
         btnRegister = view.findViewById(R.id.btnRegister);
         btnBackToLogin = view.findViewById(R.id.btnBackToLogin);
+        cbRememberMe = view.findViewById(R.id.cbRememberMe);
         progressBar = view.findViewById(R.id.progressBar);
     }
 
@@ -149,7 +152,8 @@ public class RegisterFragment extends Fragment {
         }
 
         // Perform registration (additional validation happens in ViewModel)
-        viewModel.register(email, password, name);
+        boolean rememberMe = cbRememberMe.isChecked();
+        viewModel.register(email, password, name, rememberMe);
     }
 
     @Override

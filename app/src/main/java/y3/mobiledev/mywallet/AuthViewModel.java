@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import y3.mobiledev.mywallet.helpers.SessionManager;
 import y3.mobiledev.mywallet.models.User;
 import y3.mobiledev.mywallet.repository.UserRepository;
 
@@ -34,10 +35,13 @@ public class AuthViewModel extends AndroidViewModel {
         userRepository = new UserRepository(application);
         executorService = Executors.newSingleThreadExecutor();
 
-        // Restore from static holder
+        // Restore from static holder first (for same app session)
         if (staticUser != null) {
             currentUser.setValue(staticUser);
             isLoggedIn.setValue(staticLoggedIn);
+        } else {
+            // Try to restore from SharedPreferences (for app restart)
+            // Note: restoreSession() will be called explicitly from AuthActivity
         }
     }
 
@@ -48,7 +52,7 @@ public class AuthViewModel extends AndroidViewModel {
     public LiveData<Boolean> getIsLoading() { return isLoading; }
 
     // User Log In
-    public void login(String email, String password) {
+    public void login(String email, String password, boolean rememberMe) {
         isLoading.setValue(true);
         errorMessage.setValue(null);
 
@@ -72,6 +76,10 @@ public class AuthViewModel extends AndroidViewModel {
                     // Login successful - save to static holder
                     staticUser = user;
                     staticLoggedIn = true;
+                    
+                    // Save session to SharedPreferences if rememberMe is true
+                    SessionManager.saveSession(getApplication(), user.getUserId(), rememberMe);
+                    
                     currentUser.postValue(user);
                     isLoggedIn.postValue(true);
                     errorMessage.postValue(null);
@@ -88,7 +96,7 @@ public class AuthViewModel extends AndroidViewModel {
     }
 
    // Register New User
-    public void register(String email, String password, String name) {
+    public void register(String email, String password, String name, boolean rememberMe) {
         isLoading.setValue(true);
         errorMessage.setValue(null);
 
@@ -129,6 +137,9 @@ public class AuthViewModel extends AndroidViewModel {
                     staticUser = newUser;
                     staticLoggedIn = true;
 
+                    // Save session to SharedPreferences if rememberMe is true
+                    SessionManager.saveSession(getApplication(), newUser.getUserId(), rememberMe);
+
                     currentUser.postValue(newUser);
                     isLoggedIn.postValue(true);
                     errorMessage.postValue(null);
@@ -143,10 +154,46 @@ public class AuthViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     * Restore user session from SharedPreferences
+     * Called on app startup if session exists
+     */
+    public void restoreSession() {
+        if (SessionManager.isSessionSaved(getApplication())) {
+            int userId = SessionManager.getSavedUserId(getApplication());
+            if (userId != -1) {
+                isLoading.setValue(true);
+                executorService.execute(() -> {
+                    try {
+                        User user = userRepository.getUserByIdSync(userId);
+                        if (user != null) {
+                            // Restore user session
+                            staticUser = user;
+                            staticLoggedIn = true;
+                            currentUser.postValue(user);
+                            isLoggedIn.postValue(true);
+                        } else {
+                            // User not found in database, clear session
+                            SessionManager.clearSession(getApplication());
+                        }
+                    } catch (Exception e) {
+                        // Error restoring session, clear it
+                        SessionManager.clearSession(getApplication());
+                    } finally {
+                        isLoading.postValue(false);
+                    }
+                });
+            }
+        }
+    }
+
     public void logout() {
         // Clear static holder
         staticUser = null;
         staticLoggedIn = false;
+
+        // Clear session from SharedPreferences
+        SessionManager.clearSession(getApplication());
 
         currentUser.setValue(null);
         isLoggedIn.setValue(false);
