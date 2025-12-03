@@ -26,6 +26,10 @@ import y3.mobiledev.mywallet.repository.UserRepository;
 import y3.mobiledev.mywallet.repository.WalletRepository;
 import y3.mobiledev.mywallet.helpers.NotificationDataManager;
 
+// Import Subscription
+import y3.mobiledev.mywallet.models.Subscription;
+import y3.mobiledev.mywallet.repository.SubscriptionRepository;
+
 public class TransactionViewModel extends AndroidViewModel {
 
     // Repositories
@@ -33,6 +37,8 @@ public class TransactionViewModel extends AndroidViewModel {
     private WalletRepository walletRepository;
     private CategoryRepository categoryRepository;
     private TransactionRepository transactionRepository;
+
+    private SubscriptionRepository subscriptionRepository;
 
 
     // Current user
@@ -51,6 +57,10 @@ public class TransactionViewModel extends AndroidViewModel {
 
     private Observer<List<TransactionGroup>> transactionGroupsObserver;
 
+    //Subscription Live data
+    private LiveData<List<Subscription>> activeSubscriptions;
+    private LiveData<List<Subscription>> allSubscriptions;
+
     public TransactionViewModel(@NonNull Application application) {
         super(application);
         // Initialize repositories
@@ -58,6 +68,7 @@ public class TransactionViewModel extends AndroidViewModel {
         walletRepository = new WalletRepository(application);
         categoryRepository = new CategoryRepository(application);
         transactionRepository = new TransactionRepository(application);
+        subscriptionRepository = new SubscriptionRepository(application);
     }
 
     //Initialize User Data as user log in
@@ -70,6 +81,10 @@ public class TransactionViewModel extends AndroidViewModel {
         expenseCategories = categoryRepository.getActiveExpenseCategories(userId);
         incomeCategories = categoryRepository.getActiveIncomeCategories(userId);
         transactionsWithCategory = transactionRepository.getTransactionsWithCategoryByUser(userId);
+
+        //Subscription
+        activeSubscriptions = subscriptionRepository.getActiveSubscriptionsByUser(userId);
+        allSubscriptions = subscriptionRepository.getAllSubscriptionsByUser(userId);
 
         // Transform transactions into grouped format
         transactionGroups = Transformations.switchMap(transactionsWithCategory, list -> {
@@ -126,6 +141,10 @@ public class TransactionViewModel extends AndroidViewModel {
         incomeCategories = null;
         transactionsWithCategory = null;
         transactionGroups = null;
+
+        //Subscription
+        activeSubscriptions = null;
+        allSubscriptions = null;
     }
 
     @Override
@@ -227,6 +246,37 @@ public class TransactionViewModel extends AndroidViewModel {
         return categoryRepository.getTransactionCount(categoryId);
     }
 
+    //Subscription Methods
+    public void addSubscription(int walletId, String name, double amount,
+                                long startDate, String notes) {
+        User user = currentUser.getValue();
+        if (user == null) return;
+
+        Subscription subscription = new Subscription(
+                user.getUserId(),
+                walletId,
+                name,
+                amount,
+                startDate,
+                notes
+        );
+
+        subscriptionRepository.addSubscription(subscription);
+    }
+
+    public void updateSubscription(Subscription subscription) {
+        subscriptionRepository.updateSubscription(subscription);
+    }
+
+    public void deleteSubscription(Subscription subscription) {
+        subscriptionRepository.deleteSubscription(subscription);
+    }
+
+    public void toggleSubscriptionStatus(int subscriptionId, boolean isActive) {
+        subscriptionRepository.toggleSubscriptionStatus(subscriptionId, isActive);
+    }
+
+
     // Getters
     public LiveData<User> getCurrentUser() { return currentUser; }
     public LiveData<List<Wallet>> getWallets() { return wallets; }
@@ -234,5 +284,13 @@ public class TransactionViewModel extends AndroidViewModel {
     public LiveData<List<Category>> getIncomeCategories() { return incomeCategories; }
     public LiveData<List<TransactionWithCategory>> getTransactionsWithCategory() { return transactionsWithCategory; }
     public LiveData<List<TransactionGroup>> getTransactionGroups() { return transactionGroups; }
+
+    public LiveData<List<Subscription>> getActiveSubscriptions() {
+        return activeSubscriptions;
+    }
+
+    public LiveData<List<Subscription>> getAllSubscriptions() {
+        return allSubscriptions;
+    }
 
 }
