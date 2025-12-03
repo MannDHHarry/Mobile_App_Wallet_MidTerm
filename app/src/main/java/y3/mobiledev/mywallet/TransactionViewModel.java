@@ -12,9 +12,13 @@ import androidx.lifecycle.Transformations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import y3.mobiledev.mywallet.helpers.SpendingAnalyzer;
 import y3.mobiledev.mywallet.helpers.TransactionManager;
 import y3.mobiledev.mywallet.models.Category;
+import y3.mobiledev.mywallet.models.SpendingAnalysisResult;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
 import y3.mobiledev.mywallet.models.TransactionWithCategory;
@@ -61,6 +65,12 @@ public class TransactionViewModel extends AndroidViewModel {
     private LiveData<List<Subscription>> activeSubscriptions;
     private LiveData<List<Subscription>> allSubscriptions;
 
+    // Spending Analysis
+    private final MutableLiveData<SpendingAnalysisResult> spendingInsights = new MutableLiveData<>();
+    private final ExecutorService analysisExecutor = Executors.newSingleThreadExecutor();
+    private SpendingAnalysisResult cachedAnalysisResult;
+    private androidx.lifecycle.Observer<List<TransactionWithCategory>> transactionsObserver;
+
     public TransactionViewModel(@NonNull Application application) {
         super(application);
         // Initialize repositories
@@ -95,6 +105,9 @@ public class TransactionViewModel extends AndroidViewModel {
         });
 
         setupNotificationDataSync(user);
+        
+        // Observe transactions for automatic analysis
+        setupSpendingAnalysis();
     }
 
     private void setupNotificationDataSync(User user) {
@@ -145,6 +158,14 @@ public class TransactionViewModel extends AndroidViewModel {
         //Subscription
         activeSubscriptions = null;
         allSubscriptions = null;
+        
+        // Clear analysis and remove observer
+        if (transactionsObserver != null && transactionsWithCategory != null) {
+            transactionsWithCategory.removeObserver(transactionsObserver);
+            transactionsObserver = null;
+        }
+        spendingInsights.setValue(null);
+        cachedAnalysisResult = null;
     }
 
     @Override
@@ -153,6 +174,7 @@ public class TransactionViewModel extends AndroidViewModel {
         if (transactionGroupsObserver != null && transactionGroups != null) {
             transactionGroups.removeObserver(transactionGroupsObserver);
         }
+        analysisExecutor.shutdown();
     }
 
     // Transaction Related Methods
@@ -174,6 +196,7 @@ public class TransactionViewModel extends AndroidViewModel {
         );
 
         transactionRepository.addTransaction(transaction);
+        // Analysis will be triggered automatically by the observer when LiveData updates
     }
 
 
@@ -291,6 +314,109 @@ public class TransactionViewModel extends AndroidViewModel {
 
     public LiveData<List<Subscription>> getAllSubscriptions() {
         return allSubscriptions;
+    }
+
+    // Spending Analysis Methods
+
+    /**
+     * Setup automatic spending analysis when transactions change
+     */
+    private void setupSpendingAnalysis() {
+        // Remove existing observer if any
+        if (transactionsObserver != null && transactionsWithCategory != null) {
+            try {
+                transactionsWithCategory.removeObserver(transactionsObserver);
+            } catch (Exception e) {
+                Log.e("TransactionViewModel", "Error removing observer", e);
+            }
+        }
+
+        if (transactionsWithCategory != null) {
+            transactionsObserver = transactions -> {
+                try {
+                    // Only analyze if we have transactions and executor is running
+                    if (transactions != null && !transactions.isEmpty() && !analysisExecutor.isShutdown()) {
+                        // Pass transactions directly to avoid LiveData thread issues
+                        analyzeSpendingPatterns(transactions);
+                    }
+                } catch (Exception e) {
+                    Log.e("TransactionViewModel", "Error in transactions observer", e);
+                }
+            };
+            try {
+                transactionsWithCategory.observeForever(transactionsObserver);
+            } catch (Exception e) {
+                Log.e("TransactionViewModel", "Error setting up observer", e);
+            }
+        }
+    }
+
+    /**
+     * Analyze spending patterns with given transactions list
+     */
+    private void analyzeSpendingPatterns(List<TransactionWithCategory> transactions) {
+        // Check if executor is still running
+        if (analysisExecutor.isShutdown()) {
+            return;
+        }
+        
+        // Create a copy to avoid concurrent modification issues
+        final List<TransactionWithCategory> transactionsCopy = new ArrayList<>(transactions);
+        
+        analysisExecutor.execute(() -> {
+            try {
+                if (transactionsCopy == null || transactionsCopy.isEmpty()) {
+                    spendingInsights.postValue(null);
+                    return;
+                }
+
+                SpendingAnalysisResult result = SpendingAnalyzer.analyzeSpendingPatterns(transactionsCopy);
+                if (result != null) {
+                    cachedAnalysisResult = result;
+                    spendingInsights.postValue(result);
+                    
+                    Log.d("TransactionViewModel", "Spending analysis completed. Insights: " + 
+                            (result.getInsights() != null ? result.getInsights().size() : 0));
+                }
+            } catch (Exception e) {
+                Log.e("TransactionViewModel", "Error analyzing spending patterns", e);
+                e.printStackTrace();
+                // Don't crash - just log the error
+            }
+        });
+    }
+
+    /**
+     * Trigger spending analysis in background thread (public method for manual trigger)
+     */
+    public void triggerSpendingAnalysis() {
+        if (transactionsWithCategory != null && !analysisExecutor.isShutdown()) {
+            List<TransactionWithCategory> transactions = transactionsWithCategory.getValue();
+            if (transactions != null) {
+                analyzeSpendingPatterns(transactions);
+            }
+        }
+    }
+
+    /**
+     * Manually trigger analysis (for refresh)
+     */
+    public void analyzeSpendingPatterns() {
+        triggerSpendingAnalysis();
+    }
+
+    /**
+     * Get spending insights LiveData
+     */
+    public LiveData<SpendingAnalysisResult> getSpendingInsights() {
+        return spendingInsights;
+    }
+
+    /**
+     * Get cached analysis result (synchronous)
+     */
+    public SpendingAnalysisResult getCachedAnalysisResult() {
+        return cachedAnalysisResult;
     }
 
 }

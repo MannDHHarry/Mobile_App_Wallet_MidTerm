@@ -8,16 +8,21 @@ import android.content.Intent;
 
 import androidx.core.app.NotificationCompat;
 
+import java.util.List;
 import java.util.Locale;
 
 import y3.mobiledev.mywallet.MainActivity;
 
 public class NotificationHelper {
     public static final String CHANNEL_ID = "daily_summary_channel";
+    public static final String SPENDING_ALERT_CHANNEL_ID = "spending_alert_channel";
     public static final int NOTIFICATION_ID = 1001;
+    public static final int SPENDING_ALERT_NOTIFICATION_ID = 1002;
 
     private static final String CHANNEL_NAME = "Daily Financial Summary";
     private static final String CHANNEL_DESCRIPTION = "Shows daily income and expense summary at 10 PM";
+    private static final String SPENDING_ALERT_CHANNEL_NAME = "Spending Alerts";
+    private static final String SPENDING_ALERT_CHANNEL_DESCRIPTION = "Alerts about unusual spending patterns";
 
     public static void createNotificationChannel(Context context) {
 
@@ -33,6 +38,20 @@ public class NotificationHelper {
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         if (manager != null) {
             manager.createNotificationChannel(channel);
+        }
+
+        // Create spending alert channel
+        NotificationChannel spendingChannel = new NotificationChannel(
+                SPENDING_ALERT_CHANNEL_ID,
+                SPENDING_ALERT_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+        );
+        spendingChannel.setDescription(SPENDING_ALERT_CHANNEL_DESCRIPTION);
+        spendingChannel.enableVibration(true);
+        spendingChannel.enableLights(true);
+
+        if (manager != null) {
+            manager.createNotificationChannel(spendingChannel);
         }
     }
 
@@ -106,5 +125,73 @@ public class NotificationHelper {
         String netSign = netAmount >= 0 ? "+" : "-";
         return String.format(Locale.US, "Income: $%,.2f | Expenses: $%,.2f | Net: %s$%,.2f",
                 income, expense, netSign, Math.abs(netAmount));
+    }
+
+    /**
+     * Show spending alert notification for unusual spending patterns
+     */
+    public static void showSpendingAlertNotification(Context context, String title, String message) {
+        createNotificationChannel(context); // Ensure channel exists
+
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        int pendingIntentFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+        pendingIntentFlags |= PendingIntent.FLAG_IMMUTABLE;
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, pendingIntentFlags);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, SPENDING_ALERT_CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager manager = context.getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.notify(SPENDING_ALERT_NOTIFICATION_ID, builder.build());
+        }
+    }
+
+    /**
+     * Show weekly/monthly insights notification
+     */
+    public static void showInsightsNotification(Context context, String title, List<String> insights) {
+        createNotificationChannel(context);
+
+        StringBuilder content = new StringBuilder();
+        for (int i = 0; i < Math.min(insights.size(), 5); i++) {
+            content.append(insights.get(i));
+            if (i < Math.min(insights.size(), 5) - 1) {
+                content.append("\n");
+            }
+        }
+
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        int pendingIntentFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+        pendingIntentFlags |= PendingIntent.FLAG_IMMUTABLE;
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, pendingIntentFlags);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, SPENDING_ALERT_CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_menu_info_details)
+                .setContentTitle(title)
+                .setContentText(insights.isEmpty() ? "No insights available" : insights.get(0))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content.toString()))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager manager = context.getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.notify(SPENDING_ALERT_NOTIFICATION_ID + 1, builder.build());
+        }
     }
 }
