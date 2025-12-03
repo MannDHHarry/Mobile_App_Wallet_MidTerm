@@ -171,6 +171,12 @@ public class Transaction {
     @Ignore
     public void setCategoryColor(int color) { }
 
+    @Ignore
+    public Transaction(int userId, int walletId, int categoryId, String description,
+                       double amount, long date, boolean isExpense) {
+        this(userId, walletId, categoryId, description, amount, date, isExpense, null);
+    }
+
     public String getReceiptPhotoUri() {
         return receiptPhotoUri;
     }
