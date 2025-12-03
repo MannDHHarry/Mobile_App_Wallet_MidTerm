@@ -38,6 +38,8 @@ import y3.mobiledev.mywallet.helpers.NotificationScheduler;
 import y3.mobiledev.mywallet.helpers.NotificationDataManager;
 import y3.mobiledev.mywallet.models.User;
 
+//Subscription Import
+import y3.mobiledev.mywallet.fragments.SubscriptionFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -289,7 +291,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_profile) {
             // TODO: Open profile fragment or activity
             // loadFragment(new ProfileFragment());
-        } else if (id == R.id.nav_logout) {
+        } else if (id == R.id.nav_subscriptions){
+            loadFragment(new SubscriptionFragment());
+            fabAddTransaction.hide();
+        }
+        else if (id == R.id.nav_logout) {
             drawerLayout.closeDrawer(GravityCompat.START);
             showLogoutConfirmation();
             return true;
