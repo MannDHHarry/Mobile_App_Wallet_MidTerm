@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/radio_button_expense_selector.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- When checked (selected) - RED -->
+    <item android:state_checked="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/income_green"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+
+    <!-- When not checked - PURPLE -->
+    <item android:state_checked="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorDarkPurple"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+
+    <!-- Default state - Green -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/income_green"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+</selector>

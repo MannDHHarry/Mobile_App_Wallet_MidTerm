@@ -33,7 +33,7 @@ import y3.mobiledev.mywallet.models.Wallet;
                 Transaction.class,
                 Subscription.class
         },
-        version = 2,
+        version = 3,
         exportSchema = false
 )
 @TypeConverters({Converters.class})
@@ -75,6 +75,14 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    // New migration from version 2 → 3 (adds receipt_photo_uri to transactions)
+    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE transactions ADD COLUMN receipt_photo_uri TEXT");
+        }
+    };
+
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
@@ -83,7 +91,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     context.getApplicationContext(),
                                     AppDatabase.class,
                                     "mywallet_database")
-                            .addMigrations(MIGRATION_1_2)   // ← Now works perfectly
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)   // ← Now works perfectly
                             .addCallback(roomCallback)
                             .build();
                 }

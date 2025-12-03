@@ -45,7 +45,7 @@ public interface TransactionDao {
     int getTransactionCountByWallet(int walletId);
 
     @Query("SELECT t.transaction_id, t.user_id, t.wallet_id, t.category_id, " +
-            "t.description, t.amount, t.date, t.is_expense, " +
+            "t.description, t.amount, t.date, t.is_expense, t.receipt_photo_uri, " +  // ← Add this
             "c.name as categoryName, c.icon_res_id as categoryIcon, c.color_res_id as categoryColor " +
             "FROM transactions t " +
             "INNER JOIN categories c ON t.category_id = c.category_id " +
@@ -54,7 +54,7 @@ public interface TransactionDao {
     LiveData<List<TransactionWithCategory>> getTransactionsWithCategoryByUser(int userId);
 
     @Query("SELECT t.transaction_id, t.user_id, t.wallet_id, t.category_id, " +
-            "t.description, t.amount, t.date, t.is_expense, " +
+            "t.description, t.amount, t.date, t.is_expense, t.receipt_photo_uri, " +  // ← Add this
             "c.name as categoryName, c.icon_res_id as categoryIcon, c.color_res_id as categoryColor " +
             "FROM transactions t " +
             "INNER JOIN categories c ON t.category_id = c.category_id " +

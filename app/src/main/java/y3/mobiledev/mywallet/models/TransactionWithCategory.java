@@ -45,10 +45,16 @@ public class TransactionWithCategory {
     @ColumnInfo(name = "categoryColor")
     private int categoryColor;
 
+    @ColumnInfo(name = "receipt_photo_uri")
+    private String receiptPhotoUri;
+
+
     // Constructor
     public TransactionWithCategory(int transactionId, int userId, int walletId, int categoryId,
                                    String description, double amount, long date, boolean isExpense,
-                                   String categoryName, int categoryIcon, int categoryColor) {
+                                   String categoryName, int categoryIcon, int categoryColor,
+                                   String receiptPhotoUri) {
+
         this.transactionId = transactionId;
         this.userId = userId;
         this.walletId = walletId;
@@ -60,6 +66,7 @@ public class TransactionWithCategory {
         this.categoryName = categoryName;
         this.categoryIcon = categoryIcon;
         this.categoryColor = categoryColor;
+        this.receiptPhotoUri = receiptPhotoUri;
     }
 
     // Getters
@@ -100,10 +107,21 @@ public class TransactionWithCategory {
     public void setCategoryIcon(int categoryIcon) { this.categoryIcon = categoryIcon; }
     public void setCategoryColor(int categoryColor) { this.categoryColor = categoryColor; }
 
+    public String getReceiptPhotoUri() {
+        return receiptPhotoUri;
+    }
+
+    public void setReceiptPhotoUri(String receiptPhotoUri) {
+        this.receiptPhotoUri = receiptPhotoUri;
+    }
+
+
     // Convert to Transaction object (without category details)
     @Ignore
     public Transaction toTransaction() {
         return new Transaction(transactionId, userId, walletId, categoryId,
-                description, amount, date, isExpense, System.currentTimeMillis());
+                description, amount, date, isExpense, System.currentTimeMillis(),
+                receiptPhotoUri);
     }
+
 }

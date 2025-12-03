@@ -1,22 +1,34 @@
 package y3.mobiledev.mywallet.fragments;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import y3.mobiledev.mywallet.helpers.PhotoManager;
 import y3.mobiledev.mywallet.helpers.PickersAndDialog;
 import y3.mobiledev.mywallet.helpers.CategoryWalletManager;
 import y3.mobiledev.mywallet.helpers.TransactionManager;
@@ -40,7 +52,9 @@ public class AddTransactionFragment extends Fragment {
     private RadioGroup rgTransactionType;
     private RelativeLayout layoutCategoryPicker, layoutWalletPicker, layoutDatePicker;
     private TextView tvSelectedCategory, tvSelectedWallet, tvSelectedDate;
-    private Button btnSave;
+    private Button btnSave, btnAddReceipt;
+    private ImageView ivReceiptPreview, ivRemoveReceipt;
+    private CardView cvReceiptPreview;
     private TransactionViewModel viewModel;
 
     private List<Wallet> wallets = new ArrayList<>();
@@ -49,12 +63,23 @@ public class AddTransactionFragment extends Fragment {
     private Date selectedDate;
     private boolean isExpense = true;
 
+
+    // Photo handling
+    private Uri selectedPhotoUri;
+    private String savedPhotoPath;
+
+    // Launchers
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_add_transaction, container, false);
         viewModel = new ViewModelProvider(requireActivity()).get(TransactionViewModel.class);
 
+        setupLaunchers();
         initViews(view);
         setupListeners();
         observeData();
@@ -63,6 +88,33 @@ public class AddTransactionFragment extends Fragment {
         etAmount.requestFocus();
 
         return view;
+    }
+
+    private void setupLaunchers() {
+        // Image picker launcher
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
+                        selectedPhotoUri = result.getData().getData();
+                        updateReceiptPreview();
+                    }
+                }
+        );
+
+        // Permission launcher
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        launchImagePicker();
+                    } else {
+                        Toast.makeText(requireContext(),
+                                "Permission denied. Cannot select photo.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
     }
 
 
@@ -78,6 +130,13 @@ public class AddTransactionFragment extends Fragment {
         tvSelectedCategory = view.findViewById(R.id.tvSelectedCategory);
         tvSelectedWallet = view.findViewById(R.id.tvSelectedWallet);
         tvSelectedDate = view.findViewById(R.id.tvSelectedDate);
+
+        // Receipt views
+        btnAddReceipt = view.findViewById(R.id.btnAddReceipt);
+        ivReceiptPreview = view.findViewById(R.id.ivReceiptPreview);
+        ivRemoveReceipt = view.findViewById(R.id.ivRemoveReceipt);
+        cvReceiptPreview = view.findViewById(R.id.cvReceiptPreview);
+
     }
 
     //Setting up ClickListeners
@@ -97,7 +156,60 @@ public class AddTransactionFragment extends Fragment {
         layoutCategoryPicker.setOnClickListener(v -> onCategoryPicker());
         layoutWalletPicker.setOnClickListener(v -> onWalletPicker());
         layoutDatePicker.setOnClickListener(v -> showDatePicker());
+
+        // Receipt photo button
+        btnAddReceipt.setOnClickListener(v -> openImagePicker());
+
+        // Remove receipt button
+        ivRemoveReceipt.setOnClickListener(v -> clearReceipt());
+
     }
+
+    private void openImagePicker() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+
+            if (ContextCompat.checkSelfPermission(requireContext(),
+                    Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
+                launchImagePicker();
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES);
+            }
+        } else {
+            // Android 12 and below
+            if (ContextCompat.checkSelfPermission(requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                launchImagePicker();
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        }
+    }
+
+    private void launchImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        imagePickerLauncher.launch(intent);
+    }
+
+    private void updateReceiptPreview() {
+        if (selectedPhotoUri != null) {
+            ivReceiptPreview.setImageURI(selectedPhotoUri);
+            cvReceiptPreview.setVisibility(View.VISIBLE);
+            btnAddReceipt.setText("Change Receipt Photo");
+        } else {
+            cvReceiptPreview.setVisibility(View.GONE);
+            btnAddReceipt.setText("Add Receipt Photo");
+        }
+    }
+
+    private void clearReceipt() {
+        selectedPhotoUri = null;
+        savedPhotoPath = null;
+        updateReceiptPreview();
+        Toast.makeText(requireContext(), "Receipt removed", Toast.LENGTH_SHORT).show();
+    }
+
+
 
     //Save Transaction with Input Validation
     private void saveTransaction() {
@@ -133,15 +245,26 @@ public class AddTransactionFragment extends Fragment {
 
         String notes = TransactionManager.truncateToWords(etNotes.getText().toString().trim(), MAX_NOTE_WORDS, false);
 
-        // Call the addTransaction from View Model
+        // Save photo if selected
+        if (selectedPhotoUri != null) {
+            savedPhotoPath = PhotoManager.saveReceiptPhoto(requireContext(), selectedPhotoUri);
+            if (savedPhotoPath == null) {
+                Toast.makeText(requireContext(), "Failed to save receipt photo", Toast.LENGTH_SHORT).show();
+                // Continue anyway - photo is optional
+            }
+        }
+
+        // Call addTransaction with receipt photo path
         viewModel.addTransaction(
                 selectedWallet.getWalletId(),
-                selectedCategory.getCategoryId(),  // ← Now using categoryId instead of name
+                selectedCategory.getCategoryId(),
                 notes,
                 amount,
-                selectedDate.getTime(),  // ← Convert Date to long timestamp
-                isExpense
+                selectedDate.getTime(),
+                isExpense,
+                savedPhotoPath
         );
+
 
 
         Toast.makeText(requireContext(), "Transaction saved!", Toast.LENGTH_SHORT).show();
