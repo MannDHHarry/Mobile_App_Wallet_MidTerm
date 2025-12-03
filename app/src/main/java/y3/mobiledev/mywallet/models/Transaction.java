@@ -67,11 +67,14 @@ public class Transaction {
     @ColumnInfo(name = "created_at")
     private long createdAt;
 
+    @ColumnInfo(name = "receipt_photo_uri")
+    private String receiptPhotoUri;
+
     // Primary Constructor - for Room Db
 
     public Transaction(int transactionId, int userId, int walletId, int categoryId,
                        String description, double amount, long date, boolean isExpense,
-                       long createdAt) {
+                       long createdAt , String receiptPhotoUri) {
         this.transactionId = transactionId;
         this.userId = userId;
         this.walletId = walletId;
@@ -81,12 +84,14 @@ public class Transaction {
         this.date = date;
         this.isExpense = isExpense;
         this.createdAt = createdAt;
+        this.receiptPhotoUri = receiptPhotoUri;
+
     }
 
     // Constructor for creating new transactions
     @Ignore
     public Transaction(int userId, int walletId, int categoryId, String description,
-                       double amount, long date, boolean isExpense) {
+                       double amount, long date, boolean isExpense, String receiptPhotoUri) {
         this.userId = userId;
         this.walletId = walletId;
         this.categoryId = categoryId;
@@ -95,6 +100,8 @@ public class Transaction {
         this.date = date;
         this.isExpense = isExpense;
         this.createdAt = System.currentTimeMillis();
+        this.receiptPhotoUri = receiptPhotoUri;
+
     }
 
     @Ignore
@@ -163,4 +170,13 @@ public class Transaction {
     public void setCategoryIconResId(int iconResId) { }
     @Ignore
     public void setCategoryColor(int color) { }
+
+    public String getReceiptPhotoUri() {
+        return receiptPhotoUri;
+    }
+
+    public void setReceiptPhotoUri(String receiptPhotoUri) {
+        this.receiptPhotoUri = receiptPhotoUri;
+    }
+
 }

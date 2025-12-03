@@ -139,19 +139,24 @@ public class TransactionViewModel extends AndroidViewModel {
     // Transaction Related Methods
 
     public void addTransaction(int walletId, int categoryId, String description, double amount,
-                               long date, boolean isExpense)
-
-    {
-        //Call this in AddTransaction Fragment
-
+                               long date, boolean isExpense, String receiptPhotoUri) {
         User user = currentUser.getValue();
         if (user == null) return;
 
-        Transaction transaction = new Transaction( user.getUserId(), walletId, categoryId,
-                                                    description, amount, date, isExpense );
+        Transaction transaction = new Transaction(
+                user.getUserId(),
+                walletId,
+                categoryId,
+                description,
+                amount,
+                date,
+                isExpense,
+                receiptPhotoUri  // ← NEW parameter
+        );
 
         transactionRepository.addTransaction(transaction);
     }
+
 
     public void updateTransaction(Transaction oldTransaction, Transaction newTransaction) {
         transactionRepository.updateTransaction(oldTransaction, newTransaction);

@@ -66,7 +66,7 @@
                     android:layout_height="48dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:background="@drawable/radio_button_expense"
+                    android:background="@drawable/radio_button_expense_selector"
                     android:button="@null"
                     android:checked="true"
                     android:gravity="center"
@@ -81,7 +81,7 @@
                     android:layout_height="48dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:background="@drawable/radio_button_income"
+                    android:background="@drawable/radio_button_income_selector"
                     android:button="@null"
                     android:gravity="center"
                     android:text="Income"
@@ -243,12 +243,95 @@
                 android:textColorHint="@color/text_gray"
                 android:textSize="16sp"/>
 
+            <!-- Receipt Photo Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Receipt Photo (Optional)"
+                android:textColor="@color/text_black"
+                android:textSize="14sp"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp">
+
+                <!-- Add Receipt Button -->
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnAddReceipt"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/rounded_input_background"
+                    android:drawableStart="@android:drawable/ic_menu_camera"
+                    android:drawablePadding="8dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:text="Add Receipt Photo"
+                    android:textColor="@color/colorDarkPurple"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"/>
+
+                <!-- Receipt Preview Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cvReceiptPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnAddReceipt"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/ivReceiptPreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="180dp"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Receipt preview"/>
+
+                        <!-- Remove button overlay -->
+                        <ImageView
+                            android:id="@+id/ivRemoveReceipt"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_margin="8dp"
+                            android:background="@drawable/circle_background_red"
+                            android:padding="6dp"
+                            android:src="@android:drawable/ic_menu_close_clear_cancel"
+                            android:contentDescription="Remove receipt"
+                            app:tint="@color/colorWhite"/>
+
+                        <!-- Hint Text -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginBottom="8dp"
+                            android:background="#80000000"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"
+                            android:text="Tap ✕ to remove"
+                            android:textColor="@color/colorWhite"
+                            android:textSize="11sp"/>
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+            </RelativeLayout>
+
             <!-- Save Button -->
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnSaveTransaction"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/rounded_button_purple"
                 android:text="Save Transaction"
                 android:textColor="@color/colorWhite"

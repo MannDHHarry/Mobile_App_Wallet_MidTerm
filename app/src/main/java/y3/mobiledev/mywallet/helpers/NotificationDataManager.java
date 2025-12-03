@@ -136,6 +136,7 @@ public class NotificationDataManager {
         json.put("categoryName", nullToEmpty(t.getCategoryName()));
         json.put("categoryIcon", t.getCategoryIcon());
         json.put("categoryColor", t.getCategoryColor());
+        json.put("receiptPhotoUri", nullToEmpty(t.getReceiptPhotoUri()));
         return json;
     }
 
@@ -159,7 +160,8 @@ public class NotificationDataManager {
                     json.getBoolean("isExpense"),
                     json.optString("categoryName", "Unknown"),
                     json.optInt("categoryIcon", 0),
-                    json.optInt("categoryColor", 0)
+                    json.optInt("categoryColor", 0),
+                    json.optString("receiptPhotoUri", null)  // THIS WAS MISSING TOO!
             );
             list.add(t);
         }
