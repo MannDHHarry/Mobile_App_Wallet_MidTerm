@@ -42,9 +42,9 @@ public class PickersAndDialog {
     // ===== CATEGORY PICKER (Selection Only) =====
     public static void showCategoryPicker(Context context, List<Category> categories,
                                           boolean isExpense, OnSelectionListener listener) {
-        if (categories == null || categories.isEmpty()) {
-            Toast.makeText(context, "No categories available", Toast.LENGTH_SHORT).show();
-            return;
+        // Initialize empty list if null
+        if (categories == null) {
+            categories = new ArrayList<>();
         }
 
         List<Object> displayList = new ArrayList<>(categories);

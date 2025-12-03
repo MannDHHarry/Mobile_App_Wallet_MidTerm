@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import y3.mobiledev.mywallet.Converters;
+import y3.mobiledev.mywallet.models.SpendingAnalysisResult;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
 import y3.mobiledev.mywallet.models.TransactionWithCategory;
@@ -42,7 +43,7 @@ public class StatisticsFragment extends Fragment {
     private RadioGroup rgTransactionType;
     private RadioButton rbExpense, rbIncome;
     private Button btnPreviousMonth, btnNextMonth;
-    private TextView tvMonthYear, tvSummaryTitle, tvTotalAmount, tvCategoryBreakdown;
+    private TextView tvMonthYear, tvSummaryTitle, tvTotalAmount, tvCategoryBreakdown, tvAIInsights;
     private TransactionViewModel viewModel;
 
     private boolean isExpense = true;
@@ -62,6 +63,7 @@ public class StatisticsFragment extends Fragment {
         setupRadioButtons();
         setupDatePickers();
         observeData();
+        observeAIInsights();
 
         return view;
     }
@@ -79,6 +81,7 @@ public class StatisticsFragment extends Fragment {
         tvSummaryTitle = view.findViewById(R.id.tvSummaryTitle);
         tvTotalAmount = view.findViewById(R.id.tvTotalAmount);
         tvCategoryBreakdown = view.findViewById(R.id.tvCategoryBreakdown);
+        tvAIInsights = view.findViewById(R.id.tvAIInsights);
     }
 
     private void setupChart() {
@@ -261,5 +264,26 @@ public class StatisticsFragment extends Fragment {
         colors.add(Color.parseColor("#F7DC6F"));
         colors.add(Color.parseColor("#BB8FCE"));
         return colors;
+    }
+
+    // Observe AI Insights
+    private void observeAIInsights() {
+        viewModel.getSpendingInsights().observe(getViewLifecycleOwner(), result -> {
+            if (result != null && result.getInsights() != null && !result.getInsights().isEmpty()) {
+                // Show top 3 insights
+                List<String> insights = result.getInsights();
+                StringBuilder insightsText = new StringBuilder();
+                int maxInsights = Math.min(insights.size(), 3);
+                for (int i = 0; i < maxInsights; i++) {
+                    insightsText.append(insights.get(i));
+                    if (i < maxInsights - 1) {
+                        insightsText.append("\n\n");
+                    }
+                }
+                tvAIInsights.setText(insightsText.toString());
+            } else {
+                tvAIInsights.setText("Add more transactions to get AI insights!");
+            }
+        });
     }
 }

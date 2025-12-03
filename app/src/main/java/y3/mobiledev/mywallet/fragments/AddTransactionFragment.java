@@ -58,6 +58,8 @@ public class AddTransactionFragment extends Fragment {
     private TransactionViewModel viewModel;
 
     private List<Wallet> wallets = new ArrayList<>();
+    private List<Category> expenseCategories = new ArrayList<>();
+    private List<Category> incomeCategories = new ArrayList<>();
     private Category selectedCategory;
     private Wallet selectedWallet;
     private Date selectedDate;
@@ -273,13 +275,7 @@ public class AddTransactionFragment extends Fragment {
 
     //Three Pickers Category , Wallet and Date
     private void onCategoryPicker() {
-        List<Category> categoriesToShow = isExpense ?
-                viewModel.getExpenseCategories().getValue() :
-                viewModel.getIncomeCategories().getValue();
-
-        if (categoriesToShow == null) {
-            categoriesToShow = new ArrayList<>();
-        }
+        List<Category> categoriesToShow = isExpense ? expenseCategories : incomeCategories;
 
         PickersAndDialog.showCategoryPicker(requireContext(), categoriesToShow, isExpense,
                 item -> {
@@ -329,9 +325,7 @@ public class AddTransactionFragment extends Fragment {
                 isExpense,
                 () -> {
                     // pick the newly created category (last in the list)
-                    List<Category> list = isExpense
-                            ? viewModel.getExpenseCategories().getValue()
-                            : viewModel.getIncomeCategories().getValue();
+                    List<Category> list = isExpense ? expenseCategories : incomeCategories;
                     if (list != null && !list.isEmpty()) {
                         selectedCategory = list.get(list.size() - 1);
                         tvSelectedCategory.setText(selectedCategory.getName());
@@ -387,6 +381,24 @@ public class AddTransactionFragment extends Fragment {
         viewModel.getWallets().observe(getViewLifecycleOwner(), walletList -> {
             if (walletList != null) {
                 wallets = new ArrayList<>(walletList);
+            }
+        });
+
+        // Observe expense categories
+        viewModel.getExpenseCategories().observe(getViewLifecycleOwner(), categoryList -> {
+            if (categoryList != null) {
+                expenseCategories = new ArrayList<>(categoryList);
+            } else {
+                expenseCategories = new ArrayList<>();
+            }
+        });
+
+        // Observe income categories
+        viewModel.getIncomeCategories().observe(getViewLifecycleOwner(), categoryList -> {
+            if (categoryList != null) {
+                incomeCategories = new ArrayList<>(categoryList);
+            } else {
+                incomeCategories = new ArrayList<>();
             }
         });
     }
