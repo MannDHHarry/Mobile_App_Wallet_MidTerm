@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import y3.mobiledev.mywallet.adapters.TransactionAdapter;
 import y3.mobiledev.mywallet.adapters.WalletAdapter;
 import y3.mobiledev.mywallet.helpers.CategoryWalletManager;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 import y3.mobiledev.mywallet.helpers.DateManager;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
@@ -188,9 +189,9 @@ public class HomeFragment extends Fragment {
             }
         }
 
-        tvTotalBalance.setText(String.format(Locale.US, "$%,.2f", totalBalance));
-        tvIncome.setText(String.format(Locale.US, "$%,.0f", totalIncome));
-        tvExpense.setText(String.format(Locale.US, "$%,.0f", totalExpense));
+        tvTotalBalance.setText(CurrencyUtils.formatFullAmount(totalBalance));
+        tvIncome.setText(CurrencyUtils.formatPlainAmount(totalIncome));
+        tvExpense.setText(CurrencyUtils.formatPlainAmount(totalExpense));
     }
 
 

@@ -108,7 +108,7 @@ public class SubscriptionFragment extends Fragment {
         if (subscriptions.isEmpty()) {
             rvSubscriptions.setVisibility(View.GONE);
             emptyState.setVisibility(View.VISIBLE);
-            tvTotalSubscriptions.setText("Total Monthly: $0.00");
+            tvTotalSubscriptions.setText("Total Monthly: 0 ₫");
         } else {
             rvSubscriptions.setVisibility(View.VISIBLE);
             emptyState.setVisibility(View.GONE);
@@ -120,8 +120,9 @@ public class SubscriptionFragment extends Fragment {
                     total += sub.getAmount();
                 }
             }
-            tvTotalSubscriptions.setText(String.format(Locale.US,
-                    "Total Monthly: $%,.2f", total));
+            tvTotalSubscriptions.setText(
+                    "Total Monthly: " + y3.mobiledev.mywallet.helpers.CurrencyUtils.formatPlainAmount(total)
+            );
         }
     }
 

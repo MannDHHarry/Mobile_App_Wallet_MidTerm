@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 import y3.mobiledev.mywallet.models.SpendingAnalysisResult;
 import y3.mobiledev.mywallet.models.TransactionWithCategory;
 
@@ -314,8 +315,9 @@ public class SpendingAnalyzer {
         // Savings insights
         if (result.isExpensesExceedIncome()) {
             insights.add(String.format(Locale.US,
-                    "⚠️ Your expenses (Rs. %.2f) exceeded your income (Rs. %.2f) this period.",
-                    result.getTotalExpenses(), result.getTotalIncome()));
+                    "⚠️ Your expenses (%s) exceeded your income (%s) this period.",
+                    CurrencyUtils.formatPlainAmount(result.getTotalExpenses()),
+                    CurrencyUtils.formatPlainAmount(result.getTotalIncome())));
         } else if (result.getSavingsRate() > 0) {
             insights.add(String.format(Locale.US,
                     "✅ Great! You saved %.1f%% of your income this period.",
@@ -370,8 +372,9 @@ public class SpendingAnalyzer {
                 }
             }
             insights.add(String.format(Locale.US,
-                    "💰 %s is your top spending category (Rs. %.2f).",
-                    topCategory.getCategoryName(), topCategory.getCurrentAmount()));
+                    "💰 %s is your top spending category (%s).",
+                    topCategory.getCategoryName(),
+                    CurrencyUtils.formatPlainAmount(topCategory.getCurrentAmount())));
         }
 
         if (insights.isEmpty()) {

@@ -102,16 +102,22 @@ public class NotificationHelper {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format(Locale.US, " Income: $%,.2f (%d transaction%s)\n",
-                income, incomeCount, incomeCount == 1 ? "" : "s"));
+        sb.append(String.format(Locale.US, " Income: %s (%d transaction%s)\n",
+                CurrencyUtils.formatPlainAmount(income),
+                incomeCount,
+                incomeCount == 1 ? "" : "s"));
 
-        sb.append(String.format(Locale.US, " Expenses: $%,.2f (%d transaction%s)\n",
-                expense, expenseCount, expenseCount == 1 ? "" : "s"));
+        sb.append(String.format(Locale.US, " Expenses: %s (%d transaction%s)\n",
+                CurrencyUtils.formatPlainAmount(expense),
+                expenseCount,
+                expenseCount == 1 ? "" : "s"));
 
         if (netAmount >= 0) {
-            sb.append(String.format(Locale.US, " You saved $%,.2f today!", netAmount));
+            sb.append(String.format(Locale.US, " You saved %s today!",
+                    CurrencyUtils.formatPlainAmount(netAmount)));
         } else {
-            sb.append(String.format(Locale.US, " You overspent by $%,.2f today", Math.abs(netAmount)));
+            sb.append(String.format(Locale.US, " You overspent by %s today",
+                    CurrencyUtils.formatPlainAmount(Math.abs(netAmount))));
         }
 
         return sb.toString();
@@ -123,8 +129,12 @@ public class NotificationHelper {
         }
 
         String netSign = netAmount >= 0 ? "+" : "-";
-        return String.format(Locale.US, "Income: $%,.2f | Expenses: $%,.2f | Net: %s$%,.2f",
-                income, expense, netSign, Math.abs(netAmount));
+        return String.format(Locale.US,
+                "Income: %s | Expenses: %s | Net: %s%s",
+                CurrencyUtils.formatPlainAmount(income),
+                CurrencyUtils.formatPlainAmount(expense),
+                netSign,
+                CurrencyUtils.formatPlainAmount(Math.abs(netAmount)));
     }
 
     /**

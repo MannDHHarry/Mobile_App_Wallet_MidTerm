@@ -121,8 +121,8 @@ public class PickersAndDialog {
                     public String getDisplayText(Object item) {
                         if (item instanceof Wallet) {
                             Wallet wallet = (Wallet) item;
-                            return wallet.getName() + " ($" +
-                                    String.format(Locale.US, "%.2f", wallet.getBalance()) + ")";
+                            String balanceText = CurrencyUtils.formatPlainAmount(wallet.getBalance());
+                            return wallet.getName() + " (" + balanceText + ")";
                         } else if (item instanceof String) {
                             return (String) item;
                         }

@@ -17,6 +17,7 @@ import java.util.Locale;
 
 import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.TransactionViewModel;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 import y3.mobiledev.mywallet.models.SpendingAnalysisResult;
 
 public class SpendingInsightsFragment extends Fragment {
@@ -89,12 +90,12 @@ public class SpendingInsightsFragment extends Fragment {
             tvInsights.setText("No insights available yet.");
         }
 
-        // Update financial summary
-        tvTotalIncome.setText(String.format(Locale.US, "Total Income: Rs. %.2f", result.getTotalIncome()));
-        tvTotalExpenses.setText(String.format(Locale.US, "Total Expenses: Rs. %.2f", result.getTotalExpenses()));
+        // Update financial summary (VND)
+        tvTotalIncome.setText("Total Income: " + CurrencyUtils.formatPlainAmount(result.getTotalIncome()));
+        tvTotalExpenses.setText("Total Expenses: " + CurrencyUtils.formatPlainAmount(result.getTotalExpenses()));
         
         double netAmount = result.getNetAmount();
-        String netText = String.format(Locale.US, "Net Amount: Rs. %.2f", netAmount);
+        String netText = "Net Amount: " + CurrencyUtils.formatPlainAmount(netAmount);
         if (netAmount < 0) {
             netText += " (Overspent)";
         } else {
@@ -110,9 +111,9 @@ public class SpendingInsightsFragment extends Fragment {
             StringBuilder spikesText = new StringBuilder();
             for (SpendingAnalysisResult.SpendingSpike spike : spikes) {
                 spikesText.append(String.format(Locale.US,
-                        "• %s: Rs. %.2f (%.1fx above average)\n",
+                        "• %s: %s (%.1fx above average)\n",
                         spike.getCategoryName(),
-                        spike.getTransaction().getAmount(),
+                        CurrencyUtils.formatPlainAmount(spike.getTransaction().getAmount()),
                         spike.getSpikeMultiplier()));
             }
             tvSpendingSpikes.setText(spikesText.toString().trim());
@@ -128,10 +129,10 @@ public class SpendingInsightsFragment extends Fragment {
                 if (Math.abs(analysis.getChangePercentage()) > 10) {
                     String trend = analysis.isIncreasing() ? "↑" : "↓";
                     trendsText.append(String.format(Locale.US,
-                            "• %s %s: Rs. %.2f (%.1f%% change)\n",
+                            "• %s %s: %s (%.1f%% change)\n",
                             trend,
                             analysis.getCategoryName(),
-                            analysis.getCurrentAmount(),
+                            CurrencyUtils.formatPlainAmount(analysis.getCurrentAmount()),
                             Math.abs(analysis.getChangePercentage())));
                 }
             }
@@ -147,9 +148,9 @@ public class SpendingInsightsFragment extends Fragment {
 
     private void showEmptyState() {
         tvInsights.setText("No data available. Add some transactions to get insights!");
-        tvTotalIncome.setText("Total Income: Rs. 0.00");
-        tvTotalExpenses.setText("Total Expenses: Rs. 0.00");
-        tvNetAmount.setText("Net Amount: Rs. 0.00");
+        tvTotalIncome.setText("Total Income: 0 ₫");
+        tvTotalExpenses.setText("Total Expenses: 0 ₫");
+        tvNetAmount.setText("Net Amount: 0 ₫");
         tvSavingsRate.setText("Savings Rate: 0%");
         tvSpendingSpikes.setText("No data available.");
         tvCategoryTrends.setText("No data available.");

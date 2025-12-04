@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import y3.mobiledev.mywallet.Converters;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 import y3.mobiledev.mywallet.helpers.TransactionManager;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
@@ -193,13 +194,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         Date transactionDate = Converters.fromTimestamp(twc.getDate());
         holder.tvDate.setText(formatDate(transactionDate));
 
-        // Amount with color
-        String amountText;
+        // Amount with color (VND, compact)
+        String amountText = CurrencyUtils.formatTransactionAmount(twc.getAmount(), twc.isExpense());
         if (twc.isExpense()) {
-            amountText = String.format(Locale.US, "-$%,.2f", twc.getAmount());
             holder.tvAmount.setTextColor(ContextCompat.getColor(context, R.color.expense_red));
         } else {
-            amountText = String.format(Locale.US, "+$%,.2f", twc.getAmount());
             holder.tvAmount.setTextColor(ContextCompat.getColor(context, R.color.income_green));
         }
         holder.tvAmount.setText(amountText);
@@ -252,12 +251,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     private void setAmountText(TransactionViewHolder holder, Transaction transaction) {
-        String amountText;
+        String amountText = CurrencyUtils.formatTransactionAmount(transaction.getAmount(), transaction.isExpense());
         if (transaction.isExpense()) {
-            amountText = String.format(Locale.US, "-$%,.2f", transaction.getAmount());
             holder.tvAmount.setTextColor(ContextCompat.getColor(context, R.color.expense_red));
         } else {
-            amountText = String.format(Locale.US, "+$%,.2f", transaction.getAmount());
             holder.tvAmount.setTextColor(ContextCompat.getColor(context, R.color.income_green));
         }
         holder.tvAmount.setText(amountText);

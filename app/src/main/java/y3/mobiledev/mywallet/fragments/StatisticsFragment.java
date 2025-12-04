@@ -2,6 +2,7 @@ package y3.mobiledev.mywallet.fragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +16,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,15 +43,20 @@ import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
 import y3.mobiledev.mywallet.models.TransactionWithCategory;
 import y3.mobiledev.mywallet.R;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 import y3.mobiledev.mywallet.TransactionViewModel;
 
 public class StatisticsFragment extends Fragment {
 
+    private LineChart lineChart;
     private PieChart pieChart;
     private RadioGroup rgTransactionType;
     private RadioButton rbExpense, rbIncome;
     private Button btnPreviousMonth, btnNextMonth;
     private TextView tvMonthYear, tvSummaryTitle, tvTotalAmount, tvCategoryBreakdown, tvAIInsights;
+    private TextView tvSummaryIncome, tvSummaryExpenses, tvSummaryNet;
+    private View emptyStateView;
+    private View statsScrollView;
     private TransactionViewModel viewModel;
 
     private boolean isExpense = true;
@@ -59,16 +72,18 @@ public class StatisticsFragment extends Fragment {
         initViews(view);
         viewModel = new ViewModelProvider(requireActivity()).get(TransactionViewModel.class);
 
-        setupChart();
+        setupLineChart();
+        setupPieChart();
         setupRadioButtons();
         setupDatePickers();
         observeData();
-        observeAIInsights();
+        observeStatisticsAlerts();
 
         return view;
     }
 
     private void initViews(View view) {
+        lineChart = view.findViewById(R.id.lineChart);
         pieChart = view.findViewById(R.id.pieChart);
         rgTransactionType = view.findViewById(R.id.rgTransactionType);
         rbExpense = view.findViewById(R.id.rbExpense);
@@ -82,9 +97,28 @@ public class StatisticsFragment extends Fragment {
         tvTotalAmount = view.findViewById(R.id.tvTotalAmount);
         tvCategoryBreakdown = view.findViewById(R.id.tvCategoryBreakdown);
         tvAIInsights = view.findViewById(R.id.tvAIInsights);
+
+        tvSummaryIncome = view.findViewById(R.id.tvSummaryIncome);
+        tvSummaryExpenses = view.findViewById(R.id.tvSummaryExpenses);
+        tvSummaryNet = view.findViewById(R.id.tvSummaryNet);
+        emptyStateView = view.findViewById(R.id.emptyStateStatistics);
+        statsScrollView = view.findViewById(R.id.statsScrollView);
     }
 
-    private void setupChart() {
+    private void setupLineChart() {
+        lineChart.getDescription().setEnabled(false);
+        lineChart.setNoDataText("No data for this period");
+        lineChart.getAxisRight().setEnabled(false);
+
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setDrawGridLines(false);
+
+        lineChart.getAxisLeft().setDrawGridLines(true);
+    }
+
+    private void setupPieChart() {
         pieChart.setUsePercentValues(true);
         pieChart.getDescription().setEnabled(false);
         pieChart.setExtraOffsets(5, 10, 5, 5);
@@ -146,13 +180,111 @@ public class StatisticsFragment extends Fragment {
     private void observeData() {
         viewModel.getTransactionGroups().observe(getViewLifecycleOwner(), groups -> {
             if (groups != null) {
-                updateChart(groups);
                 updateSummaryReport(groups);
+                updateLineChart(groups);
+                updatePieChart(groups);
+                toggleEmptyState(hasTransactionsInRange(groups));
+            } else {
+                toggleEmptyState(false);
             }
         });
     }
 
-    private void updateChart(List<TransactionGroup> groups) {
+    private void updateLineChart(List<TransactionGroup> groups) {
+        if (lineChart == null) return;
+
+        long startTime = startDate.getTimeInMillis();
+        long endTime = endDate.getTimeInMillis();
+
+        // Aggregate amounts by day within the current month and type (expense/income)
+        Map<String, Float> dailyAmounts = new HashMap<>();
+        SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.US);
+
+        for (TransactionGroup group : groups) {
+            for (Object transactionObj : group.getTransactions()) {
+                long transactionTime;
+                double amount;
+                boolean isTransactionExpense;
+
+                if (transactionObj instanceof TransactionWithCategory) {
+                    TransactionWithCategory twc = (TransactionWithCategory) transactionObj;
+                    transactionTime = twc.getDate();
+                    amount = twc.getAmount();
+                    isTransactionExpense = twc.isExpense();
+                } else if (transactionObj instanceof Transaction) {
+                    Transaction transaction = (Transaction) transactionObj;
+                    transactionTime = transaction.getDate();
+                    amount = transaction.getAmount();
+                    isTransactionExpense = transaction.isExpense();
+                } else {
+                    continue;
+                }
+
+                if (transactionTime >= startTime && transactionTime <= endTime &&
+                        isTransactionExpense == isExpense) {
+                    Date date = new Date(transactionTime);
+                    String dayKey = dayFormat.format(date);
+                    float current = dailyAmounts.getOrDefault(dayKey, 0f);
+                    dailyAmounts.put(dayKey, current + (float) amount);
+                }
+            }
+        }
+
+        if (dailyAmounts.isEmpty()) {
+            lineChart.clear();
+            lineChart.invalidate();
+            return;
+        }
+
+        // Sort by day number
+        List<String> days = new ArrayList<>(dailyAmounts.keySet());
+        java.util.Collections.sort(days, (d1, d2) -> {
+            try {
+                int i1 = Integer.parseInt(d1);
+                int i2 = Integer.parseInt(d2);
+                return Integer.compare(i1, i2);
+            } catch (NumberFormatException e) {
+                return d1.compareTo(d2);
+            }
+        });
+
+        List<Entry> entries = new ArrayList<>();
+        for (int i = 0; i < days.size(); i++) {
+            String day = days.get(i);
+            float value = dailyAmounts.get(day);
+            entries.add(new Entry(i, value));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, isExpense ? "Daily Expenses" : "Daily Income");
+        dataSet.setLineWidth(2f);
+        dataSet.setCircleRadius(3f);
+        dataSet.setDrawValues(false);
+        int color = getResources().getColor(isExpense ? R.color.expense_red : R.color.income_green);
+        dataSet.setColor(color);
+        dataSet.setCircleColor(color);
+
+        LineData lineData = new LineData(dataSet);
+
+        // Format X axis with day numbers
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                int index = (int) value;
+                if (index >= 0 && index < days.size()) {
+                    return days.get(index);
+                }
+                return "";
+            }
+        });
+
+        lineChart.setData(lineData);
+        lineChart.invalidate();
+    }
+
+    private void updatePieChart(List<TransactionGroup> groups) {
+        if (pieChart == null) return;
+
         Map<String, Float> categoryAmounts = calculateCategoryAmounts(groups);
 
         ArrayList<PieEntry> entries = new ArrayList<>();
@@ -162,6 +294,7 @@ public class StatisticsFragment extends Fragment {
 
         if (entries.isEmpty()) {
             pieChart.clear();
+            pieChart.invalidate();
             return;
         }
 
@@ -175,7 +308,8 @@ public class StatisticsFragment extends Fragment {
         data.setValueTextColor(Color.WHITE);
 
         pieChart.setData(data);
-        pieChart.animateY(1000);
+        pieChart.animateY(800);
+        pieChart.invalidate();
     }
 
     private void updateSummaryReport(List<TransactionGroup> groups) {
@@ -186,11 +320,55 @@ public class StatisticsFragment extends Fragment {
             totalAmount += amount;
         }
 
+        // Update top summary cards
+        float totalExpenses = 0f;
+        float totalIncome = 0f;
+
+        // Recalculate income/expense totals from original groups within date range
+        long startTime = startDate.getTimeInMillis();
+        long endTime = endDate.getTimeInMillis();
+
+        for (TransactionGroup group : groups) {
+            for (Object transactionObj : group.getTransactions()) {
+                long transactionTime;
+                double amount;
+                boolean isTransactionExpense;
+
+                if (transactionObj instanceof TransactionWithCategory) {
+                    TransactionWithCategory twc = (TransactionWithCategory) transactionObj;
+                    transactionTime = twc.getDate();
+                    amount = twc.getAmount();
+                    isTransactionExpense = twc.isExpense();
+                } else if (transactionObj instanceof Transaction) {
+                    Transaction transaction = (Transaction) transactionObj;
+                    transactionTime = transaction.getDate();
+                    amount = transaction.getAmount();
+                    isTransactionExpense = transaction.isExpense();
+                } else {
+                    continue;
+                }
+
+                if (transactionTime >= startTime && transactionTime <= endTime) {
+                    if (isTransactionExpense) {
+                        totalExpenses += amount;
+                    } else {
+                        totalIncome += amount;
+                    }
+                }
+            }
+        }
+
+        float net = totalIncome - totalExpenses;
+
+        tvSummaryIncome.setText(CurrencyUtils.formatPlainAmount(totalIncome));
+        tvSummaryExpenses.setText(CurrencyUtils.formatPlainAmount(totalExpenses));
+        tvSummaryNet.setText(CurrencyUtils.formatPlainAmount(net));
+
         SimpleDateFormat format = new SimpleDateFormat("MMMM yyyy", Locale.US);
         String dateRange = "(" + format.format(currentMonthCalendar.getTime()) + ")";
 
         tvSummaryTitle.setText((isExpense ? "Expense" : "Income") + " Summary " + dateRange);
-        tvTotalAmount.setText(String.format(Locale.US, "Total: Rs. %.2f", totalAmount));
+        tvTotalAmount.setText("Total: " + CurrencyUtils.formatPlainAmount(totalAmount));
 
         if (totalAmount == 0) {
             tvCategoryBreakdown.setText("No transactions in this period");
@@ -200,8 +378,10 @@ public class StatisticsFragment extends Fragment {
         StringBuilder breakdown = new StringBuilder("Breakdown:\n");
         for (Map.Entry<String, Float> entry : categoryAmounts.entrySet()) {
             float percentage = (entry.getValue() / totalAmount) * 100;
-            breakdown.append(String.format(Locale.US, "• %s: Rs. %.2f (%.1f%%)\n",
-                    entry.getKey(), entry.getValue(), percentage));
+            breakdown.append(String.format(Locale.US, "• %s: %s (%.1f%%)\n",
+                    entry.getKey(),
+                    CurrencyUtils.formatPlainAmount(entry.getValue()),
+                    percentage));
         }
 
         tvCategoryBreakdown.setText(breakdown.toString());
@@ -266,23 +446,45 @@ public class StatisticsFragment extends Fragment {
         return colors;
     }
 
-    // Observe AI Insights
-    private void observeAIInsights() {
-        viewModel.getSpendingInsights().observe(getViewLifecycleOwner(), result -> {
-            if (result != null && result.getInsights() != null && !result.getInsights().isEmpty()) {
-                // Show top 3 insights
-                List<String> insights = result.getInsights();
-                StringBuilder insightsText = new StringBuilder();
-                int maxInsights = Math.min(insights.size(), 3);
-                for (int i = 0; i < maxInsights; i++) {
-                    insightsText.append(insights.get(i));
-                    if (i < maxInsights - 1) {
-                        insightsText.append("\n\n");
-                    }
+    private void toggleEmptyState(boolean hasData) {
+        if (emptyStateView == null || statsScrollView == null) return;
+        emptyStateView.setVisibility(hasData ? View.GONE : View.VISIBLE);
+        statsScrollView.setVisibility(hasData ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean hasTransactionsInRange(List<TransactionGroup> groups) {
+        if (groups == null || startDate == null || endDate == null) {
+            return false;
+        }
+        long startTime = startDate.getTimeInMillis();
+        long endTime = endDate.getTimeInMillis();
+
+        for (TransactionGroup group : groups) {
+            for (Object transactionObj : group.getTransactions()) {
+                long transactionTime;
+                if (transactionObj instanceof TransactionWithCategory) {
+                    transactionTime = ((TransactionWithCategory) transactionObj).getDate();
+                } else if (transactionObj instanceof Transaction) {
+                    transactionTime = ((Transaction) transactionObj).getDate();
+                } else {
+                    continue;
                 }
-                tvAIInsights.setText(insightsText.toString());
+
+                if (transactionTime >= startTime && transactionTime <= endTime) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void observeStatisticsAlerts() {
+        viewModel.getStatisticsAlerts().observe(getViewLifecycleOwner(), alerts -> {
+            if (alerts != null && !alerts.isEmpty()) {
+                String text = TextUtils.join("\n\n", alerts);
+                tvAIInsights.setText(text);
             } else {
-                tvAIInsights.setText("Add more transactions to get AI insights!");
+                tvAIInsights.setText("Add transactions to see this month's alerts.");
             }
         });
     }
