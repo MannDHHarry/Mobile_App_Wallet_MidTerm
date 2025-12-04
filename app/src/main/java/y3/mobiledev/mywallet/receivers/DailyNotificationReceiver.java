@@ -1,19 +1,18 @@
 package y3.mobiledev.mywallet.receivers;
 
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import y3.mobiledev.mywallet.helpers.NotificationDataManager;
 import y3.mobiledev.mywallet.helpers.NotificationHelper;
 import y3.mobiledev.mywallet.helpers.NotificationScheduler;
-import y3.mobiledev.mywallet.helpers.TransactionManager;
-import y3.mobiledev.mywallet.models.TransactionGroup;
+import y3.mobiledev.mywallet.models.TransactionWithCategory;
+import y3.mobiledev.mywallet.repository.TransactionRepository;
 
 public class DailyNotificationReceiver extends BroadcastReceiver {
 
@@ -37,45 +36,55 @@ public class DailyNotificationReceiver extends BroadcastReceiver {
         int userId = NotificationDataManager.getUserId(context);
         Log.d(TAG, "Processing daily summary for user ID: " + userId);
 
-        // Step 2: Load cached transaction groups
-        List<TransactionGroup> groups = NotificationDataManager.loadTransactionGroups(context);
-        if (groups.isEmpty()) {
-            Log.d(TAG, "No transaction groups loaded → showing empty summary");
+        // Step 2: Fetch FRESH data from database (not cached!)
+        TransactionRepository repository = new TransactionRepository(
+                (Application) context.getApplicationContext()
+        );
+        
+        List<TransactionWithCategory> todayTransactions = repository.getTodayTransactionsSync(userId);
+        
+        if (todayTransactions == null || todayTransactions.isEmpty()) {
+            Log.d(TAG, "No transactions today (fresh from database)");
             showEmptySummaryAndReschedule(context);
             return;
         }
 
-        // Step 3: Extract today's transactions
-        TransactionGroup todayGroup = TransactionManager.getTodayGroup(groups);
-        if (todayGroup == null || todayGroup.getTransactions().isEmpty()) {
-            Log.d(TAG, "No transactions today");
-            showEmptySummaryAndReschedule(context);
-            return;
+        // Step 3: Calculate summary from fresh data
+        double totalIncome = 0.0;
+        double totalExpense = 0.0;
+        int incomeCount = 0;
+        int expenseCount = 0;
+
+        for (TransactionWithCategory transaction : todayTransactions) {
+            if (transaction.isExpense()) {
+                totalExpense += transaction.getAmount();
+                expenseCount++;
+            } else {
+                totalIncome += transaction.getAmount();
+                incomeCount++;
+            }
         }
 
-        // Step 4: Calculate summary
-        TransactionManager.DailySummary summary = TransactionManager.calculateDailySummary(todayGroup);
+        Log.d(TAG, String.format("Today's summary (FRESH) → Income: $%.2f (%d), Expense: $%.2f (%d), Net: $%.2f",
+                totalIncome,
+                incomeCount,
+                totalExpense,
+                expenseCount,
+                totalIncome - totalExpense));
 
-        Log.d(TAG, String.format("Today's summary → Income: $%.2f (%d), Expense: $%.2f (%d), Net: $%.2f",
-                summary.getTotalIncome(),
-                summary.getIncomeCount(),
-                summary.getTotalExpense(),
-                summary.getExpenseCount(),
-                summary.getTotalIncome() - summary.getTotalExpense()));
-
-        // Step 5: Show notification
+        // Step 4: Show notification
         NotificationHelper.createNotificationChannel(context);
         NotificationHelper.showDailySummaryNotification(
                 context,
-                summary.getTotalIncome(),
-                summary.getTotalExpense(),
-                summary.getIncomeCount(),
-                summary.getExpenseCount()
+                totalIncome,
+                totalExpense,
+                incomeCount,
+                expenseCount
         );
 
-        Log.d(TAG, "Daily summary notification shown");
+        Log.d(TAG, "Daily summary notification shown with fresh data");
 
-        // Step 6: Always reschedule for tomorrow (critical!)
+        // Step 5: Always reschedule for tomorrow (critical!)
         rescheduleNext(context);
     }
 

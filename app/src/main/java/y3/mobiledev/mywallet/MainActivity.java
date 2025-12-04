@@ -3,6 +3,7 @@ package y3.mobiledev.mywallet;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,12 +63,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean isInitialized = false;
 
 
+    private static final String PREFS_NAME = "welcome_prefs";
+    private static final String PREF_WELCOME_SHOWN = "welcome_notification_shown";
+
     //Permission Request laucher for notification
 
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     Log.d("MainActivity", "Notification permission granted");
+                    if (!hasShownWelcomeNotification()) {
+                        NotificationHelper.showWelcomeNotification(this);
+                        setWelcomeNotificationShown();
+                    }
                     scheduleNotificationIfNeeded();
                 } else {
                     Log.w("MainActivity", "Notification permission denied");
@@ -290,10 +298,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             } else {
                 Log.d("MainActivity", "Notification permission already granted");
+                if (!hasShownWelcomeNotification()) {
+                    NotificationHelper.showWelcomeNotification(this);
+                    setWelcomeNotificationShown();
+                }
+                scheduleNotificationIfNeeded();
+            }
+        } else {
+            if (!hasShownWelcomeNotification()) {
+                showNotificationPermissionDialog();
+            } else {
+                scheduleNotificationIfNeeded();
             }
         }
     }
 
+    private void showNotificationPermissionDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Enable Notifications")
+                .setMessage("Would you like to receive daily summaries of your transactions at 10:00 PM?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    Log.d("MainActivity", "User enabled notifications");
+                    NotificationHelper.showWelcomeNotification(this);
+                    setWelcomeNotificationShown();
+                    scheduleNotificationIfNeeded();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    Log.d("MainActivity", "User declined notifications");
+                    setWelcomeNotificationShown();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    private boolean hasShownWelcomeNotification() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        return prefs.getBoolean(PREF_WELCOME_SHOWN, false);
+    }
+
+    private void setWelcomeNotificationShown() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().putBoolean(PREF_WELCOME_SHOWN, true).apply();
+    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {

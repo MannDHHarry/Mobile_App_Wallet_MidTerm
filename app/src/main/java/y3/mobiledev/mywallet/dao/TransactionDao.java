@@ -61,4 +61,14 @@ public interface TransactionDao {
             "WHERE t.wallet_id = :walletId " +
             "ORDER BY t.date DESC")
     LiveData<List<TransactionWithCategory>> getTransactionsWithCategoryByWallet(int walletId);
+
+
+    @Query("SELECT t.transaction_id, t.user_id, t.wallet_id, t.category_id, " +
+            "t.description, t.amount, t.date, t.is_expense, t.receipt_photo_uri, " +
+            "c.name as categoryName, c.icon_res_id as categoryIcon, c.color_res_id as categoryColor " +
+            "FROM transactions t " +
+            "INNER JOIN categories c ON t.category_id = c.category_id " +
+            "WHERE t.user_id = :userId AND t.date BETWEEN :startOfDay AND :endOfDay " +
+            "ORDER BY t.date DESC")
+    List<TransactionWithCategory> getTodayTransactionsSync(int userId, long startOfDay, long endOfDay);
 }

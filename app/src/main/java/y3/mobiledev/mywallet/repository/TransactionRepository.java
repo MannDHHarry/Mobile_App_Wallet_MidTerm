@@ -4,6 +4,7 @@ import android.app.Application;
 
 import androidx.lifecycle.LiveData;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -190,5 +191,40 @@ public class TransactionRepository {
 
     public LiveData<List<TransactionWithCategory>> getTransactionsWithCategoryByWallet(int walletId) {
         return transactionDao.getTransactionsWithCategoryByWallet(walletId);
+    }
+
+    public List<TransactionWithCategory> getTodayTransactionsSync(int userId) {
+        Future<List<TransactionWithCategory>> future = AppDatabase.databaseWriteExecutor.submit(
+                new Callable<List<TransactionWithCategory>>() {
+                    @Override
+                    public List<TransactionWithCategory> call() throws Exception {
+                        // Calculate start and end of today
+                        Calendar calendar = Calendar.getInstance();
+                        
+                        // Start of today: 00:00:00.000
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+                        calendar.set(Calendar.MILLISECOND, 0);
+                        long startOfDay = calendar.getTimeInMillis();
+                        
+                        // End of today: 23:59:59.999
+                        calendar.set(Calendar.HOUR_OF_DAY, 23);
+                        calendar.set(Calendar.MINUTE, 59);
+                        calendar.set(Calendar.SECOND, 59);
+                        calendar.set(Calendar.MILLISECOND, 999);
+                        long endOfDay = calendar.getTimeInMillis();
+                        
+                        return transactionDao.getTodayTransactionsSync(userId, startOfDay, endOfDay);
+                    }
+                }
+        );
+
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

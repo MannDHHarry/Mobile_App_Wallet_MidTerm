@@ -18,6 +18,7 @@ public class NotificationHelper {
     public static final String SPENDING_ALERT_CHANNEL_ID = "spending_alert_channel";
     public static final int NOTIFICATION_ID = 1001;
     public static final int SPENDING_ALERT_NOTIFICATION_ID = 1002;
+    public static final int WELCOME_NOTIFICATION_ID = 1003;
 
     private static final String CHANNEL_NAME = "Daily Financial Summary";
     private static final String CHANNEL_DESCRIPTION = "Shows daily income and expense summary at 10 PM";
@@ -202,6 +203,39 @@ public class NotificationHelper {
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         if (manager != null) {
             manager.notify(SPENDING_ALERT_NOTIFICATION_ID + 1, builder.build());
+        }
+    }
+
+    /**
+     * Show welcome notification after user grants notification permission
+     */
+    public static void showWelcomeNotification(Context context) {
+        createNotificationChannel(context);
+
+        String title = "Welcome to MyWallet!";
+        String content = "You're all set! We'll send you a daily summary of your transactions at 10:00 PM.";
+
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        int pendingIntentFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+        pendingIntentFlags |= PendingIntent.FLAG_IMMUTABLE;
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, pendingIntentFlags);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager manager = context.getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.notify(WELCOME_NOTIFICATION_ID, builder.build());
         }
     }
 }
