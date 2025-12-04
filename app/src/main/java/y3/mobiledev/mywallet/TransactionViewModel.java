@@ -104,7 +104,7 @@ public class TransactionViewModel extends AndroidViewModel {
             return new MutableLiveData<>(TransactionManager.groupByDateRich(list));
         });
 
-        setupNotificationDataSync(user);
+        setupNotificationDataSync(user); 
         
         // Observe transactions for automatic analysis
         setupSpendingAnalysis();

@@ -17,6 +17,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import y3.mobiledev.mywallet.R;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 import y3.mobiledev.mywallet.helpers.PhotoManager;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionWithCategory;
@@ -113,13 +114,11 @@ public class TransactionDetailDialog extends Dialog {
             tvDescription.setTextColor(ContextCompat.getColor(getContext(), R.color.text_black));
         }
 
-        // Amount
-        String amountText;
+        // Amount (VND, compact)
+        String amountText = CurrencyUtils.formatTransactionAmount(transaction.getAmount(), transaction.isExpense());
         if (transaction.isExpense()) {
-            amountText = String.format(Locale.US, "-$%,.2f", transaction.getAmount());
             tvAmount.setTextColor(ContextCompat.getColor(getContext(), R.color.expense_red));
         } else {
-            amountText = String.format(Locale.US, "+$%,.2f", transaction.getAmount());
             tvAmount.setTextColor(ContextCompat.getColor(getContext(), R.color.income_green));
         }
         tvAmount.setText(amountText);

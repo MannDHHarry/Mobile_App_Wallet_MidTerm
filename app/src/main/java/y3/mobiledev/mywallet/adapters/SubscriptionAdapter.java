@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import y3.mobiledev.mywallet.models.Subscription;
 import y3.mobiledev.mywallet.R;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,9 +54,8 @@ public class SubscriptionAdapter extends RecyclerView.Adapter<SubscriptionAdapte
         // Set name
         holder.tvName.setText(subscription.getName());
 
-        // Set amount
-        holder.tvAmount.setText(String.format(Locale.US, "$%,.2f",
-                subscription.getAmount()));
+        // Set amount (VND, compact)
+        holder.tvAmount.setText(CurrencyUtils.formatPlainAmount(subscription.getAmount()));
 
         // Set next billing date
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d", Locale.US);

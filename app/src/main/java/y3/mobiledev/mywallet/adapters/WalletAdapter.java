@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import y3.mobiledev.mywallet.models.Wallet;
 import y3.mobiledev.mywallet.R;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 
 import java.util.List;
-import java.util.Locale;
 
 public class WalletAdapter extends RecyclerView.Adapter<WalletAdapter.WalletViewHolder> {
 
@@ -88,7 +88,7 @@ public class WalletAdapter extends RecyclerView.Adapter<WalletAdapter.WalletView
     }
 
     private void setWalletBalance(WalletViewHolder holder, Wallet wallet) {
-        holder.tvWalletBalance.setText(String.format(Locale.US, "$%,.2f", wallet.getBalance()));
+        holder.tvWalletBalance.setText(CurrencyUtils.formatPlainAmount(wallet.getBalance()));
     }
 
     private void setWalletIcon(WalletViewHolder holder, Wallet wallet) {
