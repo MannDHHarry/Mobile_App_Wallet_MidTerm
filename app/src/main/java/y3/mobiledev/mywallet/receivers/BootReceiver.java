@@ -7,6 +7,7 @@ import android.util.Log;
 
 import y3.mobiledev.mywallet.helpers.NotificationDataManager;
 import y3.mobiledev.mywallet.helpers.NotificationScheduler;
+import y3.mobiledev.mywallet.helpers.SubscriptionScheduler;
 
 public final class BootReceiver extends BroadcastReceiver {
 
@@ -26,7 +27,6 @@ public final class BootReceiver extends BroadcastReceiver {
         if (action == null) {
             return;
         }
-
         // Check if this is a boot-related broadcast
         if (!isBootAction(action)) {
             return;
@@ -42,6 +42,9 @@ public final class BootReceiver extends BroadcastReceiver {
 
             String nextTime = NotificationScheduler.getNextScheduledTimeString(context);
             Log.d(TAG, "Daily notification rescheduled for: " + nextTime);
+
+            SubscriptionScheduler.scheduleDailyCheck(context);
+            Log.d(TAG, "Subscription checks rescheduled");
         } else {
             Log.d(TAG, "No saved user data — skipping notification reschedule");
         }

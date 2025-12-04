@@ -39,9 +39,9 @@ public interface SubscriptionDao {
     @Query("SELECT * FROM subscriptions WHERE is_active = 1 AND next_billing_date <= :currentTime")
     List<Subscription> getSubscriptionsDueForBilling(long currentTime);
 
-    // Get subscriptions due for reminder (7 days before billing)
-    @Query("SELECT * FROM subscriptions WHERE is_active = 1 AND next_billing_date BETWEEN :reminderTime AND :currentTime")
-    List<Subscription> getSubscriptionsForReminder(long reminderTime, long currentTime);
+    // Get subscriptions due for reminder (billing date within the next 7 days)
+    @Query("SELECT * FROM subscriptions WHERE is_active = 1 AND next_billing_date BETWEEN :currentTime AND :reminderTime")
+    List<Subscription> getSubscriptionsForReminder(long currentTime, long reminderTime);
 
     // Update next billing date after processing
     @Query("UPDATE subscriptions SET next_billing_date = :newDate WHERE subscription_id = :subscriptionId")

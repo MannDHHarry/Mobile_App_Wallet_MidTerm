@@ -36,6 +36,8 @@ import y3.mobiledev.mywallet.fragments.TransactionHistoryFragment;
 import y3.mobiledev.mywallet.helpers.NotificationHelper;
 import y3.mobiledev.mywallet.helpers.NotificationScheduler;
 import y3.mobiledev.mywallet.helpers.NotificationDataManager;
+import y3.mobiledev.mywallet.helpers.SubscriptionNotificationHelper;
+import y3.mobiledev.mywallet.helpers.SubscriptionScheduler;
 import y3.mobiledev.mywallet.models.User;
 
 //Subscription Import
@@ -141,6 +143,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("MainActivity", "HomeFragment loaded");
         scheduleNotificationIfNeeded();
 
+        //Subscription Schedular
+        initializeSubscriptionScheduler();
+
+    }
+
+    private void initializeSubscriptionScheduler() {
+        SubscriptionNotificationHelper.createNotificationChannel(this);
+        SubscriptionScheduler.scheduleDailyCheck(this);
+        Log.d("MainActivity", "Subscription scheduler initialized");
     }
 
     private void initViews() {
@@ -229,6 +240,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     NotificationScheduler.cancelDailyNotification(this);
                     NotificationDataManager.clearData(this);
                     Log.d("MainActivity", "Notifications cancelled and data cleared");
+
+                    SubscriptionScheduler.cancelDailyCheck(this);
+                    Log.d("MainActivity", "Subscription checks cancelled");
 
 
                     // Clear user data

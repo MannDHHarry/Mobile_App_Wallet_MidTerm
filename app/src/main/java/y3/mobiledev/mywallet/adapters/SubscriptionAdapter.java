@@ -37,6 +37,17 @@ public class SubscriptionAdapter extends RecyclerView.Adapter<SubscriptionAdapte
         this.context = context;
         this.subscriptions = subscriptions;
         this.listener = listener;
+        // Enable stable IDs so RecyclerView can track items correctly
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        // Return unique subscription ID for stable identification
+        if (subscriptions != null && position >= 0 && position < subscriptions.size()) {
+            return subscriptions.get(position).getSubscriptionId();
+        }
+        return RecyclerView.NO_ID;
     }
 
     @NonNull
@@ -76,22 +87,31 @@ public class SubscriptionAdapter extends RecyclerView.Adapter<SubscriptionAdapte
             holder.btnToggle.setImageResource(android.R.drawable.ic_media_play);
         }
 
-        // Set click listeners
+        // Set click listeners - use getBindingAdapterPosition() to get correct item at click time
         holder.btnEdit.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onEditClick(subscription);
+                int currentPosition = holder.getBindingAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION && currentPosition < subscriptions.size()) {
+                    listener.onEditClick(subscriptions.get(currentPosition));
+                }
             }
         });
 
         holder.btnToggle.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onToggleClick(subscription);
+                int currentPosition = holder.getBindingAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION && currentPosition < subscriptions.size()) {
+                    listener.onToggleClick(subscriptions.get(currentPosition));
+                }
             }
         });
 
         holder.btnDelete.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onDeleteClick(subscription);
+                int currentPosition = holder.getBindingAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION && currentPosition < subscriptions.size()) {
+                    listener.onDeleteClick(subscriptions.get(currentPosition));
+                }
             }
         });
     }
