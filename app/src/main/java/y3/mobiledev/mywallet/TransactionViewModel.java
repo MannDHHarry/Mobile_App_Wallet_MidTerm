@@ -11,7 +11,12 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,6 +33,7 @@ import y3.mobiledev.mywallet.repository.CategoryRepository;
 import y3.mobiledev.mywallet.repository.TransactionRepository;
 import y3.mobiledev.mywallet.repository.UserRepository;
 import y3.mobiledev.mywallet.repository.WalletRepository;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 import y3.mobiledev.mywallet.helpers.NotificationDataManager;
 
 // Import Subscription
@@ -67,6 +73,7 @@ public class TransactionViewModel extends AndroidViewModel {
 
     // Spending Analysis
     private final MutableLiveData<SpendingAnalysisResult> spendingInsights = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> statisticsAlerts = new MutableLiveData<>();
     private final ExecutorService analysisExecutor = Executors.newSingleThreadExecutor();
     private SpendingAnalysisResult cachedAnalysisResult;
     private androidx.lifecycle.Observer<List<TransactionWithCategory>> transactionsObserver;
@@ -339,6 +346,7 @@ public class TransactionViewModel extends AndroidViewModel {
                         // Pass transactions directly to avoid LiveData thread issues
                         analyzeSpendingPatterns(transactions);
                     }
+                    updateStatisticsAlerts(transactions);
                 } catch (Exception e) {
                     Log.e("TransactionViewModel", "Error in transactions observer", e);
                 }
@@ -386,6 +394,134 @@ public class TransactionViewModel extends AndroidViewModel {
         });
     }
 
+    private void updateStatisticsAlerts(List<TransactionWithCategory> transactions) {
+        if (transactions == null || transactions.isEmpty()) {
+            statisticsAlerts.postValue(Collections.singletonList("Add transactions to see spending alerts."));
+            return;
+        }
+
+        Calendar currentMonthStart = Calendar.getInstance();
+        currentMonthStart.set(Calendar.DAY_OF_MONTH, 1);
+        currentMonthStart.set(Calendar.HOUR_OF_DAY, 0);
+        currentMonthStart.set(Calendar.MINUTE, 0);
+        currentMonthStart.set(Calendar.SECOND, 0);
+        currentMonthStart.set(Calendar.MILLISECOND, 0);
+
+        long currentStart = currentMonthStart.getTimeInMillis();
+        long now = System.currentTimeMillis();
+
+        Calendar previousMonthStart = (Calendar) currentMonthStart.clone();
+        previousMonthStart.add(Calendar.MONTH, -1);
+        long previousStart = previousMonthStart.getTimeInMillis();
+        long previousEnd = currentStart;
+
+        double currentExpense = 0;
+        double previousExpense = 0;
+        double currentIncome = 0;
+        double previousIncome = 0;
+
+        Map<String, Double> currentCategoryTotals = new HashMap<>();
+        Map<String, Double> previousCategoryTotals = new HashMap<>();
+
+        for (TransactionWithCategory transaction : transactions) {
+            long date = transaction.getDate();
+            boolean inCurrent = date >= currentStart && date <= now;
+            boolean inPrevious = !inCurrent && date >= previousStart && date < previousEnd;
+
+            if (!inCurrent && !inPrevious) {
+                continue;
+            }
+
+            double amount = transaction.getAmount();
+            boolean isExpense = transaction.isExpense();
+
+            if (isExpense) {
+                if (inCurrent) {
+                    currentExpense += amount;
+                } else {
+                    previousExpense += amount;
+                }
+            } else {
+                if (inCurrent) {
+                    currentIncome += amount;
+                } else {
+                    previousIncome += amount;
+                }
+            }
+
+            if (isExpense) {
+                String category = transaction.getCategoryName() != null ? transaction.getCategoryName() : "Other";
+                Map<String, Double> target = inCurrent ? currentCategoryTotals : previousCategoryTotals;
+                target.put(category, target.getOrDefault(category, 0.0) + amount);
+            }
+        }
+
+        List<String> alerts = new ArrayList<>();
+
+        if (previousExpense > 0) {
+            double expenseChange = ((currentExpense - previousExpense) / previousExpense) * 100;
+            if (expenseChange >= 20) {
+                alerts.add(String.format(Locale.US,
+                        "Expenses increased by %.1f%% vs last month.", expenseChange));
+            } else if (expenseChange <= -20) {
+                alerts.add(String.format(Locale.US,
+                        "Great! Expenses dropped %.1f%% vs last month.", Math.abs(expenseChange)));
+            }
+        } else if (currentExpense > 0) {
+            alerts.add("Tracking spending for the first time this month.");
+        }
+
+        if (previousIncome > 0) {
+            double incomeChange = ((currentIncome - previousIncome) / previousIncome) * 100;
+            if (incomeChange <= -20) {
+                alerts.add(String.format(Locale.US,
+                        "Income decreased by %.1f%% vs last month.", Math.abs(incomeChange)));
+            }
+        } else if (currentIncome == 0) {
+            alerts.add("No income recorded this month yet.");
+        }
+
+        double netCurrent = currentIncome - currentExpense;
+        if (netCurrent < 0) {
+            alerts.add(String.format(Locale.US,
+                    "You are overspending by %s this month.",
+                    CurrencyUtils.formatPlainAmount(Math.abs(netCurrent))));
+        }
+
+        List<String> categoryAlerts = new ArrayList<>();
+        for (Map.Entry<String, Double> entry : currentCategoryTotals.entrySet()) {
+            String category = entry.getKey();
+            double currentValue = entry.getValue();
+            double previousValue = previousCategoryTotals.getOrDefault(category, 0.0);
+
+            if (previousValue > 0) {
+                double changePct = ((currentValue - previousValue) / previousValue) * 100;
+                if (changePct >= 30) {
+                    categoryAlerts.add(String.format(Locale.US,
+                            "%s spending up %.1f%% vs last month (%s).",
+                            category,
+                            changePct,
+                            CurrencyUtils.formatPlainAmount(currentValue)));
+                }
+            } else if (currentValue >= 1) {
+                categoryAlerts.add(String.format(Locale.US,
+                        "%s spending reached %s this month.",
+                        category,
+                        CurrencyUtils.formatPlainAmount(currentValue)));
+            }
+        }
+
+        for (int i = 0; i < Math.min(2, categoryAlerts.size()); i++) {
+            alerts.add(categoryAlerts.get(i));
+        }
+
+        if (alerts.isEmpty()) {
+            alerts.add("Spending looks stable compared to last month.");
+        }
+
+        statisticsAlerts.postValue(alerts);
+    }
+
     /**
      * Trigger spending analysis in background thread (public method for manual trigger)
      */
@@ -419,4 +555,7 @@ public class TransactionViewModel extends AndroidViewModel {
         return cachedAnalysisResult;
     }
 
+    public LiveData<List<String>> getStatisticsAlerts() {
+        return statisticsAlerts;
+    }
 }

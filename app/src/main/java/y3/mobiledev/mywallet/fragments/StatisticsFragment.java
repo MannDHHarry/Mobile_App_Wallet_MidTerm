@@ -2,6 +2,7 @@ package y3.mobiledev.mywallet.fragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,8 @@ public class StatisticsFragment extends Fragment {
     private Button btnPreviousMonth, btnNextMonth;
     private TextView tvMonthYear, tvSummaryTitle, tvTotalAmount, tvCategoryBreakdown, tvAIInsights;
     private TextView tvSummaryIncome, tvSummaryExpenses, tvSummaryNet;
+    private View emptyStateView;
+    private View statsScrollView;
     private TransactionViewModel viewModel;
 
     private boolean isExpense = true;
@@ -74,7 +77,7 @@ public class StatisticsFragment extends Fragment {
         setupRadioButtons();
         setupDatePickers();
         observeData();
-        observeAIInsights();
+        observeStatisticsAlerts();
 
         return view;
     }
@@ -98,6 +101,8 @@ public class StatisticsFragment extends Fragment {
         tvSummaryIncome = view.findViewById(R.id.tvSummaryIncome);
         tvSummaryExpenses = view.findViewById(R.id.tvSummaryExpenses);
         tvSummaryNet = view.findViewById(R.id.tvSummaryNet);
+        emptyStateView = view.findViewById(R.id.emptyStateStatistics);
+        statsScrollView = view.findViewById(R.id.statsScrollView);
     }
 
     private void setupLineChart() {
@@ -178,6 +183,9 @@ public class StatisticsFragment extends Fragment {
                 updateSummaryReport(groups);
                 updateLineChart(groups);
                 updatePieChart(groups);
+                toggleEmptyState(hasTransactionsInRange(groups));
+            } else {
+                toggleEmptyState(false);
             }
         });
     }
@@ -438,23 +446,45 @@ public class StatisticsFragment extends Fragment {
         return colors;
     }
 
-    // Observe AI Insights
-    private void observeAIInsights() {
-        viewModel.getSpendingInsights().observe(getViewLifecycleOwner(), result -> {
-            if (result != null && result.getInsights() != null && !result.getInsights().isEmpty()) {
-                // Show top 3 insights
-                List<String> insights = result.getInsights();
-                StringBuilder insightsText = new StringBuilder();
-                int maxInsights = Math.min(insights.size(), 3);
-                for (int i = 0; i < maxInsights; i++) {
-                    insightsText.append(insights.get(i));
-                    if (i < maxInsights - 1) {
-                        insightsText.append("\n\n");
-                    }
+    private void toggleEmptyState(boolean hasData) {
+        if (emptyStateView == null || statsScrollView == null) return;
+        emptyStateView.setVisibility(hasData ? View.GONE : View.VISIBLE);
+        statsScrollView.setVisibility(hasData ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean hasTransactionsInRange(List<TransactionGroup> groups) {
+        if (groups == null || startDate == null || endDate == null) {
+            return false;
+        }
+        long startTime = startDate.getTimeInMillis();
+        long endTime = endDate.getTimeInMillis();
+
+        for (TransactionGroup group : groups) {
+            for (Object transactionObj : group.getTransactions()) {
+                long transactionTime;
+                if (transactionObj instanceof TransactionWithCategory) {
+                    transactionTime = ((TransactionWithCategory) transactionObj).getDate();
+                } else if (transactionObj instanceof Transaction) {
+                    transactionTime = ((Transaction) transactionObj).getDate();
+                } else {
+                    continue;
                 }
-                tvAIInsights.setText(insightsText.toString());
+
+                if (transactionTime >= startTime && transactionTime <= endTime) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void observeStatisticsAlerts() {
+        viewModel.getStatisticsAlerts().observe(getViewLifecycleOwner(), alerts -> {
+            if (alerts != null && !alerts.isEmpty()) {
+                String text = TextUtils.join("\n\n", alerts);
+                tvAIInsights.setText(text);
             } else {
-                tvAIInsights.setText("Add more transactions to get AI insights!");
+                tvAIInsights.setText("Add transactions to see this month's alerts.");
             }
         });
     }
