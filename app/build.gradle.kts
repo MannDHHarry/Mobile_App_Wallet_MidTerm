@@ -60,6 +60,9 @@ dependencies {
     // Optional - RxJava2 support for Room
     implementation("androidx.room:room-rxjava2:$roomVersion")
 
+    //pager
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+
     // Lifecycle components
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")

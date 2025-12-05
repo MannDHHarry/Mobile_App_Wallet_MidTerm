@@ -1,0 +1,284 @@
+    package y3.mobiledev.mywallet.fragments;
+
+    import android.os.Bundle;
+    import android.text.Editable;
+    import android.text.TextWatcher;
+    import android.view.LayoutInflater;
+    import android.view.View;
+    import android.view.ViewGroup;
+    import android.widget.AdapterView;
+    import android.widget.ArrayAdapter;
+    import android.widget.EditText;
+    import android.widget.ImageButton;
+    import android.widget.Spinner;
+    import android.widget.Toast;
+
+    import androidx.annotation.NonNull;
+    import androidx.annotation.Nullable;
+    import androidx.fragment.app.Fragment;
+    import androidx.lifecycle.ViewModelProvider;
+    import androidx.recyclerview.widget.LinearLayoutManager;
+    import androidx.recyclerview.widget.RecyclerView;
+
+    import y3.mobiledev.mywallet.adapters.TransactionAdapter;
+    import y3.mobiledev.mywallet.helpers.DateManager;
+    import y3.mobiledev.mywallet.helpers.PhotoManager;
+    import y3.mobiledev.mywallet.helpers.TransactionDetailDialog;
+    import y3.mobiledev.mywallet.helpers.TransactionManager;
+    import y3.mobiledev.mywallet.models.Category;
+    import y3.mobiledev.mywallet.models.Transaction;
+    import y3.mobiledev.mywallet.models.TransactionGroup;
+    import y3.mobiledev.mywallet.R;
+    import y3.mobiledev.mywallet.TransactionViewModel;
+    import y3.mobiledev.mywallet.models.TransactionWithCategory;
+
+    import java.util.ArrayList;
+    import java.util.Date;
+    import java.util.List;
+    import java.util.Locale;
+
+    public class TransactionsTabFragment extends Fragment {
+        private EditText etSearchTransaction;
+        private ImageButton btnClearSearch;
+        private Spinner spDateRange, spCategory, spPaymentType;
+        private RecyclerView rvTransactions;
+        private TransactionAdapter transactionAdapter;
+        private TransactionViewModel viewModel;
+
+        // Filter states
+        private String currentSearchText = "";
+        private String currentDateFilter = "All Time";
+        private String currentCategoryFilter = "All Categories";
+        private String currentPaymentFilter = "All Types";
+
+        @Nullable
+        @Override
+        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.fragment_transactions_tab, container, false);
+            viewModel = new ViewModelProvider(requireActivity()).get(TransactionViewModel.class);
+            initViews(view);
+            setupRecyclerView();
+            setupFilterSpinners();
+            setupSearchListener();
+            observeData();
+            return view;
+        }
+
+        private void initViews(View view) {
+            etSearchTransaction = view.findViewById(R.id.etSearchTransaction);
+            spDateRange = view.findViewById(R.id.spDateRange);
+            btnClearSearch = view.findViewById(R.id.btnClearSearch);
+            spCategory = view.findViewById(R.id.spCategory);
+            spPaymentType = view.findViewById(R.id.spPaymentType);
+            rvTransactions = view.findViewById(R.id.rvTransactions);
+        }
+
+        //Setting up RV for Transactions
+        private void setupRecyclerView() {
+            transactionAdapter = new TransactionAdapter(
+                    requireContext(),
+                    new ArrayList<>(),
+                    transaction -> onTransactionClick(transaction)
+            );
+            rvTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
+            rvTransactions.setAdapter(transactionAdapter);
+            rvTransactions.setNestedScrollingEnabled(false);
+        }
+
+        //setting up 3 filterSpinners Date , Category and Payment Type
+        private void setupFilterSpinners() {
+
+            // Date Range Spinner
+            String[] dateRanges = {"All Time", "Today", "This Week", "This Month", "This Year"};
+            ArrayAdapter<String> dateAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, dateRanges);
+            dateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spDateRange.setAdapter(dateAdapter);
+            spDateRange.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    currentDateFilter = dateRanges[position];
+                    applyFilters();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {}
+            });
+
+            // Category Spinner
+            viewModel.getExpenseCategories().observe(getViewLifecycleOwner(), expenseCats -> {
+                viewModel.getIncomeCategories().observe(getViewLifecycleOwner(), incomeCats -> {
+                    List<String> categories = new ArrayList<>();
+                    categories.add("All Categories");
+                    if (expenseCats != null) {
+                        for (Category cat : expenseCats) {
+                            categories.add(cat.getName());
+                        }
+                    }
+                    if (incomeCats != null) {
+                        for (Category cat : incomeCats) {
+                            categories.add(cat.getName());
+                        }
+                    }
+                    ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categories);
+                    categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spCategory.setAdapter(categoryAdapter);
+
+                    spCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            // Update the filter state with the selected category name
+                            currentCategoryFilter = categories.get(position);
+                            // Re-apply the filters to update the RecyclerView
+                            applyFilters();
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+                            // No action needed here
+                        }
+                    });
+                });
+            });
+
+            // Payment Type Spinner
+            String[] paymentTypes = {"All Types", "Expense", "Income"};
+            ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, paymentTypes);
+            paymentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spPaymentType.setAdapter(paymentAdapter);
+            spPaymentType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    currentPaymentFilter = paymentTypes[position];
+                    applyFilters();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {}
+            });
+        }
+
+        //Searching the transactions with text input
+        private void setupSearchListener() {
+            btnClearSearch.setOnClickListener(v -> {
+                etSearchTransaction.setText("");
+            });
+            etSearchTransaction.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    currentSearchText = s.toString().toLowerCase().trim();
+                    // 3. Show or hide the clear button based on text presence
+                    if (s.length() > 0) {
+                        btnClearSearch.setVisibility(View.VISIBLE);
+                    } else {
+                        btnClearSearch.setVisibility(View.GONE);
+                    }
+                    applyFilters();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+        }
+
+        private void applyFilters() {
+            List<TransactionWithCategory> transactions = viewModel.getTransactionsWithCategory().getValue();
+            if (transactions == null) {
+                transactionAdapter.updateTransactions(new ArrayList<>());
+                return;
+            }
+
+            List<TransactionWithCategory> filtered = new ArrayList<>(transactions);
+
+            // Filter by search text
+            if (!currentSearchText.isEmpty()) {
+                filtered.removeIf(t ->
+                        !t.getCategoryName().toLowerCase().contains(currentSearchText) &&
+                                !t.getDescription().toLowerCase().contains(currentSearchText) &&
+                                !String.format(Locale.US, "%.2f", t.getAmount()).contains(currentSearchText)
+                );
+            }
+
+            // Filter by date range
+            if (!currentDateFilter.equals("All Time")) {
+                filtered.removeIf(t -> !DateManager.isWithinDateRange(new Date(t.getDate()), currentDateFilter));
+            }
+
+            // Filter by category
+            if (!currentCategoryFilter.equals("All Categories")) {
+                filtered.removeIf(t -> !t.getCategoryName().equals(currentCategoryFilter));
+            }
+
+            // Filter by payment type
+            if (!currentPaymentFilter.equals("All Types")) {
+                boolean isExpenseFilter = currentPaymentFilter.equals("Expense");
+                filtered.removeIf(t -> t.isExpense() != isExpenseFilter);
+            }
+
+
+            List<TransactionGroup> filteredGroups = TransactionManager.groupByDateRich(filtered);
+            transactionAdapter.updateTransactions(filteredGroups);
+        }
+
+
+        private void onTransactionClick(Transaction transaction) {
+            // Fetch full transaction data with category
+            List<TransactionWithCategory> allTransactions = viewModel.getTransactionsWithCategory().getValue();
+            if (allTransactions == null) return;
+
+            // Find the clicked transaction with category data
+            TransactionWithCategory transactionWithCategory = null;
+            for (TransactionWithCategory twc : allTransactions) {
+                if (twc.getTransactionId() == transaction.getTransactionId()) {
+                    transactionWithCategory = twc;
+                    break;
+                }
+            }
+
+            if (transactionWithCategory != null) {
+                showTransactionDetail(transactionWithCategory);
+            }
+        }
+
+        private void showTransactionDetail(TransactionWithCategory transaction) {
+            TransactionDetailDialog dialog = new TransactionDetailDialog(requireContext(), transaction);
+            dialog.setOnActionListener(new TransactionDetailDialog.OnActionListener() {
+                @Override
+                public void onEdit(Transaction transaction) {
+                    // TODO: Navigate to edit transaction
+                    Toast.makeText(requireContext(), "Edit feature coming soon", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onDelete(Transaction transaction) {
+                    // Show confirmation dialog
+                    new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                            .setTitle("Delete Transaction")
+                            .setMessage("Are you sure you want to delete this transaction?")
+                            .setPositiveButton("Delete", (d, w) -> {
+                                // Delete receipt photo if exists
+                                if (transaction.getReceiptPhotoUri() != null) {
+                                    PhotoManager.deleteReceiptPhoto(transaction.getReceiptPhotoUri());
+                                }
+                                viewModel.deleteTransaction(transaction);
+                                Toast.makeText(requireContext(), "Transaction deleted", Toast.LENGTH_SHORT).show();
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }
+            });
+            dialog.show();
+        }
+
+
+        //Observing Live Datas
+        private void observeData() {
+            viewModel.getTransactionsWithCategory().observe(getViewLifecycleOwner(), transactions -> applyFilters());
+            //viewModel.getTransactionGroups().observe(getViewLifecycleOwner(), groups -> applyFilters());
+        }
+
+
+
+    }

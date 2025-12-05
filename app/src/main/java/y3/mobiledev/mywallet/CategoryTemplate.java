@@ -14,14 +14,14 @@ public class CategoryTemplate {
 
         categories.add(new Category(
                 userId, "Food",
-                R.drawable.ic_launcher_foreground,
+                R.drawable.food,
                 R.color.category_orange,
                 false, true // isIncome=false, isDefault=true
         ));
 
         categories.add(new Category(
                 userId, "Transport",
-                R.drawable.ic_launcher_foreground,
+                R.drawable.bus,
                 R.color.category_blue,
                 false, true
         ));

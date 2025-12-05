@@ -10,6 +10,7 @@
     <color name="colorPainAu">#F7F4F7</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorDark">#120216</color>
+    <color name="transfer_blue">#2196F3</color>
 
     <!-- Background colors -->
     <color name="background_dark">#1C1C1E</color>

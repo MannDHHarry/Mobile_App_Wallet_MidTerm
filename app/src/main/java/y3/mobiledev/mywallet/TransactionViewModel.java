@@ -27,10 +27,13 @@ import y3.mobiledev.mywallet.models.SpendingAnalysisResult;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionGroup;
 import y3.mobiledev.mywallet.models.TransactionWithCategory;
+import y3.mobiledev.mywallet.models.Transfer;
+import y3.mobiledev.mywallet.models.TransferWithWallets;
 import y3.mobiledev.mywallet.models.User;
 import y3.mobiledev.mywallet.models.Wallet;
 import y3.mobiledev.mywallet.repository.CategoryRepository;
 import y3.mobiledev.mywallet.repository.TransactionRepository;
+import y3.mobiledev.mywallet.repository.TransferRepository;
 import y3.mobiledev.mywallet.repository.UserRepository;
 import y3.mobiledev.mywallet.repository.WalletRepository;
 import y3.mobiledev.mywallet.helpers.CurrencyUtils;
@@ -47,8 +50,10 @@ public class TransactionViewModel extends AndroidViewModel {
     private WalletRepository walletRepository;
     private CategoryRepository categoryRepository;
     private TransactionRepository transactionRepository;
-
+    private TransferRepository transferRepository;
     private SubscriptionRepository subscriptionRepository;
+
+
 
 
     // Current user
@@ -66,6 +71,8 @@ public class TransactionViewModel extends AndroidViewModel {
     private LiveData<List<TransactionGroup>> transactionGroups;
 
     private Observer<List<TransactionGroup>> transactionGroupsObserver;
+
+    private LiveData<List<TransferWithWallets>> transfersWithWallets;   // ← ADD THIS LINE
 
     //Subscription Live data
     private LiveData<List<Subscription>> activeSubscriptions;
@@ -85,6 +92,7 @@ public class TransactionViewModel extends AndroidViewModel {
         walletRepository = new WalletRepository(application);
         categoryRepository = new CategoryRepository(application);
         transactionRepository = new TransactionRepository(application);
+        transferRepository = new TransferRepository(application);
         subscriptionRepository = new SubscriptionRepository(application);
     }
 
@@ -99,6 +107,8 @@ public class TransactionViewModel extends AndroidViewModel {
         incomeCategories = categoryRepository.getActiveIncomeCategories(userId);
         transactionsWithCategory = transactionRepository.getTransactionsWithCategoryByUser(userId);
 
+        transfersWithWallets = transferRepository.getTransfersWithWalletsByUser(userId);  // ← ADD THIS
+
         //Subscription
         activeSubscriptions = subscriptionRepository.getActiveSubscriptionsByUser(userId);
         allSubscriptions = subscriptionRepository.getAllSubscriptionsByUser(userId);
@@ -110,6 +120,8 @@ public class TransactionViewModel extends AndroidViewModel {
             }
             return new MutableLiveData<>(TransactionManager.groupByDateRich(list));
         });
+
+
 
         setupNotificationDataSync(user); 
         
@@ -215,6 +227,29 @@ public class TransactionViewModel extends AndroidViewModel {
         transactionRepository.deleteTransaction(transaction);
     }
 
+    public void executeTransfer(int fromWalletId, int toWalletId, double amount, long date) {
+        User user = currentUser.getValue();
+        if (user == null) return;
+
+        Transfer transfer = new Transfer(
+                user.getUserId(),
+                fromWalletId,
+                toWalletId,
+                amount,
+                date
+        );
+
+        transferRepository.executeTransfer(transfer);
+    }
+
+    /**
+     * Delete transfer and reverse wallet balances
+     */
+    public void deleteTransfer(Transfer transfer) {
+        transferRepository.deleteTransfer(transfer);
+    }
+
+
     // Wallet Related Methods
 
     public void addWallet(String name, int iconResId, double initialBalance) {
@@ -314,6 +349,17 @@ public class TransactionViewModel extends AndroidViewModel {
     public LiveData<List<Category>> getIncomeCategories() { return incomeCategories; }
     public LiveData<List<TransactionWithCategory>> getTransactionsWithCategory() { return transactionsWithCategory; }
     public LiveData<List<TransactionGroup>> getTransactionGroups() { return transactionGroups; }
+
+    /* public LiveData<List<TransferWithWallets>> getTransfersWithWallets() {
+        User user = currentUser.getValue();
+        if (user == null) return new MutableLiveData<>(new ArrayList<>());
+        return transferRepository.getTransfersWithWalletsByUser(user.getUserId());
+    } */
+
+    public LiveData<List<TransferWithWallets>> getTransfersWithWallets() {
+        return transfersWithWallets != null ? transfersWithWallets : new MutableLiveData<>(new ArrayList<>());
+    }
+
 
     public LiveData<List<Subscription>> getActiveSubscriptions() {
         return activeSubscriptions;

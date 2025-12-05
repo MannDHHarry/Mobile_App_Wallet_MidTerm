@@ -32,6 +32,9 @@ import y3.mobiledev.mywallet.fragments.CategoriesFragment;
 import y3.mobiledev.mywallet.fragments.HomeFragment;
 import y3.mobiledev.mywallet.fragments.StatisticsFragment;
 import y3.mobiledev.mywallet.fragments.TransactionHistoryFragment;
+import y3.mobiledev.mywallet.fragments.TransactionsTabFragment;
+import y3.mobiledev.mywallet.fragments.TransferDialogFragment;
+
 
 //Notification Import
 import y3.mobiledev.mywallet.helpers.NotificationHelper;
@@ -229,14 +232,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupListeners() {
-        fabAddTransaction.setOnClickListener(v -> {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, new AddTransactionFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+        fabAddTransaction.setOnClickListener(v -> showAddOptionsDialog());
     }
+
+    // ADD this new method after setupListeners():
+    private void showAddOptionsDialog() {
+        String[] options = {"Transaction", "Transfer"};
+
+        new AlertDialog.Builder(this)
+                .setTitle("Add New")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        // Transaction
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragmentContainer, new AddTransactionFragment())
+                                .addToBackStack(null)
+                                .commit();
+                    } else if (which == 1) {
+                        // Transfer
+                        TransferDialogFragment transferDialog = new TransferDialogFragment();
+                        transferDialog.show(getSupportFragmentManager(), "TransferDialog");
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
 
     private void showLogoutConfirmation() {
         new AlertDialog.Builder(this)
