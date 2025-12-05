@@ -17,11 +17,13 @@ import y3.mobiledev.mywallet.Converters;
 import y3.mobiledev.mywallet.dao.CategoryDao;
 import y3.mobiledev.mywallet.dao.SubscriptionDao;
 import y3.mobiledev.mywallet.dao.TransactionDao;
+import y3.mobiledev.mywallet.dao.TransferDao;
 import y3.mobiledev.mywallet.dao.UserDao;
 import y3.mobiledev.mywallet.dao.WalletDao;
 import y3.mobiledev.mywallet.models.Category;
 import y3.mobiledev.mywallet.models.Subscription;
 import y3.mobiledev.mywallet.models.Transaction;
+import y3.mobiledev.mywallet.models.Transfer;
 import y3.mobiledev.mywallet.models.User;
 import y3.mobiledev.mywallet.models.Wallet;
 
@@ -31,9 +33,10 @@ import y3.mobiledev.mywallet.models.Wallet;
                 Wallet.class,
                 Category.class,
                 Transaction.class,
-                Subscription.class
+                Subscription.class,
+                Transfer.class  // ← NEW
         },
-        version = 3,
+        version = 4,  // ← Increment from 3 to 4
         exportSchema = false
 )
 @TypeConverters({Converters.class})
@@ -44,12 +47,14 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract CategoryDao categoryDao();
     public abstract TransactionDao transactionDao();
     public abstract SubscriptionDao subscriptionDao();
+    public abstract TransferDao transferDao();  // ← NEW
 
     private static volatile AppDatabase INSTANCE;
 
     private static final int NUMBER_OF_THREADS = 4;
     public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+
 
     // THIS MIGRATION IS 100% CORRECT FOR YOUR Subscription CLASS
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
@@ -83,6 +88,32 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    // Migration 3 → 4 (Transfers)
+    static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // Create transfers table
+            database.execSQL("CREATE TABLE transfers (" +
+                    "transfer_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "user_id INTEGER NOT NULL, " +
+                    "from_wallet_id INTEGER NOT NULL, " +
+                    "to_wallet_id INTEGER NOT NULL, " +
+                    "amount REAL NOT NULL, " +
+                    "date INTEGER NOT NULL, " +
+                    "created_at INTEGER NOT NULL, " +
+                    "FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE, " +
+                    "FOREIGN KEY(from_wallet_id) REFERENCES wallets(wallet_id) ON DELETE CASCADE, " +
+                    "FOREIGN KEY(to_wallet_id) REFERENCES wallets(wallet_id) ON DELETE CASCADE)");
+
+            // Create indexes for performance
+            database.execSQL("CREATE INDEX index_transfers_user_id ON transfers(user_id)");
+            database.execSQL("CREATE INDEX index_transfers_from_wallet_id ON transfers(from_wallet_id)");
+            database.execSQL("CREATE INDEX index_transfers_to_wallet_id ON transfers(to_wallet_id)");
+            database.execSQL("CREATE INDEX index_transfers_date ON transfers(date)");
+        }
+    };
+
+
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
@@ -91,7 +122,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     context.getApplicationContext(),
                                     AppDatabase.class,
                                     "mywallet_database")
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)   // ← Now works perfectly
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3 ,MIGRATION_3_4) // ← Now works perfectly
                             .addCallback(roomCallback)
                             .build();
                 }

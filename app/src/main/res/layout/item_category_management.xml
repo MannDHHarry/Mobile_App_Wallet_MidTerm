@@ -23,7 +23,7 @@
             <View
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="@drawable/purple_circle" />
+                android:background="@drawable/purple_circle"/>
             <ImageView
                 android:id="@+id/ivCategoryIcon"
                 android:layout_width="32dp"

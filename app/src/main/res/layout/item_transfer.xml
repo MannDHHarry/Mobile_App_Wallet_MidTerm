@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
+
+    <!-- Icon Background (Blue Circle) -->
+    <RelativeLayout
+        android:id="@+id/iconContainer"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true">
+
+        <View
+            android:id="@+id/vIconBackground"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/category_icon_bg_blue"/>
+
+        <ImageView
+            android:id="@+id/ivTransferIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/transactionhee"
+            android:contentDescription="Transfer icon"
+            app:tint="@color/colorWhite"/>
+    </RelativeLayout>
+
+    <!-- Transfer Details -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/iconContainer"
+        android:layout_toStartOf="@id/amountContainer"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvWallets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cash → Bank"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_black"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5 Jan"
+            android:textSize="13sp"
+            android:textColor="@color/text_gray"
+            android:layout_marginTop="2dp"/>
+    </LinearLayout>
+
+    <!-- Amount -->
+    <LinearLayout
+        android:id="@+id/amountContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/tvAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$100.00"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#2196F3"/>
+    </LinearLayout>
+
+</RelativeLayout>
