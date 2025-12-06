@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Transfer Details"
+            android:text="@string/transfer_details"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/text_black"
@@ -82,7 +82,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="FROM"
+                        android:text="@string/from_label"
                         android:textSize="11sp"
                         android:textColor="@color/text_gray"
                         android:textStyle="bold"
@@ -118,7 +118,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TO"
+                        android:text="@string/to_label"
                         android:textSize="11sp"
                         android:textColor="@color/text_gray"
                         android:textStyle="bold"
@@ -143,7 +143,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="DATE"
+                        android:text="@string/date_label"
                         android:textSize="11sp"
                         android:textColor="@color/text_gray"
                         android:textStyle="bold"
@@ -174,7 +174,7 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/rounded_button_purple"
-                android:text="Close"
+                android:text="@string/close"
                 android:textAllCaps="false"
                 android:textColor="@color/colorWhite"
                 android:textSize="15sp"
@@ -187,7 +187,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/rounded_button_purple"
-                android:text="Delete"
+                android:text="@string/delete"
                 android:textAllCaps="false"
                 android:textColor="@color/colorWhite"
                 android:textSize="15sp"

@@ -2,6 +2,7 @@ package y3.mobiledev.mywallet;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -49,6 +50,9 @@ import y3.mobiledev.mywallet.models.User;
 //Subscription Import
 import y3.mobiledev.mywallet.fragments.SubscriptionFragment;
 
+//Locale Import
+import y3.mobiledev.mywallet.helpers.LocaleHelper;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private TextView tvUserName;
@@ -86,6 +90,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Log.w("MainActivity", "Notification permission denied");
                 }
             });
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -269,10 +278,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // ADD this new method after setupListeners():
     private void showAddOptionsDialog() {
-        String[] options = {"Transaction", "Transfer"};
+        String[] options = {getString(R.string.transaction), getString(R.string.transfer)};
 
         new AlertDialog.Builder(this)
-                .setTitle("Add New")
+                .setTitle(getString(R.string.add_new))
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
                         // Transaction
@@ -287,16 +296,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         transferDialog.show(getSupportFragmentManager(), "TransferDialog");
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 
 
     private void showLogoutConfirmation() {
         new AlertDialog.Builder(this)
-                .setTitle("Logout")
-                .setMessage("Are you sure you want to logout?")
-                .setPositiveButton("Yes", (dialog, which) -> {
+                .setTitle(getString(R.string.logout))
+                .setMessage(getString(R.string.logout_confirm))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
 
 
                     NotificationScheduler.cancelDailyNotification(this);
@@ -317,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     startActivity(intent);
                     finish();
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton(getString(R.string.no), null)
                 .show();
     }
 
@@ -369,15 +378,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void showNotificationPermissionDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Enable Notifications")
-                .setMessage("Would you like to receive daily summaries of your transactions at 10:00 PM?")
-                .setPositiveButton("Yes", (dialog, which) -> {
+                .setTitle(getString(R.string.enable_notifications))
+                .setMessage(getString(R.string.notification_prompt))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
                     Log.d("MainActivity", "User enabled notifications");
                     NotificationHelper.showWelcomeNotification(this);
                     setWelcomeNotificationShown();
                     scheduleNotificationIfNeeded();
                 })
-                .setNegativeButton("No", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                     Log.d("MainActivity", "User declined notifications");
                     setWelcomeNotificationShown();
                 })
@@ -411,8 +420,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_exchange_rates) {
             loadFragment(new ExchangeRateFragment());
             fabAddTransaction.hide();
-        }
-        else if (id == R.id.nav_logout) {
+        } else if (id == R.id.nav_language) {
+            showLanguageDialog();
+        } else if (id == R.id.nav_logout) {
             drawerLayout.closeDrawer(GravityCompat.START);
             showLogoutConfirmation();
             return true;
@@ -420,6 +430,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showLanguageDialog() {
+        String[] languages = {"English", "Tiếng Việt"};
+        int currentSelection = LocaleHelper.isVietnamese(this) ? 1 : 0;
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.select_language))
+                .setSingleChoiceItems(languages, currentSelection, (dialog, which) -> {
+                    String selectedLang = (which == 0) ? LocaleHelper.ENGLISH : LocaleHelper.VIETNAMESE;
+
+                    if (!selectedLang.equals(LocaleHelper.getLanguage(this))) {
+                        LocaleHelper.setLocale(this, selectedLang);
+                        dialog.dismiss();
+                        // Recreate activity to apply new language
+                        recreate();
+                    } else {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
 }

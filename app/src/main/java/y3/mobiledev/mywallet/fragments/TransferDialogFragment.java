@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.TransactionViewModel;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 import y3.mobiledev.mywallet.helpers.PickersAndDialog;
 import y3.mobiledev.mywallet.models.Wallet;
 
@@ -103,8 +104,8 @@ public class TransferDialogFragment extends DialogFragment {
             if (item instanceof Wallet) {
                 fromWallet = (Wallet) item;
                 tvFromWallet.setText(fromWallet.getName());
-                tvFromBalance.setText(String.format(Locale.US, "Balance: $%,.2f",
-                        fromWallet.getBalance()));
+                tvFromBalance.setText(String.format(getString(R.string.balance_display),
+                        CurrencyUtils.formatPlainAmount(fromWallet.getBalance())));
                 tvFromBalance.setVisibility(View.VISIBLE);
             }
         });
@@ -147,7 +148,7 @@ public class TransferDialogFragment extends DialogFragment {
         String dateText;
         if (selectedCal.equals(today)) {
             SimpleDateFormat format = new SimpleDateFormat("MMM d", Locale.US);
-            dateText = "Today, " + format.format(selectedDate);
+            dateText = getString(R.string.today) + ", " + format.format(selectedDate);
         } else {
             SimpleDateFormat format = new SimpleDateFormat("EEE, MMM d", Locale.US);
             dateText = format.format(selectedDate);
@@ -166,7 +167,7 @@ public class TransferDialogFragment extends DialogFragment {
         // Validate amount
         String amountStr = etAmount.getText().toString().trim();
         if (amountStr.isEmpty()) {
-            Toast.makeText(requireContext(), "Please enter amount", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.please_enter_amount), Toast.LENGTH_SHORT).show();
             etAmount.requestFocus();
             return;
         }
@@ -175,38 +176,38 @@ public class TransferDialogFragment extends DialogFragment {
         try {
             amount = Double.parseDouble(amountStr);
             if (amount <= 0) {
-                Toast.makeText(requireContext(), "Amount must be greater than 0",
+                Toast.makeText(requireContext(), getString(R.string.amount_greater_than_zero),
                         Toast.LENGTH_SHORT).show();
                 return;
             }
         } catch (NumberFormatException e) {
-            Toast.makeText(requireContext(), "Invalid amount", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.invalid_amount), Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Validate wallets
         if (fromWallet == null) {
-            Toast.makeText(requireContext(), "Please select source wallet",
+            Toast.makeText(requireContext(), getString(R.string.please_select_source_wallet),
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (toWallet == null) {
-            Toast.makeText(requireContext(), "Please select destination wallet",
+            Toast.makeText(requireContext(), getString(R.string.please_select_destination_wallet),
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Validate not same wallet
         if (fromWallet.getWalletId() == toWallet.getWalletId()) {
-            Toast.makeText(requireContext(), "Cannot transfer to the same wallet",
+            Toast.makeText(requireContext(), getString(R.string.cannot_transfer_same_wallet),
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Validate sufficient balance
         if (fromWallet.getBalance() < amount) {
-            Toast.makeText(requireContext(), "Insufficient balance in source wallet",
+            Toast.makeText(requireContext(), getString(R.string.insufficient_balance),
                     Toast.LENGTH_SHORT).show();
             return;
         }
@@ -219,7 +220,7 @@ public class TransferDialogFragment extends DialogFragment {
                 selectedDate.getTime()
         );
 
-        Toast.makeText(requireContext(), "Transfer completed!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.transfer_completed), Toast.LENGTH_SHORT).show();
         dismiss();
     }
 }

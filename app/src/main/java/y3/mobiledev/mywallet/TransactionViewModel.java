@@ -113,12 +113,12 @@ public class TransactionViewModel extends AndroidViewModel {
         activeSubscriptions = subscriptionRepository.getActiveSubscriptionsByUser(userId);
         allSubscriptions = subscriptionRepository.getAllSubscriptionsByUser(userId);
 
-        // Transform transactions into grouped format
+        // Transform transactions into grouped format with localized headers
         transactionGroups = Transformations.switchMap(transactionsWithCategory, list -> {
             if (list == null) {
                 return new MutableLiveData<>(new ArrayList<>());
             }
-            return new MutableLiveData<>(TransactionManager.groupByDateRich(list));
+            return new MutableLiveData<>(TransactionManager.groupByDateRich(list, getApplication()));
         });
 
 

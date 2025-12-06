@@ -1,5 +1,6 @@
 package y3.mobiledev.mywallet.helpers;
 
+import android.content.Context;
 import android.util.Log;
 
 import y3.mobiledev.mywallet.models.Transaction;
@@ -20,10 +21,71 @@ public class TransactionManager {
         return new ArrayList<>(); // force empty
     }
 
-
-    public static List<TransactionGroup> groupByDateRich(List<TransactionWithCategory> transactions) {
+    /**
+     * Groups transactions by date with localized headers
+     * @param transactions List of transactions to group
+     * @param context Context for string resources
+     * @return List of transaction groups with localized headers
+     */
+    public static List<TransactionGroup> groupByDateRich(List<TransactionWithCategory> transactions, Context context) {
 
         Log.e(TAG, "groupByDateRich CALLED — CORRECT METHOD! Count: "
+                + (transactions != null ? transactions.size() : "NULL"));
+        if (transactions == null || transactions.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+
+        List<TransactionWithCategory> today = new ArrayList<>();
+        List<TransactionWithCategory> yesterday = new ArrayList<>();
+        List<TransactionWithCategory> earlier = new ArrayList<>();
+
+        for (TransactionWithCategory t : transactions) {
+            String key = DateManager.getGroupKey(new Date(t.getDate()));
+            switch (key) {
+                case DateManager.KEY_TODAY:
+                    today.add(t);
+                    break;
+                case DateManager.KEY_YESTERDAY:
+                    yesterday.add(t);
+                    break;
+                case DateManager.KEY_EARLIER:
+                    earlier.add(t);
+                    break;
+            }
+        }
+
+        // Sort newest first
+        Comparator<TransactionWithCategory> desc = (a, b) -> Long.compare(b.getDate(), a.getDate());
+        today.sort(desc);
+        yesterday.sort(desc);
+        earlier.sort(desc);
+
+        List<TransactionGroup> groups = new ArrayList<>();
+        if (!today.isEmpty()) {
+            String header = DateManager.getLocalizedHeader(context, DateManager.KEY_TODAY);
+            groups.add(new TransactionGroup(header, today));
+        }
+        if (!yesterday.isEmpty()) {
+            String header = DateManager.getLocalizedHeader(context, DateManager.KEY_YESTERDAY);
+            groups.add(new TransactionGroup(header, yesterday));
+        }
+        if (!earlier.isEmpty()) {
+            String header = DateManager.getLocalizedHeader(context, DateManager.KEY_EARLIER);
+            groups.add(new TransactionGroup(header, earlier));
+        }
+
+        Log.e(TAG, "groupByDateRich returning " + groups.size() + " groups");
+        return groups;
+    }
+
+    /**
+     * @deprecated Use groupByDateRich(transactions, context) instead
+     */
+    @Deprecated
+    public static List<TransactionGroup> groupByDateRich(List<TransactionWithCategory> transactions) {
+
+        Log.e(TAG, "groupByDateRich (deprecated) CALLED — Count: "
                 + (transactions != null ? transactions.size() : "NULL"));
         if (transactions == null || transactions.isEmpty()) {
             return new ArrayList<>();
@@ -82,7 +144,30 @@ public class TransactionManager {
         return addEllipsis ? result + "..." : result;
     }
 
-   //New Methods for Notificaton System
+   //New Methods for Notification System
+   public static TransactionGroup getTodayGroup(List<TransactionGroup> groups, Context context) {
+       if (groups == null || groups.isEmpty()) {
+           Log.d(TAG, "getTodayGroup: groups is null or empty");
+           return null;
+       }
+
+       String todayHeader = DateManager.getLocalizedHeader(context, DateManager.KEY_TODAY);
+       for (TransactionGroup group : groups) {
+           if (group != null && todayHeader.equals(group.getHeader())) {
+               Log.d(TAG, "getTodayGroup: Found Today group with " +
+                       group.getTransactions().size() + " transactions");
+               return group;
+           }
+       }
+
+       Log.d(TAG, "getTodayGroup: No Today group found");
+       return null;
+   }
+
+   /**
+    * @deprecated Use getTodayGroup(groups, context) instead
+    */
+   @Deprecated
    public static TransactionGroup getTodayGroup(List<TransactionGroup> groups) {
        if (groups == null || groups.isEmpty()) {
            Log.d(TAG, "getTodayGroup: groups is null or empty");

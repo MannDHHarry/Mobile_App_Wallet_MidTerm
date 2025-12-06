@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ví Của Tôi</string>
+
+    <!-- Top bar -->
+    <string name="hello">Xin chào,</string>
+
+    <!-- Balance card -->
+    <string name="total_balance">Tổng Số Dư</string>
+    <string name="income">Thu Nhập</string>
+    <string name="expense">Chi Tiêu</string>
+    <string name="this_month">Tháng này: %s</string>
+
+    <!-- Wallets section -->
+    <string name="my_wallets">Ví Của Tôi</string>
+    <string name="show_more">Xem Thêm</string>
+    <string name="show_less">Thu Gọn</string>
+
+    <!-- Transactions section -->
+    <string name="recent_transactions">Giao Dịch Gần Đây</string>
+    <string name="view_all">Xem Tất Cả</string>
+    <string name="today">Hôm Nay</string>
+    <string name="yesterday">Hôm Qua</string>
+    <string name="earlier">Trước Đó</string>
+
+    <!-- Empty states -->
+    <string name="no_wallets_title">Chưa Có Ví</string>
+    <string name="no_wallets_message">Thêm ví đầu tiên để bắt đầu theo dõi</string>
+    <string name="no_transactions_title">Chưa Có Giao Dịch</string>
+    <string name="no_transactions_message">Nhấn + để thêm giao dịch đầu tiên</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Trang Chủ</string>
+    <string name="nav_statistics">Thống Kê</string>
+    <string name="nav_management">Quản Lý</string>
+    <string name="nav_transition_History">Lịch Sử</string>
+    <string name="statistics_empty_state_desc">Hình minh họa khi chưa có thống kê</string>
+
+    <!-- Common Actions -->
+    <string name="add">Thêm</string>
+    <string name="search">Tìm Kiếm</string>
+    <string name="logout">Đăng Xuất</string>
+    <string name="profile">Hồ Sơ</string>
+    <string name="user_name">Tên Người Dùng</string>
+    <string name="user_email">email@example.com</string>
+    <string name="cancel">Hủy</string>
+    <string name="create">Tạo</string>
+    <string name="update">Cập Nhật</string>
+    <string name="delete">Xóa</string>
+    <string name="edit">Sửa</string>
+    <string name="close">Đóng</string>
+    <string name="yes">Có</string>
+    <string name="no">Không</string>
+    <string name="save">Lưu</string>
+    <string name="archive">Lưu Trữ</string>
+
+    <!-- Exchange Rates -->
+    <string name="exchange_rates">Tỷ Giá</string>
+    <string name="loading_exchange_rates">Đang tải tỷ giá...</string>
+    <string name="error_loading_rates">Lỗi Tải Tỷ Giá</string>
+    <string name="no_exchange_rates">Không có tỷ giá. Kéo xuống để làm mới.</string>
+    <string name="spot_price">Giá Giao Ngay</string>
+    <string name="p2p_rates">Tỷ Giá P2P</string>
+    <string name="buy">Mua</string>
+    <string name="sell">Bán</string>
+    <string name="last_updated">Cập nhật lần cuối: %s</string>
+
+    <!-- Language -->
+    <string name="language">Ngôn Ngữ</string>
+    <string name="select_language">Chọn Ngôn Ngữ</string>
+    <string name="subscriptions">Đăng Ký</string>
+
+    <!-- Wallet Operations -->
+    <string name="wallet_name">Tên Ví</string>
+    <string name="enter_wallet_name">Nhập tên ví</string>
+    <string name="initial_balance">Số Dư Ban Đầu</string>
+    <string name="balance">Số Dư</string>
+    <string name="enter_balance">Nhập số dư</string>
+    <string name="add_new_wallet">Thêm Ví Mới</string>
+    <string name="edit_wallet">Sửa Ví</string>
+    <string name="delete_wallet">Xóa Ví?</string>
+    <string name="delete_wallet_confirm">Bạn có chắc muốn xóa \"%s\"?</string>
+    <string name="wallet_created">Tạo ví thành công!</string>
+    <string name="wallet_updated">Đã cập nhật ví</string>
+    <string name="wallet_deleted">Đã xóa ví</string>
+    <string name="cannot_delete_wallet">Không thể xóa ví</string>
+    <string name="cannot_delete_last_wallet">Không thể xóa ví cuối cùng. Vui lòng tạo ví khác trước.</string>
+    <string name="wallet_name_empty">Tên ví không được để trống</string>
+    <string name="balance_negative">Số dư không được âm</string>
+    <string name="invalid_balance">Số dư không hợp lệ</string>
+    <string name="no_wallets_available">Không có ví nào</string>
+    <string name="select_wallet">Chọn Ví</string>
+    <string name="wallet_management">Quản Lý Ví</string>
+    <string name="add_wallet_desc">Thêm ví</string>
+    <string name="balance_display">Số dư: %s</string>
+
+    <!-- Category Operations -->
+    <string name="add_new_category">Thêm Danh Mục Mới</string>
+    <string name="edit_category">Sửa Danh Mục</string>
+    <string name="delete_category">Xóa Danh Mục?</string>
+    <string name="delete_category_confirm">Bạn có chắc muốn xóa \"%s\"?</string>
+    <string name="category_name">Tên danh mục</string>
+    <string name="choose_icon">Chọn Biểu Tượng</string>
+    <string name="choose_color">Chọn Màu Sắc</string>
+    <string name="type">Loại</string>
+    <string name="add_category">Thêm Danh Mục</string>
+    <string name="category_added">Thêm danh mục thành công!</string>
+    <string name="category_exists">Danh mục đã tồn tại!</string>
+    <string name="category_updated">Đã cập nhật danh mục</string>
+    <string name="category_deleted">Đã xóa danh mục</string>
+    <string name="category_name_empty">Tên danh mục không được để trống</string>
+    <string name="please_enter_category_name">Vui lòng nhập tên danh mục</string>
+    <string name="select_category">Chọn Danh Mục</string>
+    <string name="select_expense_category">Chọn Danh Mục Chi Tiêu</string>
+    <string name="select_income_category">Chọn Danh Mục Thu Nhập</string>
+    <string name="add_new_category_option">+ Thêm Danh Mục Mới</string>
+    <string name="category_management">Quản Lý Danh Mục</string>
+    <string name="expense_categories">Danh Mục Chi Tiêu</string>
+    <string name="income_categories">Danh Mục Thu Nhập</string>
+    <string name="add_category_desc">Thêm danh mục</string>
+    <string name="archive_category">Lưu Trữ Danh Mục?</string>
+    <string name="archive_category_message">%s có %d giao dịch. Lưu trữ sẽ ẩn danh mục khỏi danh sách chọn nhưng vẫn giữ lịch sử giao dịch.\n\nTiếp tục?</string>
+    <string name="category_archived">Đã lưu trữ danh mục (lịch sử giao dịch được giữ lại)</string>
+
+    <!-- Transaction Operations -->
+    <string name="amount">Số Tiền</string>
+    <string name="date">Ngày</string>
+    <string name="notes_optional">Ghi Chú (Tùy chọn)</string>
+    <string name="add_note">Thêm ghi chú...</string>
+    <string name="receipt_photo_optional">Ảnh Hóa Đơn (Tùy chọn)</string>
+    <string name="add_receipt_photo">Thêm Ảnh Hóa Đơn</string>
+    <string name="change_receipt_photo">Đổi Ảnh Hóa Đơn</string>
+    <string name="tap_to_remove">Nhấn ✕ để xóa</string>
+    <string name="receipt_preview">Xem trước hóa đơn</string>
+    <string name="remove_receipt">Xóa hóa đơn</string>
+    <string name="save_transaction">Lưu Giao Dịch</string>
+    <string name="transaction_saved">Đã lưu giao dịch!</string>
+    <string name="receipt_removed">Đã xóa hóa đơn</string>
+    <string name="please_enter_amount">Vui lòng nhập số tiền</string>
+    <string name="amount_greater_than_zero">Số tiền phải lớn hơn 0</string>
+    <string name="invalid_amount">Số tiền không hợp lệ</string>
+    <string name="please_select_category">Vui lòng chọn danh mục</string>
+    <string name="please_select_wallet">Vui lòng chọn ví</string>
+    <string name="failed_save_receipt">Không thể lưu ảnh hóa đơn</string>
+    <string name="permission_denied_photo">Quyền bị từ chối. Không thể chọn ảnh.</string>
+    <string name="category">Danh Mục</string>
+    <string name="wallet">Ví</string>
+    <string name="transaction">Giao Dịch</string>
+    <string name="add_new">Thêm Mới</string>
+
+    <!-- Transaction Detail -->
+    <string name="description">MÔ TẢ</string>
+    <string name="transaction_description">Mô tả giao dịch</string>
+    <string name="date_label">NGÀY</string>
+    <string name="receipt_photo">ẢNH HÓA ĐƠN</string>
+    <string name="no_receipt_attached">Không có hóa đơn đính kèm</string>
+    <string name="tap_to_view_full">Nhấn để xem kích thước đầy đủ</string>
+    <string name="category_name_display">Tên Danh Mục</string>
+
+    <!-- Transfer Operations -->
+    <string name="transfer_money">Chuyển Tiền</string>
+    <string name="from_wallet">Từ Ví</string>
+    <string name="to_wallet">Đến Ví</string>
+    <string name="transfer">Chuyển</string>
+
+    <!-- Statistics -->
+    <string name="statistics">Thống Kê</string>
+    <string name="previous">← Trước</string>
+    <string name="next">Sau →</string>
+    <string name="expenses">Chi Tiêu</string>
+    <string name="net">Ròng</string>
+    <string name="spending_trend">Xu hướng chi tiêu</string>
+    <string name="category_distribution">Phân bổ theo danh mục</string>
+    <string name="expense_summary">Tổng Kết Chi Tiêu (%s)</string>
+    <string name="income_summary">Tổng Kết Thu Nhập (%s)</string>
+    <string name="total_amount">Tổng: %s</string>
+    <string name="breakdown">Chi tiết:</string>
+    <string name="no_transactions_period">Không có giao dịch trong kỳ này</string>
+    <string name="alerts_insights">📊 Cảnh Báo &amp; Phân Tích</string>
+    <string name="loading_alerts">Đang tải cảnh báo...</string>
+    <string name="no_statistics_yet">Chưa có thống kê</string>
+    <string name="add_transaction_unlock">Thêm giao dịch để xem biểu đồ và cảnh báo.</string>
+    <string name="add_transactions_alerts">Thêm giao dịch để xem cảnh báo tháng này.</string>
+    <string name="no_data_period">Không có dữ liệu cho kỳ này</string>
+    <string name="daily_expenses">Chi Tiêu Hàng Ngày</string>
+    <string name="daily_income">Thu Nhập Hàng Ngày</string>
+
+    <!-- Management Screen -->
+    <string name="management">Quản Lý</string>
+    <string name="please_fill_all_fields">Vui lòng điền đầy đủ thông tin</string>
+
+    <!-- Logout -->
+    <string name="logout_confirm">Bạn có chắc muốn đăng xuất?</string>
+    <string name="enable_notifications">Bật Thông Báo</string>
+    <string name="notification_prompt">Bạn có muốn nhận tóm tắt giao dịch hàng ngày lúc 10:00 PM?</string>
+
+    <!-- Subscription Operations -->
+    <string name="subscription_title">Đăng Ký Dịch Vụ</string>
+    <string name="total_monthly">Tổng Hàng Tháng: %s</string>
+    <string name="active_subscriptions">Đăng Ký Đang Hoạt Động</string>
+    <string name="no_subscriptions">Chưa Có Đăng Ký</string>
+    <string name="no_subscriptions_message">Thêm đăng ký đầu tiên bằng nút + bên dưới</string>
+    <string name="add_subscription">Thêm Đăng Ký</string>
+    <string name="edit_subscription">Sửa Đăng Ký</string>
+    <string name="delete_subscription">Xóa Đăng Ký?</string>
+    <string name="delete_subscription_confirm">Bạn có chắc muốn xóa \"%s\"?</string>
+    <string name="subscription_for">Đăng Ký Cho</string>
+    <string name="subscription_hint">VD: Netflix, Spotify</string>
+    <string name="start_date">Ngày Bắt Đầu</string>
+    <string name="add_notes">Thêm ghi chú...</string>
+    <string name="subscription_auto_charge">Đăng ký này sẽ tự động trừ tiền hàng tháng vào ngày thanh toán.</string>
+    <string name="please_enter_subscription_name">Vui lòng nhập tên đăng ký</string>
+    <string name="please_create_wallet_first">Vui lòng tạo ví trước</string>
+    <string name="subscription_added">Thêm đăng ký thành công!</string>
+    <string name="subscription_deleted">Đã xóa đăng ký</string>
+    <string name="subscription_resumed">Đã tiếp tục đăng ký</string>
+    <string name="subscription_paused">Đã tạm dừng đăng ký</string>
+
+    <!-- Authentication -->
+    <string name="login">Đăng Nhập</string>
+    <string name="register">Đăng Ký</string>
+    <string name="email">Email</string>
+    <string name="password">Mật Khẩu</string>
+    <string name="confirm_password">Xác Nhận Mật Khẩu</string>
+    <string name="full_name">Họ Và Tên</string>
+    <string name="remember_me">Ghi Nhớ Đăng Nhập</string>
+    <string name="dont_have_account">Chưa có tài khoản? Đăng ký</string>
+    <string name="back_to_login">Quay Lại Đăng Nhập</string>
+    <string name="email_required">Email là bắt buộc</string>
+    <string name="password_required">Mật khẩu là bắt buộc</string>
+    <string name="name_required">Tên là bắt buộc</string>
+    <string name="valid_email_required">Vui lòng nhập email hợp lệ</string>
+    <string name="password_min_length">Mật khẩu phải có ít nhất 6 ký tự</string>
+    <string name="confirm_password_required">Vui lòng xác nhận mật khẩu</string>
+    <string name="passwords_not_match">Mật khẩu không khớp</string>
+
+    <!-- Transfer Operations Extended -->
+    <string name="please_select_source_wallet">Vui lòng chọn ví nguồn</string>
+    <string name="please_select_destination_wallet">Vui lòng chọn ví đích</string>
+    <string name="cannot_transfer_same_wallet">Không thể chuyển đến cùng một ví</string>
+    <string name="insufficient_balance">Số dư không đủ trong ví nguồn</string>
+    <string name="transfer_completed">Chuyển tiền thành công!</string>
+
+    <!-- Subscription Extended -->
+    <string name="active">Đang hoạt động</string>
+    <string name="paused">Tạm dừng</string>
+    <string name="next_billing">Tiếp theo: %s</string>
+    <string name="pause">Tạm dừng</string>
+    <string name="resume">Tiếp tục</string>
+
+    <!-- Transaction Detail Extended -->
+    <string name="delete_transaction">Xóa Giao Dịch</string>
+    <string name="delete_transaction_confirm">Bạn có chắc muốn xóa giao dịch này?</string>
+    <string name="transaction_deleted">Đã xóa giao dịch</string>
+    <string name="no_description">Không có mô tả</string>
+    <string name="edit_feature_coming_soon">Tính năng sửa sẽ có sớm</string>
+    
+    <!-- Transfer Extended -->
+    <string name="delete_transfer">Xóa Chuyển Khoản?</string>
+    <string name="delete_transfer_confirm">Bạn có chắc muốn xóa chuyển khoản này? Số dư ví sẽ được hoàn lại.</string>
+    <string name="transfer_deleted">Đã xóa chuyển khoản</string>
+    <string name="transfer_details">Chi Tiết Chuyển Khoản</string>
+    <string name="from_label">TỪ</string>
+    <string name="to_label">ĐẾN</string>
+</resources>

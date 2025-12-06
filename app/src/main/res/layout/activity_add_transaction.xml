@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Amount"
+                android:text="@string/amount"
                 android:textColor="@color/text_black"
                 android:textSize="16sp"/>
 
@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Type"
+                android:text="@string/type"
                 android:textColor="@color/text_black"
                 android:textSize="14sp"/>
 
@@ -70,7 +70,7 @@
                     android:button="@null"
                     android:checked="true"
                     android:gravity="center"
-                    android:text="Expense"
+                    android:text="@string/expense"
                     android:textColor="@color/colorWhite"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
@@ -84,7 +84,7 @@
                     android:background="@drawable/radio_button_income_selector"
                     android:button="@null"
                     android:gravity="center"
-                    android:text="Income"
+                    android:text="@string/income"
                     android:textColor="@color/colorWhite"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
@@ -96,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Category"
+                android:text="@string/category"
                 android:textColor="@color/text_black"
                 android:textSize="14sp"/>
 
@@ -122,7 +122,7 @@
                         android:id="@+id/tvSelectedCategory"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Select Category"
+                        android:text="@string/select_category"
                         android:textColor="@color/colorDarkPurple"
                         android:textSize="16sp"
                         android:textStyle="bold"/>
@@ -144,7 +144,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Wallet"
+                android:text="@string/wallet"
                 android:textColor="@color/text_black"
                 android:textSize="14sp"/>
 
@@ -164,7 +164,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:text="Select Wallet"
+                    android:text="@string/select_wallet"
                     android:textColor="@color/colorDarkPurple"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
@@ -184,7 +184,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Date"
+                android:text="@string/date"
                 android:textColor="@color/text_black"
                 android:textSize="14sp"/>
 
@@ -204,7 +204,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:text="Today, Jan 12"
+                    android:text="@string/today"
                     android:textColor="@color/colorDarkPurple"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
@@ -224,7 +224,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Notes (Optional)"
+                android:text="@string/notes_optional"
                 android:textColor="@color/text_black"
                 android:textSize="14sp"/>
 
@@ -235,7 +235,7 @@
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/rounded_input_background"
                 android:gravity="start|top"
-                android:hint="Add a note..."
+                android:hint="@string/add_note"
                 android:inputType="textMultiLine"
                 android:maxLines="3"
                 android:padding="12dp"
@@ -248,7 +248,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Receipt Photo (Optional)"
+                android:text="@string/receipt_photo_optional"
                 android:textColor="@color/text_black"
                 android:textSize="14sp"/>
 
@@ -267,7 +267,7 @@
                     android:drawablePadding="8dp"
                     android:gravity="center"
                     android:paddingHorizontal="16dp"
-                    android:text="Add Receipt Photo"
+                    android:text="@string/add_receipt_photo"
                     android:textColor="@color/colorDarkPurple"
                     android:textSize="14sp"
                     android:textStyle="bold"
@@ -293,7 +293,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="180dp"
                             android:scaleType="centerCrop"
-                            android:contentDescription="Receipt preview"/>
+                            android:contentDescription="@string/receipt_preview"/>
 
                         <!-- Remove button overlay -->
                         <ImageView
@@ -306,7 +306,7 @@
                             android:background="@drawable/circle_background_red"
                             android:padding="6dp"
                             android:src="@android:drawable/ic_menu_close_clear_cancel"
-                            android:contentDescription="Remove receipt"
+                            android:contentDescription="@string/remove_receipt"
                             app:tint="@color/colorWhite"/>
 
                         <!-- Hint Text -->
@@ -319,7 +319,7 @@
                             android:background="#80000000"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="4dp"
-                            android:text="Tap ✕ to remove"
+                            android:text="@string/tap_to_remove"
                             android:textColor="@color/colorWhite"
                             android:textSize="11sp"/>
                     </RelativeLayout>
@@ -333,7 +333,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/rounded_button_purple"
-                android:text="Save Transaction"
+                android:text="@string/save_transaction"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp"
                 android:textStyle="bold"/>

@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Management"
+            android:text="@string/management"
             android:textColor="@color/text_white"
             android:textSize="25sp"
             android:textStyle="bold" />
@@ -61,7 +61,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Wallet Management"
+                            android:text="@string/wallet_management"
                             android:textColor="@color/text_black"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -73,7 +73,7 @@
                             android:background="@color/colorDarkPurple"
                             android:src="@android:drawable/ic_input_add"
                             app:tint="@color/text_white"
-                            android:contentDescription="Add wallet"
+                            android:contentDescription="@string/add_wallet_desc"
                             android:scaleType="centerInside" />
 
                     </LinearLayout>
@@ -113,7 +113,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Category Management"
+                            android:text="@string/category_management"
                             android:textColor="@color/text_black"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -125,7 +125,7 @@
                             android:background="@color/colorDarkPurple"
                             android:src="@android:drawable/ic_input_add"
                             app:tint="@color/text_white"
-                            android:contentDescription="Add category"
+                            android:contentDescription="@string/add_category_desc"
                             android:scaleType="centerInside" />
 
                     </LinearLayout>
@@ -154,7 +154,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Expense Categories"
+                                android:text="@string/expense_categories"
                                 android:textColor="@color/text_white"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
@@ -199,7 +199,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Income Categories"
+                                android:text="@string/income_categories"
                                 android:textColor="@color/text_white"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
