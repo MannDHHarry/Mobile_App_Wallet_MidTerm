@@ -1,6 +1,8 @@
 package y3.mobiledev.mywallet.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +18,8 @@ import y3.mobiledev.mywallet.R;
 
 import java.util.List;
 
-
 public class ItemDialogAdapter extends RecyclerView.Adapter<ItemDialogAdapter.ItemViewHolder> {
+
     private final Context context;
     private final List<Object> items;
     private final ItemProvider itemProvider;
@@ -34,8 +36,8 @@ public class ItemDialogAdapter extends RecyclerView.Adapter<ItemDialogAdapter.It
         void onSelect(Object item);
     }
 
-    public ItemDialogAdapter(Context context, List<Object> items, ItemProvider itemProvider,
-                             OnSelectListener onSelectListener) {
+    public ItemDialogAdapter(Context context, List<Object> items,
+                             ItemProvider itemProvider, OnSelectListener onSelectListener) {
         this.context = context;
         this.items = items;
         this.itemProvider = itemProvider;
@@ -58,37 +60,42 @@ public class ItemDialogAdapter extends RecyclerView.Adapter<ItemDialogAdapter.It
         Object item = items.get(position);
 
         if (item instanceof String) {
-            // "+ Add New" item
-            String itemText = (String) item;
-            holder.iconView.setImageResource(R.drawable.lines);
-            holder.iconView.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
-            holder.nameView.setText(itemText);
+            // "+ Add New Category"
+            holder.nameView.setText((String) item);
             holder.nameView.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
             holder.nameView.setTypeface(null, android.graphics.Typeface.BOLD);
-        } else {
-            // Regular item
-            int iconResId = itemProvider.getIconResId(item);
-            int colorResId = itemProvider.getColorResId(item);
-            String displayText = itemProvider.getDisplayText(item);
 
-            if (iconResId != 0) {
-                holder.iconView.setImageResource(iconResId);
-                if (colorResId != 0) {
-                    holder.iconView.setColorFilter(ContextCompat.getColor(context, colorResId));
-                }
-            }
-            holder.nameView.setText(displayText);
+            // Primary color background
+            GradientDrawable bg = (GradientDrawable) holder.colorBackground.getBackground().mutate();
+            bg.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
+
+            // "+" icon
+            holder.iconView.setImageResource(android.R.drawable.ic_menu_add);
+            holder.iconView.setColorFilter(ContextCompat.getColor(context, R.color.text_white));
+        }
+        else {
+            // Real category
+            int iconRes = itemProvider.getIconResId(item);
+            Log.d("ItemDialogAdapter", "Icon resource ID: " + iconRes + " for item: " + itemProvider.getDisplayText(item));
+
+            int colorRes = itemProvider.getColorResId(item);
+            String text = itemProvider.getDisplayText(item);
+
+            holder.nameView.setText(text);
             holder.nameView.setTextColor(ContextCompat.getColor(context, R.color.text_black));
+
+            // ICON — FROM DATABASE
+            holder.iconView.setImageResource(iconRes != 0 ? iconRes : R.drawable.ic_profile);
+            holder.iconView.setColorFilter(ContextCompat.getColor(context, R.color.text_white));
+
+            // COLOR BACKGROUND
+            GradientDrawable bg = (GradientDrawable) holder.colorBackground.getBackground().mutate();
+            bg.setColor(ContextCompat.getColor(context, colorRes));
         }
 
-        // Click for selection
         holder.itemView.setOnClickListener(v -> {
-            if (onSelectListener != null) {
-                onSelectListener.onSelect(item);
-            }
-            if (dialog != null) {
-                dialog.dismiss();
-            }
+            if (onSelectListener != null) onSelectListener.onSelect(item);
+            if (dialog != null) dialog.dismiss();
         });
     }
 
@@ -98,11 +105,13 @@ public class ItemDialogAdapter extends RecyclerView.Adapter<ItemDialogAdapter.It
     }
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
+        View colorBackground;
         ImageView iconView;
         TextView nameView;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
+            colorBackground = itemView.findViewById(R.id.vColorBackground);
             iconView = itemView.findViewById(R.id.ivDialogIcon);
             nameView = itemView.findViewById(R.id.tvDialogText);
         }

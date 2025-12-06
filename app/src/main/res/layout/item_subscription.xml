@@ -117,7 +117,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/edit"
+                android:src="@drawable/edit2"
                 android:scaleType="centerInside"
                 app:tint="@color/colorDarkPurple"
                 android:contentDescription="Edit" />
@@ -140,7 +140,8 @@
                 android:layout_height="40dp"
                 android:layout_marginStart="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/trash"
+                android:src="@drawable/delete_new"
+                app:tint="@color/cat_red"
                 android:scaleType="centerInside"
                 android:contentDescription="Delete" />
 

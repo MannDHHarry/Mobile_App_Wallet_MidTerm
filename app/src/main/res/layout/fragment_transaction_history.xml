@@ -3,19 +3,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite">
 
-    <!-- TabLayout -->
+    <!-- TabLayout with purple gradient background -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FF0000"
+        android:layout_height="56dp"
+        android:background="@color/colorDarkPurple"
+        android:elevation="4dp"
         app:tabMode="fixed"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/colorWhite"
         app:tabSelectedTextColor="@color/colorWhite"
-        app:tabTextColor="@color/text_gray"
+        app:tabTextColor="#B3FFFFFF"
         app:tabIndicatorHeight="3dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"

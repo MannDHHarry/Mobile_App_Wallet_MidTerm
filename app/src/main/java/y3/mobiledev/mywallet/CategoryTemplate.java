@@ -14,56 +14,50 @@ public class CategoryTemplate {
 
         categories.add(new Category(
                 userId, "Food",
-                R.drawable.food,
+                R.drawable.cat_fastfood,
                 R.color.category_orange,
                 false, true // isIncome=false, isDefault=true
         ));
 
         categories.add(new Category(
                 userId, "Transport",
-                R.drawable.bus,
-                R.color.category_blue,
+                R.drawable.cat_transport,
+                R.color.cat_red,
                 false, true
         ));
 
         categories.add(new Category(
                 userId, "Utilities",
-                R.drawable.ic_launcher_foreground,
+                R.drawable.cat_bill,
                 R.color.category_orange,
                 false, true
         ));
 
         categories.add(new Category(
                 userId, "Shopping",
-                R.drawable.ic_launcher_foreground,
-                R.color.category_teal,
+                R.drawable.cat_shop,
+                R.color.cat_purple,
                 false, true
         ));
 
         categories.add(new Category(
                 userId, "Entertainment",
-                R.drawable.ic_launcher_foreground,
-                R.color.category_purple,
+                R.drawable.cat_512,
+                R.color.category_teal,
                 false, true
         ));
 
         categories.add(new Category(
                 userId, "Healthcare",
-                R.drawable.ic_launcher_foreground,
-                R.color.category_pink,
+                R.drawable.cat_health,
+                R.color.category_green,
                 false, true
         ));
 
-        categories.add(new Category(
-                userId, "Bills",
-                R.drawable.ic_launcher_foreground,
-                R.color.category_orange,
-                false, true
-        ));
 
         categories.add(new Category(
                 userId, "Education",
-                R.drawable.ic_launcher_foreground,
+                R.drawable.cat_education,
                 R.color.category_blue,
                 false, true
         ));
@@ -76,36 +70,36 @@ public class CategoryTemplate {
 
         categories.add(new Category(
                 userId, "Salary",
-                R.drawable.ic_launcher_foreground,
+                R.drawable.cat_moneh,
                 R.color.category_green,
                 true, true // isIncome=true, isDefault=true
         ));
 
         categories.add(new Category(
                 userId, "Freelance",
-                R.drawable.ic_launcher_foreground,
-                R.color.category_green,
+                R.drawable.cat_owl,
+                R.color.category_blue,
                 true, true
         ));
 
         categories.add(new Category(
                 userId, "Investment",
-                R.drawable.ic_launcher_foreground,
-                R.color.category_green,
+                R.drawable.cat_pig,
+                R.color.category_orange,
                 true, true
         ));
 
         categories.add(new Category(
                 userId, "Gift",
-                R.drawable.ic_launcher_foreground,
-                R.color.category_green,
+                R.drawable.cat_gift,
+                R.color.category_teal,
                 true, true
         ));
 
         categories.add(new Category(
                 userId, "Other Income",
-                R.drawable.ic_launcher_foreground,
-                R.color.category_green,
+                R.drawable.cat_lines,
+                R.color.category_purple,
                 true, true
         ));
 

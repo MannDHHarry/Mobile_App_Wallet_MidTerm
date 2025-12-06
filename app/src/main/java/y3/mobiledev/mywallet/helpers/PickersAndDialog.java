@@ -64,7 +64,11 @@ public class PickersAndDialog {
                 new ItemDialogAdapter.ItemProvider() {
                     @Override
                     public int getIconResId(Object item) {
-                        return item instanceof Category ? R.drawable.lines : 0;
+                        if (item instanceof Category) {
+                            Category category = (Category) item;
+                            return category.getIconResId();
+                        }
+                        return 0;
 
                     }
 
@@ -196,7 +200,7 @@ public class PickersAndDialog {
         RecyclerView rvColors = view.findViewById(R.id.rvColors);
 
         // Default selections
-        final int[] selectedIcon = {R.drawable.food};     // replace with your default
+        final int[] selectedIcon = {R.drawable.cat_food};     // replace with your default
         final int[] selectedColor = {R.color.cat_orange};
 
         // Setup Icon Picker

@@ -29,17 +29,25 @@ public class IconAdapter extends RecyclerView.Adapter<IconAdapter.ViewHolder> {
         this.listener = listener;
         // Sample icons - replace with your actual drawables
         this.icons = Arrays.asList(
-                android.R.drawable.ic_menu_gallery,  // Placeholder: food
-                android.R.drawable.ic_menu_slideshow,  // game
-                android.R.drawable.ic_menu_directions,  // car
-                android.R.drawable.ic_menu_myplaces,  // home
-                android.R.drawable.ic_menu_compass,  // money
-                android.R.drawable.ic_menu_recent_history,  // plane
-                android.R.drawable.ic_menu_camera,  // movie
-                android.R.drawable.ic_menu_call,  // phone
-                android.R.drawable.ic_menu_info_details,  // education
-                android.R.drawable.ic_menu_help  // health
-                // Add more...
+                R.drawable.cat_512,
+                R.drawable.cat_bill,
+                R.drawable.cat_book,
+                R.drawable.cat_cash,
+                R.drawable.cat_education,
+                R.drawable.cat_fastfood,
+                R.drawable.cat_finance,
+                R.drawable.cat_food,
+                R.drawable.cat_gift,
+                R.drawable.cat_grocery,
+                R.drawable.cat_health,
+                R.drawable.cat_leaf,
+                R.drawable.cat_lines,
+                R.drawable.cat_moneh,
+                R.drawable.cat_money_bag,
+                R.drawable.cat_train,
+                R.drawable.cat_trophy,
+                R.drawable.cat_shop
+
         );
     }
 
