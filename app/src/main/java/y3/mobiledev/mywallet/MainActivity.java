@@ -29,6 +29,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import y3.mobiledev.mywallet.fragments.AddTransactionFragment;
 import y3.mobiledev.mywallet.fragments.CategoriesFragment;
+import y3.mobiledev.mywallet.fragments.ExchangeRateFragment;
 import y3.mobiledev.mywallet.fragments.HomeFragment;
 import y3.mobiledev.mywallet.fragments.StatisticsFragment;
 import y3.mobiledev.mywallet.fragments.TransactionHistoryFragment;
@@ -375,6 +376,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // loadFragment(new ProfileFragment());
         } else if (id == R.id.nav_subscriptions){
             loadFragment(new SubscriptionFragment());
+            fabAddTransaction.hide();
+        } else if (id == R.id.nav_exchange_rates) {
+            loadFragment(new ExchangeRateFragment());
             fabAddTransaction.hide();
         }
         else if (id == R.id.nav_logout) {

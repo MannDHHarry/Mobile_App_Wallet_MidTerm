@@ -43,4 +43,15 @@
     <string name="profile">Profile</string>
     <string name="user_name">User Name</string>
     <string name="user_email">user@example.com</string>
+
+    <!-- Exchange Rates -->
+    <string name="exchange_rates">Exchange Rates</string>
+    <string name="loading_exchange_rates">Loading exchange rates...</string>
+    <string name="error_loading_rates">Error Loading Rates</string>
+    <string name="no_exchange_rates">No exchange rates available. Pull to refresh.</string>
+    <string name="spot_price">Spot Price</string>
+    <string name="p2p_rates">P2P Rates</string>
+    <string name="buy">Buy</string>
+    <string name="sell">Sell</string>
+    <string name="last_updated">Last updated: %s</string>
 </resources>
