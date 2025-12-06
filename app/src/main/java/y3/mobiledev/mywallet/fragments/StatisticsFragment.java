@@ -143,18 +143,104 @@ public class StatisticsFragment extends Fragment {
         updateMonthDisplay();
 
         btnPreviousMonth.setOnClickListener(v -> {
-            currentMonthCalendar.add(Calendar.MONTH, -1);
-            setCurrentMonthDates();
-            updateMonthDisplay();
-            observeData();
+            navigateToPreviousMonthWithData();
         });
 
         btnNextMonth.setOnClickListener(v -> {
-            currentMonthCalendar.add(Calendar.MONTH, 1);
-            setCurrentMonthDates();
-            updateMonthDisplay();
-            observeData();
+            navigateToNextMonthWithData();
         });
+    }
+
+    private void navigateToPreviousMonthWithData() {
+        Calendar originalMonth = (Calendar) currentMonthCalendar.clone();
+        int maxAttempts = 12; // Don't search more than 12 months back
+        int attempts = 0;
+        
+        while (attempts < maxAttempts) {
+            currentMonthCalendar.add(Calendar.MONTH, -1);
+            setCurrentMonthDates();
+            
+            // Check if this month has transactions
+            if (hasTransactionsInCurrentMonth()) {
+                updateMonthDisplay();
+                observeData();
+                return;
+            }
+            attempts++;
+        }
+        
+        // If no month with data found, restore original and show current month
+        currentMonthCalendar = originalMonth;
+        setCurrentMonthDates();
+        updateMonthDisplay();
+        observeData();
+    }
+
+    private void navigateToNextMonthWithData() {
+        Calendar originalMonth = (Calendar) currentMonthCalendar.clone();
+        Calendar currentDate = Calendar.getInstance();
+        int maxAttempts = 12; // Don't search more than 12 months forward
+        int attempts = 0;
+        
+        while (attempts < maxAttempts) {
+            currentMonthCalendar.add(Calendar.MONTH, 1);
+            
+            // Don't go beyond current month
+            if (currentMonthCalendar.after(currentDate) && 
+                currentMonthCalendar.get(Calendar.MONTH) != currentDate.get(Calendar.MONTH)) {
+                currentMonthCalendar = originalMonth;
+                setCurrentMonthDates();
+                updateMonthDisplay();
+                observeData();
+                return;
+            }
+            
+            setCurrentMonthDates();
+            
+            // Check if this month has transactions
+            if (hasTransactionsInCurrentMonth()) {
+                updateMonthDisplay();
+                observeData();
+                return;
+            }
+            attempts++;
+        }
+        
+        // If no month with data found, restore original and show current month
+        currentMonthCalendar = originalMonth;
+        setCurrentMonthDates();
+        updateMonthDisplay();
+        observeData();
+    }
+
+    private boolean hasTransactionsInCurrentMonth() {
+        // Get current transaction groups synchronously
+        List<TransactionGroup> groups = viewModel.getTransactionGroups().getValue();
+        if (groups == null || startDate == null || endDate == null) {
+            return false;
+        }
+        
+        // Check if any transactions exist in the current month range
+        long startTime = startDate.getTimeInMillis();
+        long endTime = endDate.getTimeInMillis();
+
+        for (TransactionGroup group : groups) {
+            for (Object transactionObj : group.getTransactions()) {
+                long transactionTime;
+                if (transactionObj instanceof TransactionWithCategory) {
+                    transactionTime = ((TransactionWithCategory) transactionObj).getDate();
+                } else if (transactionObj instanceof Transaction) {
+                    transactionTime = ((Transaction) transactionObj).getDate();
+                } else {
+                    continue;
+                }
+
+                if (transactionTime >= startTime && transactionTime <= endTime) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void setCurrentMonthDates() {
