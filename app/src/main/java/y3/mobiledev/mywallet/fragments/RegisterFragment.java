@@ -1,5 +1,6 @@
 package y3.mobiledev.mywallet.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,11 +19,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import y3.mobiledev.mywallet.AuthViewModel;
 import y3.mobiledev.mywallet.R;
+import y3.mobiledev.mywallet.helpers.LocaleHelper;
 
 public class RegisterFragment extends Fragment {
 
     private EditText etName, etEmail, etPassword, etConfirmPassword;
     private Button btnRegister, btnBackToLogin;
+    private TextView tvChangeLanguage;
     private CheckBox cbRememberMe;
     private ProgressBar progressBar;
     private AuthViewModel viewModel;
@@ -35,6 +39,7 @@ public class RegisterFragment extends Fragment {
         initViews(view);
         setupListeners();
         observeViewModel();
+        updateLanguageDisplay();
 
         return view;
     }
@@ -46,6 +51,7 @@ public class RegisterFragment extends Fragment {
         etConfirmPassword = view.findViewById(R.id.etConfirmPassword);
         btnRegister = view.findViewById(R.id.btnRegister);
         btnBackToLogin = view.findViewById(R.id.btnBackToLogin);
+        tvChangeLanguage = view.findViewById(R.id.tvChangeLanguage);
         cbRememberMe = view.findViewById(R.id.cbRememberMe);
         progressBar = view.findViewById(R.id.progressBar);
     }
@@ -53,6 +59,7 @@ public class RegisterFragment extends Fragment {
     private void setupListeners() {
         btnRegister.setOnClickListener(v -> performRegister());
         btnBackToLogin.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        tvChangeLanguage.setOnClickListener(v -> showLanguageDialog());
 
         // Clear error when user starts typing
         android.text.TextWatcher clearErrorWatcher = new android.text.TextWatcher() {
@@ -112,37 +119,37 @@ public class RegisterFragment extends Fragment {
         boolean hasError = false;
 
         if (name.isEmpty()) {
-            etName.setError("Name is required");
+            etName.setError(getString(R.string.name_required));
             etName.requestFocus();
             hasError = true;
         }
 
         if (email.isEmpty()) {
-            etEmail.setError("Email is required");
+            etEmail.setError(getString(R.string.email_required));
             if (!hasError) etEmail.requestFocus();
             hasError = true;
         } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Please enter a valid email");
+            etEmail.setError(getString(R.string.valid_email_required));
             if (!hasError) etEmail.requestFocus();
             hasError = true;
         }
 
         if (password.isEmpty()) {
-            etPassword.setError("Password is required");
+            etPassword.setError(getString(R.string.password_required));
             if (!hasError) etPassword.requestFocus();
             hasError = true;
         } else if (password.length() < 6) {
-            etPassword.setError("Password must be at least 6 characters");
+            etPassword.setError(getString(R.string.password_min_length));
             if (!hasError) etPassword.requestFocus();
             hasError = true;
         }
 
         if (confirmPassword.isEmpty()) {
-            etConfirmPassword.setError("Please confirm your password");
+            etConfirmPassword.setError(getString(R.string.confirm_password_required));
             if (!hasError) etConfirmPassword.requestFocus();
             hasError = true;
         } else if (!password.equals(confirmPassword)) {
-            etConfirmPassword.setError("Passwords do not match");
+            etConfirmPassword.setError(getString(R.string.passwords_not_match));
             if (!hasError) etConfirmPassword.requestFocus();
             hasError = true;
         }
@@ -154,6 +161,33 @@ public class RegisterFragment extends Fragment {
         // Perform registration (additional validation happens in ViewModel)
         boolean rememberMe = cbRememberMe.isChecked();
         viewModel.register(email, password, name, rememberMe);
+    }
+
+    private void showLanguageDialog() {
+        String[] languages = {"English", "Tiếng Việt"};
+        int currentSelection = LocaleHelper.isVietnamese(requireContext()) ? 1 : 0;
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.select_language))
+                .setSingleChoiceItems(languages, currentSelection, (dialog, which) -> {
+                    String selectedLang = (which == 0) ? LocaleHelper.ENGLISH : LocaleHelper.VIETNAMESE;
+
+                    if (!selectedLang.equals(LocaleHelper.getLanguage(requireContext()))) {
+                        LocaleHelper.setLocale(requireContext(), selectedLang);
+                        dialog.dismiss();
+                        // Recreate activity to apply new language
+                        requireActivity().recreate();
+                    } else {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show();
+    }
+
+    private void updateLanguageDisplay() {
+        String currentLang = LocaleHelper.isVietnamese(requireContext()) ? "🌐 Tiếng Việt" : "🌐 English";
+        tvChangeLanguage.setText(currentLang);
     }
 
     @Override

@@ -27,7 +27,7 @@ public final class CategoryWalletManager {
         PickersAndDialog.showAddWalletDialog(ctx, userId, wallet -> {
             // ✅ UPDATED - Use new ViewModel method
             vm.addWallet(wallet.getName(), wallet.getIconResId(), wallet.getBalance());
-            toast(ctx, "Wallet created successfully!");
+            toast(ctx, ctx.getString(R.string.wallet_created));
             if (onAdded != null) onAdded.run();
         });
     }
@@ -40,7 +40,7 @@ public final class CategoryWalletManager {
 
         PickersAndDialog.showEditWalletDialog(ctx, wallet, () -> {
             vm.updateWallet(wallet);
-            toast(ctx, "Wallet updated");
+            toast(ctx, ctx.getString(R.string.wallet_updated));
             if (onUpdated != null) onUpdated.run();
         });
     }
@@ -56,7 +56,7 @@ public final class CategoryWalletManager {
 
         // Check if it's the last wallet
         if (list.size() <= 1) {
-            toast(ctx, "Cannot delete the last wallet. Create another wallet first.");
+            toast(ctx, ctx.getString(R.string.cannot_delete_last_wallet));
             return;
         }
 
@@ -64,36 +64,16 @@ public final class CategoryWalletManager {
             // ✅ UPDATED - deleteWallet now returns boolean
             boolean deleted = vm.deleteWallet(wallet);
             if (deleted) {
-                toast(ctx, "Wallet deleted");
+                toast(ctx, ctx.getString(R.string.wallet_deleted));
                 if (onDeleted != null) onDeleted.run();
             } else {
-                toast(ctx, "Cannot delete wallet");
+                toast(ctx, ctx.getString(R.string.cannot_delete_wallet));
             }
         });
     }
 
 
     /* -------------------  ADD CATEGORY ------------------- */
-   /* public static void callAddCategoryDialog(
-            Context ctx,
-            TransactionViewModel vm,
-            boolean isIncome,
-            Runnable onAdded) {
-
-        PickersAndDialog.showAddCategoryDialog(ctx, (name, incomeFlag) -> {
-            // UPDATED - Use new ViewModel methods that return Long
-            Long categoryId = incomeFlag
-                    ? vm.addIncomeCategory(name, android.R.drawable.ic_dialog_info, R.color.category_green)
-                    : vm.addExpenseCategory(name, android.R.drawable.ic_dialog_info, R.color.category_orange);
-
-            if (categoryId != null && categoryId > 0) {
-                toast(ctx, "Category added: " + name);
-                if (onAdded != null) onAdded.run();
-            } else {
-                toast(ctx, "Category already exists or failed to create");
-            }
-        });
-    } */
 
     public static void callAddCategoryDialog(Context ctx, TransactionViewModel vm, boolean isIncomeFlag, Runnable onAdded) {
         PickersAndDialog.showAddCategoryDialog(ctx, (name, isIncome, iconRes, colorRes) -> {
@@ -102,10 +82,10 @@ public final class CategoryWalletManager {
                     : vm.addExpenseCategory(name, iconRes, colorRes);
 
             if (result != null && result > 0) {
-                toast(ctx, "Category added successfully!");
+                toast(ctx, ctx.getString(R.string.category_added));
                 if (onAdded != null) onAdded.run();
             } else {
-                toast(ctx, "Category already exists!");
+                toast(ctx, ctx.getString(R.string.category_exists));
             }
         });
     }
@@ -121,7 +101,7 @@ public final class CategoryWalletManager {
         PickersAndDialog.showEditCategoryDialog(ctx, category, () -> {
             // ✅ Same - updateCategory still works
             vm.updateCategory(category);
-            toast(ctx, "Category updated");
+            toast(ctx, ctx.getString(R.string.category_updated));
             if (onUpdated != null) onUpdated.run();
         });
     }
@@ -148,14 +128,14 @@ public final class CategoryWalletManager {
             PickersAndDialog.showArchiveCategoryDialog(ctx, category, transactionCount, () -> {
                 // Archive instead of delete
                 vm.archiveCategory(category.getCategoryId());
-                toast(ctx, "Category archived (transaction history preserved)");
+                toast(ctx, ctx.getString(R.string.category_archived));
                 if (onDeleted != null) onDeleted.run();
             });
         } else {
             // No transactions - safe to delete
             PickersAndDialog.showDeleteCategoryDialog(ctx, category, list, () -> {
                 vm.deleteCategory(category.getCategoryId());
-                toast(ctx, "Category deleted");
+                toast(ctx, ctx.getString(R.string.category_deleted));
                 if (onDeleted != null) onDeleted.run();
             });
         }

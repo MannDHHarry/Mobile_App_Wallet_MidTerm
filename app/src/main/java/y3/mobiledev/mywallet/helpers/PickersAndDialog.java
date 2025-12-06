@@ -34,11 +34,6 @@ public class PickersAndDialog {
         void onComplete();
     }
 
-    /*
-    public interface OnCategoryCreatedListener {
-        void onCategoryCreated(String categoryName, boolean isIncome);
-    } */
-
     public interface OnCategoryCreatedListener {
         void onCategoryCreated(String categoryName, boolean isIncome, int iconResId, int colorResId);
     }
@@ -56,7 +51,7 @@ public class PickersAndDialog {
         }
 
         List<Object> displayList = new ArrayList<>(categories);
-        displayList.add("+ Add New Category");
+        displayList.add(context.getString(R.string.add_new_category_option));
 
         ItemDialogAdapter adapter = new ItemDialogAdapter(
                 context,
@@ -91,14 +86,14 @@ public class PickersAndDialog {
         );
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(isExpense ? "Select Expense Category" : "Select Income Category");
+        builder.setTitle(isExpense ? context.getString(R.string.select_expense_category) : context.getString(R.string.select_income_category));
 
         RecyclerView recyclerView = new RecyclerView(context);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);
 
         builder.setView(recyclerView);
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(context.getString(R.string.cancel), null);
 
         AlertDialog dialog = builder.create();
         adapter.setDialog(dialog);
@@ -109,7 +104,7 @@ public class PickersAndDialog {
     public static void showWalletPicker(Context context, List<Wallet> wallets,
                                         OnSelectionListener listener) {
         if (wallets == null || wallets.isEmpty()) {
-            Toast.makeText(context, "No wallets available", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.no_wallets_available), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -145,14 +140,14 @@ public class PickersAndDialog {
         );
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Select Wallet");
+        builder.setTitle(context.getString(R.string.select_wallet));
 
         RecyclerView recyclerView = new RecyclerView(context);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);
 
         builder.setView(recyclerView);
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(context.getString(R.string.cancel), null);
 
         AlertDialog dialog = builder.create();
         adapter.setDialog(dialog);
@@ -161,32 +156,6 @@ public class PickersAndDialog {
 
 
     // ===== CATEGORY OPERATIONS =====
-
-    /*public static void showAddCategoryDialog(Context context, OnCategoryCreatedListener listener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Add New Category");
-
-        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_category, null);
-        EditText etCategoryName = dialogView.findViewById(R.id.etCategoryName);
-        RadioGroup rgCategoryType = dialogView.findViewById(R.id.rgCategoryType);
-
-        builder.setView(dialogView);
-        builder.setPositiveButton("Add", (dialog, which) -> {
-            String categoryName = etCategoryName.getText().toString().trim();
-            boolean isIncome = rgCategoryType.getCheckedRadioButtonId() == R.id.rbCategoryIncome;
-
-            if (categoryName.isEmpty()) {
-                Toast.makeText(context, "Category name cannot be empty", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (listener != null) {
-                listener.onCategoryCreated(categoryName, isIncome);
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
-    } */
 
     public static void showAddCategoryDialog(Context context, OnCategoryCreatedListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -211,10 +180,10 @@ public class PickersAndDialog {
         rvColors.setLayoutManager(new GridLayoutManager(context, 5));
         rvColors.setAdapter(new ColorAdapter(context, colorResId -> selectedColor[0] = colorResId));
 
-        builder.setPositiveButton("Add Category", (dialog, which) -> {
+        builder.setPositiveButton(context.getString(R.string.add_category), (dialog, which) -> {
             String name = etName.getText().toString().trim();
             if (name.isEmpty()) {
-                Toast.makeText(context, "Please enter category name", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.please_enter_category_name), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -226,7 +195,7 @@ public class PickersAndDialog {
             }
         });
 
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(context.getString(R.string.cancel), null);
         builder.show();
     }
 
@@ -234,7 +203,7 @@ public class PickersAndDialog {
     public static void showEditCategoryDialog(Context context, Category category,
                                               OnOperationCompleteListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Edit Category");
+        builder.setTitle(context.getString(R.string.edit_category));
 
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_category, null);
         EditText etCategoryName = dialogView.findViewById(R.id.etCategoryName);
@@ -248,25 +217,25 @@ public class PickersAndDialog {
         }
 
         builder.setView(dialogView);
-        builder.setPositiveButton("Update", (dialog, which) -> {
+        builder.setPositiveButton(context.getString(R.string.update), (dialog, which) -> {
             String newName = etCategoryName.getText().toString().trim();
             boolean isIncome = rgCategoryType.getCheckedRadioButtonId() == R.id.rbCategoryIncome;
 
             if (newName.isEmpty()) {
-                Toast.makeText(context, "Category name cannot be empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.category_name_empty), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             category.setName(newName);
             category.setIncome(isIncome);
 
-            Toast.makeText(context, "Category updated", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.category_updated), Toast.LENGTH_SHORT).show();
 
             if (listener != null) {
                 listener.onComplete();
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(context.getString(R.string.cancel), null);
         builder.show();
     }
 
@@ -274,16 +243,16 @@ public class PickersAndDialog {
                                                 List<Category> categoryList,
                                                 OnOperationCompleteListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Delete Category?");
-        builder.setMessage("Are you sure you want to delete \"" + category.getName() + "\"?");
-        builder.setPositiveButton("Delete", (dialog, which) -> {
-            Toast.makeText(context, "Category deleted", Toast.LENGTH_SHORT).show();
+        builder.setTitle(context.getString(R.string.delete_category));
+        builder.setMessage(String.format(context.getString(R.string.delete_category_confirm), category.getName()));
+        builder.setPositiveButton(context.getString(R.string.delete), (dialog, which) -> {
+            Toast.makeText(context, context.getString(R.string.category_deleted), Toast.LENGTH_SHORT).show();
 
             if (listener != null) {
                 listener.onComplete();
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(context.getString(R.string.cancel), null);
         builder.show();
     }
 
@@ -294,14 +263,12 @@ public class PickersAndDialog {
             Runnable onConfirmed) {
 
         new AlertDialog.Builder(context)
-                .setTitle("Archive Category?")
-                .setMessage(category.getName() + " has " + transactionCount +
-                        " transaction(s). Archiving will hide it from selection but preserve your transaction history.\n\n" +
-                        "Continue?")
-                .setPositiveButton("Archive", (dialog, which) -> {
+                .setTitle(context.getString(R.string.archive_category))
+                .setMessage(String.format(context.getString(R.string.archive_category_message), category.getName(), transactionCount))
+                .setPositiveButton(context.getString(R.string.archive), (dialog, which) -> {
                     if (onConfirmed != null) onConfirmed.run();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(context.getString(R.string.cancel), null)
                 .show();
     }
 
@@ -313,19 +280,19 @@ public class PickersAndDialog {
     public static void showAddWalletDialog(Context context, int userId,
                                            OnWalletCreatedListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Add New Wallet");
+        builder.setTitle(context.getString(R.string.add_new_wallet));
 
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_wallet, null);
         EditText etWalletName = dialogView.findViewById(R.id.etWalletName);
         EditText etInitialBalance = dialogView.findViewById(R.id.etInitialBalance);
 
         builder.setView(dialogView);
-        builder.setPositiveButton("Create", (dialog, which) -> {
+        builder.setPositiveButton(context.getString(R.string.create), (dialog, which) -> {
             String walletName = etWalletName.getText().toString().trim();
             String balanceStr = etInitialBalance.getText().toString().trim();
 
             if (walletName.isEmpty()) {
-                Toast.makeText(context, "Wallet name cannot be empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.wallet_name_empty), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -336,7 +303,7 @@ public class PickersAndDialog {
             try {
                 double balance = Double.parseDouble(balanceStr);
                 if (balance < 0) {
-                    Toast.makeText(context, "Balance cannot be negative", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, context.getString(R.string.balance_negative), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -348,20 +315,20 @@ public class PickersAndDialog {
                     listener.onWalletCreated(newWallet);
                 }
 
-                Toast.makeText(context, "Wallet created successfully!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.wallet_created), Toast.LENGTH_SHORT).show();
 
             } catch (NumberFormatException e) {
-                Toast.makeText(context, "Invalid balance amount", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.invalid_balance), Toast.LENGTH_SHORT).show();
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(context.getString(R.string.cancel), null);
         builder.show();
     }
 
     public static void showEditWalletDialog(Context context, Wallet wallet,
                                             OnOperationCompleteListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Edit Wallet");
+        builder.setTitle(context.getString(R.string.edit_wallet));
 
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_edit_wallet, null);
         EditText etWalletName = dialogView.findViewById(R.id.etWalletName);
@@ -371,35 +338,35 @@ public class PickersAndDialog {
         etWalletBalance.setText(String.format(Locale.US, "%.2f", wallet.getBalance()));
 
         builder.setView(dialogView);
-        builder.setPositiveButton("Update", (dialog, which) -> {
+        builder.setPositiveButton(context.getString(R.string.update), (dialog, which) -> {
             String newName = etWalletName.getText().toString().trim();
             String balanceStr = etWalletBalance.getText().toString().trim();
 
             if (newName.isEmpty() || balanceStr.isEmpty()) {
-                Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.please_fill_all_fields), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             try {
                 double newBalance = Double.parseDouble(balanceStr);
                 if (newBalance < 0) {
-                    Toast.makeText(context, "Balance cannot be negative", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, context.getString(R.string.balance_negative), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 wallet.setName(newName);
                 wallet.setBalance(newBalance);
 
-                Toast.makeText(context, "Wallet updated", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.wallet_updated), Toast.LENGTH_SHORT).show();
 
                 if (listener != null) {
                     listener.onComplete();
                 }
             } catch (NumberFormatException e) {
-                Toast.makeText(context, "Invalid balance amount", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.invalid_balance), Toast.LENGTH_SHORT).show();
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(context.getString(R.string.cancel), null);
         builder.show();
     }
 
@@ -407,17 +374,17 @@ public class PickersAndDialog {
                                               List<Wallet> walletList,
                                               OnOperationCompleteListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Delete Wallet?");
-        builder.setMessage("Are you sure you want to delete \"" + wallet.getName() + "\"?");
-        builder.setPositiveButton("Delete", (dialog, which) -> {
+        builder.setTitle(context.getString(R.string.delete_wallet));
+        builder.setMessage(String.format(context.getString(R.string.delete_wallet_confirm), wallet.getName()));
+        builder.setPositiveButton(context.getString(R.string.delete), (dialog, which) -> {
             walletList.remove(wallet);
-            Toast.makeText(context, "Wallet deleted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.wallet_deleted), Toast.LENGTH_SHORT).show();
 
             if (listener != null) {
                 listener.onComplete();
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(context.getString(R.string.cancel), null);
         builder.show();
     }
 }

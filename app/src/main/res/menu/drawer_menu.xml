@@ -22,6 +22,11 @@
             android:icon="@android:drawable/ic_menu_view"
             android:title="@string/exchange_rates" />
 
+        <item
+            android:id="@+id/nav_language"
+            android:icon="@android:drawable/ic_menu_sort_by_size"
+            android:title="@string/language" />
+
     </group>
 
     <!-- Divider line before logout -->

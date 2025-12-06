@@ -36,13 +36,23 @@
     <string name="nav_transition_History">History</string>
     <string name="statistics_empty_state_desc">Illustration for empty statistics</string>
 
-    <!-- Common -->
+    <!-- Common Actions -->
     <string name="add">Add</string>
     <string name="search">Search</string>
     <string name="logout">Logout</string>
     <string name="profile">Profile</string>
     <string name="user_name">User Name</string>
     <string name="user_email">user@example.com</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
+    <string name="update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="close">Close</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="save">Save</string>
+    <string name="archive">Archive</string>
 
     <!-- Exchange Rates -->
     <string name="exchange_rates">Exchange Rates</string>
@@ -54,4 +64,202 @@
     <string name="buy">Buy</string>
     <string name="sell">Sell</string>
     <string name="last_updated">Last updated: %s</string>
+
+    <!-- Language -->
+    <string name="language">Language</string>
+    <string name="select_language">Select Language</string>
+    <string name="subscriptions">Subscriptions</string>
+
+    <!-- Wallet Operations -->
+    <string name="wallet_name">Wallet Name</string>
+    <string name="enter_wallet_name">Enter wallet name</string>
+    <string name="initial_balance">Initial Balance</string>
+    <string name="balance">Balance</string>
+    <string name="enter_balance">Enter balance</string>
+    <string name="add_new_wallet">Add New Wallet</string>
+    <string name="edit_wallet">Edit Wallet</string>
+    <string name="delete_wallet">Delete Wallet?</string>
+    <string name="delete_wallet_confirm">Are you sure you want to delete \"%s\"?</string>
+    <string name="wallet_created">Wallet created successfully!</string>
+    <string name="wallet_updated">Wallet updated</string>
+    <string name="wallet_deleted">Wallet deleted</string>
+    <string name="cannot_delete_wallet">Cannot delete wallet</string>
+    <string name="cannot_delete_last_wallet">Cannot delete the last wallet. Create another wallet first.</string>
+    <string name="wallet_name_empty">Wallet name cannot be empty</string>
+    <string name="balance_negative">Balance cannot be negative</string>
+    <string name="invalid_balance">Invalid balance amount</string>
+    <string name="no_wallets_available">No wallets available</string>
+    <string name="select_wallet">Select Wallet</string>
+    <string name="wallet_management">Wallet Management</string>
+    <string name="add_wallet_desc">Add wallet</string>
+    <string name="balance_display">Balance: %s</string>
+
+    <!-- Category Operations -->
+    <string name="add_new_category">Add New Category</string>
+    <string name="edit_category">Edit Category</string>
+    <string name="delete_category">Delete Category?</string>
+    <string name="delete_category_confirm">Are you sure you want to delete \"%s\"?</string>
+    <string name="category_name">Category name</string>
+    <string name="choose_icon">Choose Icon</string>
+    <string name="choose_color">Choose Color</string>
+    <string name="type">Type</string>
+    <string name="add_category">Add Category</string>
+    <string name="category_added">Category added successfully!</string>
+    <string name="category_exists">Category already exists!</string>
+    <string name="category_updated">Category updated</string>
+    <string name="category_deleted">Category deleted</string>
+    <string name="category_name_empty">Category name cannot be empty</string>
+    <string name="please_enter_category_name">Please enter category name</string>
+    <string name="select_category">Select Category</string>
+    <string name="select_expense_category">Select Expense Category</string>
+    <string name="select_income_category">Select Income Category</string>
+    <string name="add_new_category_option">+ Add New Category</string>
+    <string name="category_management">Category Management</string>
+    <string name="expense_categories">Expense Categories</string>
+    <string name="income_categories">Income Categories</string>
+    <string name="add_category_desc">Add category</string>
+    <string name="archive_category">Archive Category?</string>
+    <string name="archive_category_message">%s has %d transaction(s). Archiving will hide it from selection but preserve your transaction history.\n\nContinue?</string>
+    <string name="category_archived">Category archived (transaction history preserved)</string>
+
+    <!-- Transaction Operations -->
+    <string name="amount">Amount</string>
+    <string name="date">Date</string>
+    <string name="notes_optional">Notes (Optional)</string>
+    <string name="add_note">Add a note...</string>
+    <string name="receipt_photo_optional">Receipt Photo (Optional)</string>
+    <string name="add_receipt_photo">Add Receipt Photo</string>
+    <string name="change_receipt_photo">Change Receipt Photo</string>
+    <string name="tap_to_remove">Tap ✕ to remove</string>
+    <string name="receipt_preview">Receipt preview</string>
+    <string name="remove_receipt">Remove receipt</string>
+    <string name="save_transaction">Save Transaction</string>
+    <string name="transaction_saved">Transaction saved!</string>
+    <string name="receipt_removed">Receipt removed</string>
+    <string name="please_enter_amount">Please enter amount</string>
+    <string name="amount_greater_than_zero">Amount must be greater than 0</string>
+    <string name="invalid_amount">Invalid amount</string>
+    <string name="please_select_category">Please select a category</string>
+    <string name="please_select_wallet">Please select a wallet</string>
+    <string name="failed_save_receipt">Failed to save receipt photo</string>
+    <string name="permission_denied_photo">Permission denied. Cannot select photo.</string>
+    <string name="category">Category</string>
+    <string name="wallet">Wallet</string>
+    <string name="transaction">Transaction</string>
+    <string name="add_new">Add New</string>
+
+    <!-- Transaction Detail -->
+    <string name="description">DESCRIPTION</string>
+    <string name="transaction_description">Transaction description</string>
+    <string name="date_label">DATE</string>
+    <string name="receipt_photo">RECEIPT PHOTO</string>
+    <string name="no_receipt_attached">No receipt attached</string>
+    <string name="tap_to_view_full">Tap to view full size</string>
+    <string name="category_name_display">Category Name</string>
+
+    <!-- Transfer Operations -->
+    <string name="transfer_money">Transfer Money</string>
+    <string name="from_wallet">From Wallet</string>
+    <string name="to_wallet">To Wallet</string>
+    <string name="transfer">Transfer</string>
+
+    <!-- Statistics -->
+    <string name="statistics">Statistics</string>
+    <string name="previous">← Previous</string>
+    <string name="next">Next →</string>
+    <string name="expenses">Expenses</string>
+    <string name="net">Net</string>
+    <string name="spending_trend">Spending trend</string>
+    <string name="category_distribution">Category distribution</string>
+    <string name="expense_summary">Expense Summary (%s)</string>
+    <string name="income_summary">Income Summary (%s)</string>
+    <string name="total_amount">Total: %s</string>
+    <string name="breakdown">Breakdown:</string>
+    <string name="no_transactions_period">No transactions in this period</string>
+    <string name="alerts_insights">📊 Alerts &amp; Insights</string>
+    <string name="loading_alerts">Loading alerts...</string>
+    <string name="no_statistics_yet">No statistics yet</string>
+    <string name="add_transaction_unlock">Add a transaction to unlock charts and alerts.</string>
+    <string name="add_transactions_alerts">Add transactions to see this month\'s alerts.</string>
+    <string name="no_data_period">No data for this period</string>
+    <string name="daily_expenses">Daily Expenses</string>
+    <string name="daily_income">Daily Income</string>
+
+    <!-- Management Screen -->
+    <string name="management">Management</string>
+    <string name="please_fill_all_fields">Please fill all fields</string>
+
+    <!-- Logout -->
+    <string name="logout_confirm">Are you sure you want to logout?</string>
+    <string name="enable_notifications">Enable Notifications</string>
+    <string name="notification_prompt">Would you like to receive daily summaries of your transactions at 10:00 PM?</string>
+
+    <!-- Subscription Operations -->
+    <string name="subscription_title">Subscriptions</string>
+    <string name="total_monthly">Total Monthly: %s</string>
+    <string name="active_subscriptions">Active Subscriptions</string>
+    <string name="no_subscriptions">No Subscriptions</string>
+    <string name="no_subscriptions_message">Add your first subscription using the + button below</string>
+    <string name="add_subscription">Add Subscription</string>
+    <string name="edit_subscription">Edit Subscription</string>
+    <string name="delete_subscription">Delete Subscription?</string>
+    <string name="delete_subscription_confirm">Are you sure you want to delete \"%s\"?</string>
+    <string name="subscription_for">Subscription For</string>
+    <string name="subscription_hint">e.g., Netflix, Spotify</string>
+    <string name="start_date">Start Date</string>
+    <string name="add_notes">Add notes...</string>
+    <string name="subscription_auto_charge">This subscription will be automatically charged every month on the billing date.</string>
+    <string name="please_enter_subscription_name">Please enter subscription name</string>
+    <string name="please_create_wallet_first">Please create a wallet first</string>
+    <string name="subscription_added">Subscription added successfully!</string>
+    <string name="subscription_deleted">Subscription deleted</string>
+    <string name="subscription_resumed">Subscription resumed</string>
+    <string name="subscription_paused">Subscription paused</string>
+
+    <!-- Authentication -->
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="full_name">Full Name</string>
+    <string name="remember_me">Remember Me</string>
+    <string name="dont_have_account">Don\'t have account? Register</string>
+    <string name="back_to_login">Back to Login</string>
+    <string name="email_required">Email is required</string>
+    <string name="password_required">Password is required</string>
+    <string name="name_required">Name is required</string>
+    <string name="valid_email_required">Please enter a valid email</string>
+    <string name="password_min_length">Password must be at least 6 characters</string>
+    <string name="confirm_password_required">Please confirm your password</string>
+    <string name="passwords_not_match">Passwords do not match</string>
+
+    <!-- Transfer Operations Extended -->
+    <string name="please_select_source_wallet">Please select source wallet</string>
+    <string name="please_select_destination_wallet">Please select destination wallet</string>
+    <string name="cannot_transfer_same_wallet">Cannot transfer to the same wallet</string>
+    <string name="insufficient_balance">Insufficient balance in source wallet</string>
+    <string name="transfer_completed">Transfer completed!</string>
+
+    <!-- Subscription Extended -->
+    <string name="active">Active</string>
+    <string name="paused">Paused</string>
+    <string name="next_billing">Next: %s</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+
+    <!-- Transaction Detail Extended -->
+    <string name="delete_transaction">Delete Transaction</string>
+    <string name="delete_transaction_confirm">Are you sure you want to delete this transaction?</string>
+    <string name="transaction_deleted">Transaction deleted</string>
+    <string name="no_description">No description</string>
+    <string name="edit_feature_coming_soon">Edit feature coming soon</string>
+    
+    <!-- Transfer Extended -->
+    <string name="delete_transfer">Delete Transfer?</string>
+    <string name="delete_transfer_confirm">Are you sure you want to delete this transfer? Wallet balances will be reversed.</string>
+    <string name="transfer_deleted">Transfer deleted</string>
+    <string name="transfer_details">Transfer Details</string>
+    <string name="from_label">FROM</string>
+    <string name="to_label">TO</string>
 </resources>

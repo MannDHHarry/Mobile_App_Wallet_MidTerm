@@ -112,7 +112,7 @@ public class AddTransactionFragment extends Fragment {
                         launchImagePicker();
                     } else {
                         Toast.makeText(requireContext(),
-                                "Permission denied. Cannot select photo.",
+                                getString(R.string.permission_denied_photo),
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -151,7 +151,7 @@ public class AddTransactionFragment extends Fragment {
         rgTransactionType.setOnCheckedChangeListener((group, checkedId) -> {
             isExpense = checkedId == R.id.rbExpense;
             selectedCategory = null;
-            tvSelectedCategory.setText("Select Category");
+            tvSelectedCategory.setText(getString(R.string.select_category));
         });
 
         //Category , Wallet and Date pickers
@@ -197,10 +197,10 @@ public class AddTransactionFragment extends Fragment {
         if (selectedPhotoUri != null) {
             ivReceiptPreview.setImageURI(selectedPhotoUri);
             cvReceiptPreview.setVisibility(View.VISIBLE);
-            btnAddReceipt.setText("Change Receipt Photo");
+            btnAddReceipt.setText(getString(R.string.change_receipt_photo));
         } else {
             cvReceiptPreview.setVisibility(View.GONE);
-            btnAddReceipt.setText("Add Receipt Photo");
+            btnAddReceipt.setText(getString(R.string.add_receipt_photo));
         }
     }
 
@@ -208,7 +208,7 @@ public class AddTransactionFragment extends Fragment {
         selectedPhotoUri = null;
         savedPhotoPath = null;
         updateReceiptPreview();
-        Toast.makeText(requireContext(), "Receipt removed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.receipt_removed), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -218,7 +218,7 @@ public class AddTransactionFragment extends Fragment {
         String amountStr = etAmount.getText().toString().trim();
 
         if (amountStr.isEmpty()) {
-            Toast.makeText(requireContext(), "Please enter amount", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.please_enter_amount), Toast.LENGTH_SHORT).show();
             etAmount.requestFocus();
             return;
         }
@@ -227,21 +227,21 @@ public class AddTransactionFragment extends Fragment {
         try {
             amount = Double.parseDouble(amountStr);
             if (amount <= 0) {
-                Toast.makeText(requireContext(), "Amount must be greater than 0", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.amount_greater_than_zero), Toast.LENGTH_SHORT).show();
                 return;
             }
         } catch (NumberFormatException e) {
-            Toast.makeText(requireContext(), "Invalid amount", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.invalid_amount), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (selectedCategory == null) {
-            Toast.makeText(requireContext(), "Please select a category", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.please_select_category), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (selectedWallet == null) {
-            Toast.makeText(requireContext(), "Please select a wallet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.please_select_wallet), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -251,7 +251,7 @@ public class AddTransactionFragment extends Fragment {
         if (selectedPhotoUri != null) {
             savedPhotoPath = PhotoManager.saveReceiptPhoto(requireContext(), selectedPhotoUri);
             if (savedPhotoPath == null) {
-                Toast.makeText(requireContext(), "Failed to save receipt photo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.failed_save_receipt), Toast.LENGTH_SHORT).show();
                 // Continue anyway - photo is optional
             }
         }
@@ -269,7 +269,7 @@ public class AddTransactionFragment extends Fragment {
 
 
 
-        Toast.makeText(requireContext(), "Transaction saved!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.transaction_saved), Toast.LENGTH_SHORT).show();
         getParentFragmentManager().popBackStack();
     }
 

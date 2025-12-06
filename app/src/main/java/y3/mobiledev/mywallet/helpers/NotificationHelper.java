@@ -69,6 +69,7 @@ public class NotificationHelper {
 
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("navigate_to", "statistics");
 
         int pendingIntentFlags = PendingIntent.FLAG_UPDATE_CURRENT;
         pendingIntentFlags |= PendingIntent.FLAG_IMMUTABLE;

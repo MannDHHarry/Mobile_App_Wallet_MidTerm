@@ -218,7 +218,7 @@
             }
 
 
-            List<TransactionGroup> filteredGroups = TransactionManager.groupByDateRich(filtered);
+            List<TransactionGroup> filteredGroups = TransactionManager.groupByDateRich(filtered, requireContext());
             transactionAdapter.updateTransactions(filteredGroups);
         }
 
@@ -248,24 +248,24 @@
                 @Override
                 public void onEdit(Transaction transaction) {
                     // TODO: Navigate to edit transaction
-                    Toast.makeText(requireContext(), "Edit feature coming soon", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.edit_feature_coming_soon), Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onDelete(Transaction transaction) {
                     // Show confirmation dialog
                     new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                            .setTitle("Delete Transaction")
-                            .setMessage("Are you sure you want to delete this transaction?")
-                            .setPositiveButton("Delete", (d, w) -> {
+                            .setTitle(getString(R.string.delete_transaction))
+                            .setMessage(getString(R.string.delete_transaction_confirm))
+                            .setPositiveButton(getString(R.string.delete), (d, w) -> {
                                 // Delete receipt photo if exists
                                 if (transaction.getReceiptPhotoUri() != null) {
                                     PhotoManager.deleteReceiptPhoto(transaction.getReceiptPhotoUri());
                                 }
                                 viewModel.deleteTransaction(transaction);
-                                Toast.makeText(requireContext(), "Transaction deleted", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), getString(R.string.transaction_deleted), Toast.LENGTH_SHORT).show();
                             })
-                            .setNegativeButton("Cancel", null)
+                            .setNegativeButton(getString(R.string.cancel), null)
                             .show();
                 }
             });

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import y3.mobiledev.mywallet.adapters.SubscriptionAdapter;
+import y3.mobiledev.mywallet.helpers.CurrencyUtils;
 import y3.mobiledev.mywallet.helpers.PickersAndDialog;
 import y3.mobiledev.mywallet.models.Subscription;
 import y3.mobiledev.mywallet.models.Wallet;
@@ -108,7 +109,7 @@ public class SubscriptionFragment extends Fragment {
         if (subscriptions.isEmpty()) {
             rvSubscriptions.setVisibility(View.GONE);
             emptyState.setVisibility(View.VISIBLE);
-            tvTotalSubscriptions.setText("Total Monthly: 0 ₫");
+            tvTotalSubscriptions.setText(String.format(getString(R.string.total_monthly), "0 ₫"));
         } else {
             rvSubscriptions.setVisibility(View.VISIBLE);
             emptyState.setVisibility(View.GONE);
@@ -121,7 +122,7 @@ public class SubscriptionFragment extends Fragment {
                 }
             }
             tvTotalSubscriptions.setText(
-                    "Total Monthly: " + y3.mobiledev.mywallet.helpers.CurrencyUtils.formatPlainAmount(total)
+                    String.format(getString(R.string.total_monthly), CurrencyUtils.formatPlainAmount(total))
             );
         }
     }
@@ -156,7 +157,7 @@ public class SubscriptionFragment extends Fragment {
                     }
                 });
             } else {
-                Toast.makeText(requireContext(), "Please create a wallet first",
+                Toast.makeText(requireContext(), getString(R.string.please_create_wallet_first),
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -180,25 +181,25 @@ public class SubscriptionFragment extends Fragment {
         });
 
         builder.setView(dialogView);
-        builder.setPositiveButton("Add", (dialog, which) -> {
+        builder.setPositiveButton(getString(R.string.add), (dialog, which) -> {
             String name = etName.getText().toString().trim();
             String amountStr = etAmount.getText().toString().trim();
             String notes = etNotes.getText().toString().trim();
 
             if (name.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter subscription name",
+                Toast.makeText(requireContext(), getString(R.string.please_enter_subscription_name),
                         Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (amountStr.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter amount",
+                Toast.makeText(requireContext(), getString(R.string.please_enter_amount),
                         Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (selectedWallet[0] == null) {
-                Toast.makeText(requireContext(), "Please select a wallet",
+                Toast.makeText(requireContext(), getString(R.string.please_select_wallet),
                         Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -206,7 +207,7 @@ public class SubscriptionFragment extends Fragment {
             try {
                 double amount = Double.parseDouble(amountStr);
                 if (amount <= 0) {
-                    Toast.makeText(requireContext(), "Amount must be greater than 0",
+                    Toast.makeText(requireContext(), getString(R.string.amount_greater_than_zero),
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -219,22 +220,22 @@ public class SubscriptionFragment extends Fragment {
                         notes
                 );
 
-                Toast.makeText(requireContext(), "Subscription added successfully!",
+                Toast.makeText(requireContext(), getString(R.string.subscription_added),
                         Toast.LENGTH_SHORT).show();
 
             } catch (NumberFormatException e) {
-                Toast.makeText(requireContext(), "Invalid amount",
+                Toast.makeText(requireContext(), getString(R.string.invalid_amount),
                         Toast.LENGTH_SHORT).show();
             }
         });
 
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton(getString(R.string.cancel), null);
         builder.show();
     }
 
     private void showEditSubscriptionDialog(Subscription subscription) {
         // Similar to add dialog but pre-filled with subscription data
-        Toast.makeText(requireContext(), "Edit: " + subscription.getName(),
+        Toast.makeText(requireContext(), getString(R.string.edit) + ": " + subscription.getName(),
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -242,21 +243,20 @@ public class SubscriptionFragment extends Fragment {
         boolean newStatus = !subscription.isActive();
         viewModel.toggleSubscriptionStatus(subscription.getSubscriptionId(), newStatus);
 
-        String message = newStatus ? "Subscription resumed" : "Subscription paused";
+        String message = newStatus ? getString(R.string.subscription_resumed) : getString(R.string.subscription_paused);
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     private void showDeleteConfirmation(Subscription subscription) {
         new AlertDialog.Builder(requireContext())
-                .setTitle("Delete Subscription?")
-                .setMessage("Are you sure you want to delete \"" +
-                        subscription.getName() + "\"?")
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(getString(R.string.delete_subscription))
+                .setMessage(String.format(getString(R.string.delete_subscription_confirm), subscription.getName()))
+                .setPositiveButton(getString(R.string.delete), (dialog, which) -> {
                     viewModel.deleteSubscription(subscription);
-                    Toast.makeText(requireContext(), "Subscription deleted",
+                    Toast.makeText(requireContext(), getString(R.string.subscription_deleted),
                             Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 

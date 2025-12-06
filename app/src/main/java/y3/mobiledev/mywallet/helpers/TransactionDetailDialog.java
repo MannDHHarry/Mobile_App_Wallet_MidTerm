@@ -107,7 +107,7 @@ public class TransactionDetailDialog extends Dialog {
         // Description
         String description = transaction.getDescription();
         if (description == null || description.isEmpty()) {
-            tvDescription.setText("No description");
+            tvDescription.setText(getContext().getString(R.string.no_description));
             tvDescription.setTextColor(ContextCompat.getColor(getContext(), R.color.text_gray));
         } else {
             tvDescription.setText(description);

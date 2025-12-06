@@ -2,6 +2,7 @@ package y3.mobiledev.mywallet;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -49,6 +50,9 @@ import y3.mobiledev.mywallet.models.User;
 //Subscription Import
 import y3.mobiledev.mywallet.fragments.SubscriptionFragment;
 
+//Locale Import
+import y3.mobiledev.mywallet.helpers.LocaleHelper;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private TextView tvUserName;
@@ -86,6 +90,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Log.w("MainActivity", "Notification permission denied");
                 }
             });
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,11 +158,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         updateNavHeader(user);
         btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
-        // THIRD: Load fragment AFTER data is ready
-        loadFragment(new HomeFragment());
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
+        // THIRD: Load fragment AFTER data is ready - check for notification navigation first
+        handleNotificationNavigation();
 
-        Log.d("MainActivity", "HomeFragment loaded");
+        Log.d("MainActivity", "Initial fragment loaded");
         scheduleNotificationIfNeeded();
 
         //Subscription Schedular
@@ -165,6 +173,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SubscriptionNotificationHelper.createNotificationChannel(this);
         SubscriptionScheduler.scheduleDailyCheck(this);
         Log.d("MainActivity", "Subscription scheduler initialized");
+    }
+
+    private void handleNotificationNavigation() {
+        String navigateTo = getIntent().getStringExtra("navigate_to");
+        if ("statistics".equals(navigateTo)) {
+            Log.d("MainActivity", "Navigating to Statistics from notification");
+            loadFragment(new StatisticsFragment());
+            bottomNavigation.setSelectedItemId(R.id.nav_more);
+            fabAddTransaction.hide();
+            getIntent().removeExtra("navigate_to"); // Prevent re-navigation on config change
+        } else {
+            // Default: load Home fragment
+            loadFragment(new HomeFragment());
+            bottomNavigation.setSelectedItemId(R.id.nav_home);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(@NonNull Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        
+        // Handle notification click when app is already running
+        String navigateTo = intent.getStringExtra("navigate_to");
+        if ("statistics".equals(navigateTo) && isInitialized) {
+            Log.d("MainActivity", "Navigating to Statistics from notification (app was running)");
+            loadFragment(new StatisticsFragment());
+            bottomNavigation.setSelectedItemId(R.id.nav_more);
+            fabAddTransaction.hide();
+            intent.removeExtra("navigate_to");
+        }
     }
 
     private void initViews() {
@@ -239,10 +278,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // ADD this new method after setupListeners():
     private void showAddOptionsDialog() {
-        String[] options = {"Transaction", "Transfer"};
+        String[] options = {getString(R.string.transaction), getString(R.string.transfer)};
 
         new AlertDialog.Builder(this)
-                .setTitle("Add New")
+                .setTitle(getString(R.string.add_new))
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
                         // Transaction
@@ -257,16 +296,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         transferDialog.show(getSupportFragmentManager(), "TransferDialog");
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 
 
     private void showLogoutConfirmation() {
         new AlertDialog.Builder(this)
-                .setTitle("Logout")
-                .setMessage("Are you sure you want to logout?")
-                .setPositiveButton("Yes", (dialog, which) -> {
+                .setTitle(getString(R.string.logout))
+                .setMessage(getString(R.string.logout_confirm))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
 
 
                     NotificationScheduler.cancelDailyNotification(this);
@@ -287,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     startActivity(intent);
                     finish();
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton(getString(R.string.no), null)
                 .show();
     }
 
@@ -339,15 +378,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void showNotificationPermissionDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Enable Notifications")
-                .setMessage("Would you like to receive daily summaries of your transactions at 10:00 PM?")
-                .setPositiveButton("Yes", (dialog, which) -> {
+                .setTitle(getString(R.string.enable_notifications))
+                .setMessage(getString(R.string.notification_prompt))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
                     Log.d("MainActivity", "User enabled notifications");
                     NotificationHelper.showWelcomeNotification(this);
                     setWelcomeNotificationShown();
                     scheduleNotificationIfNeeded();
                 })
-                .setNegativeButton("No", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                     Log.d("MainActivity", "User declined notifications");
                     setWelcomeNotificationShown();
                 })
@@ -381,8 +420,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_exchange_rates) {
             loadFragment(new ExchangeRateFragment());
             fabAddTransaction.hide();
-        }
-        else if (id == R.id.nav_logout) {
+        } else if (id == R.id.nav_language) {
+            showLanguageDialog();
+        } else if (id == R.id.nav_logout) {
             drawerLayout.closeDrawer(GravityCompat.START);
             showLogoutConfirmation();
             return true;
@@ -390,6 +430,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showLanguageDialog() {
+        String[] languages = {"English", "Tiếng Việt"};
+        int currentSelection = LocaleHelper.isVietnamese(this) ? 1 : 0;
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.select_language))
+                .setSingleChoiceItems(languages, currentSelection, (dialog, which) -> {
+                    String selectedLang = (which == 0) ? LocaleHelper.ENGLISH : LocaleHelper.VIETNAMESE;
+
+                    if (!selectedLang.equals(LocaleHelper.getLanguage(this))) {
+                        LocaleHelper.setLocale(this, selectedLang);
+                        dialog.dismiss();
+                        // Recreate activity to apply new language
+                        recreate();
+                    } else {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
 }
