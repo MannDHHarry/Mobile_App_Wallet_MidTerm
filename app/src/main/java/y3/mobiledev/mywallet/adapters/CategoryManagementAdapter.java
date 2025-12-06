@@ -1,6 +1,8 @@
 package y3.mobiledev.mywallet.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,20 +54,32 @@ public class CategoryManagementAdapter extends RecyclerView.Adapter<CategoryMana
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
         Category category = categories.get(position);
 
-        // Set icon
-        if (category.getIconResId() != 0) {
-            holder.ivIcon.setImageResource(category.getIconResId());
-            holder.ivIcon.setColorFilter(ContextCompat.getColor(context, category.getColorResId()));
+        // Name
+        holder.tvName.setText(category.getName());
+
+        // SAFE ICON SETTING — THIS FIXES THE CRASH
+        int iconRes = category.getIconResId();
+        try {
+            if (iconRes != 0) {
+                holder.ivIcon.setImageResource(iconRes);
+            } else {
+                holder.ivIcon.setImageResource(R.drawable.ic_profile); // fallback icon
+            }
+        } catch (Resources.NotFoundException e) {
+            // This saves your app from crashing if icon is missing
+            holder.ivIcon.setImageResource(R.drawable.ic_profile); // or any default
         }
 
-        // Set name
-        holder.tvName.setText(category.getName());
-        holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.text_black));
+        holder.ivIcon.setColorFilter(ContextCompat.getColor(context, R.color.text_white));
 
-        // Edit button
+        // BACKGROUND: User-selected color as circle
+        GradientDrawable background = new GradientDrawable();
+        background.setShape(GradientDrawable.OVAL);
+        background.setColor(ContextCompat.getColor(context, category.getColorResId()));
+        holder.vColorBackground.setBackground(background);
+
+        // Buttons
         holder.btnEdit.setOnClickListener(v -> onEditClick.onEditClick(category));
-
-        // Delete button
         holder.btnDelete.setOnClickListener(v -> onDeleteClick.onDeleteClick(category));
     }
 
@@ -86,6 +100,7 @@ public class CategoryManagementAdapter extends RecyclerView.Adapter<CategoryMana
         TextView tvName;
         ImageButton btnEdit;
         ImageButton btnDelete;
+        View vColorBackground;  // This is the circle behind the icon
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -93,6 +108,7 @@ public class CategoryManagementAdapter extends RecyclerView.Adapter<CategoryMana
             tvName = itemView.findViewById(R.id.tvCategoryName);
             btnEdit = itemView.findViewById(R.id.btnEdit);
             btnDelete = itemView.findViewById(R.id.btnDelete);
+            vColorBackground = itemView.findViewById(R.id.viewColorBackground); // Make sure ID matches
         }
     }
 }

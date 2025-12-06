@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,26 +14,31 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <!-- Category Icon -->
+        <!-- Category Icon with Dynamic Color Background -->
         <FrameLayout
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="top">
+
+            <!-- DYNAMIC COLORED CIRCLE BACKGROUND -->
             <View
+                android:id="@+id/viewColorBackground"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="@drawable/purple_circle"/>
+                android:background="@drawable/circle_shape" /> <!-- We'll tint this in code -->
+
+            <!-- WHITE ICON ON TOP -->
             <ImageView
                 android:id="@+id/ivCategoryIcon"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
                 android:scaleType="centerInside"
-                android:src="@drawable/lines"
-                app:tint="@color/text_white" />
+                android:src="@drawable/cat_lines"
+                app:tint="@color/text_white" /> <!-- Always white -->
         </FrameLayout>
 
-        <!-- Category Details -->
+        <!-- Category Name -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -42,7 +46,6 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <!-- Category Name -->
             <TextView
                 android:id="@+id/tvCategoryName"
                 android:layout_width="wrap_content"
@@ -53,11 +56,9 @@
                 android:textColor="@color/text_black"
                 android:textSize="@dimen/text_size_large"
                 android:textStyle="bold" />
-
-
         </LinearLayout>
 
-        <!-- Action Buttons -->
+        <!-- Edit & Delete Buttons -->
         <ImageButton
             android:id="@+id/btnEdit"
             android:layout_width="40dp"
@@ -65,7 +66,7 @@
             android:layout_marginEnd="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Edit"
-            android:src="@drawable/edit"
+            android:src="@drawable/edit2"
             android:scaleType="centerInside"
             app:tint="@color/colorDarkPurple"/>
 
@@ -75,9 +76,9 @@
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Delete"
-            android:src="@drawable/trash"
-            android:scaleType="centerInside" />
-
+            android:src="@drawable/delete_new"
+            android:scaleType="centerInside"
+            app:tint="@color/cat_red"/>
     </LinearLayout>
 
     <!-- Divider -->
@@ -86,5 +87,4 @@
         android:layout_height="1dp"
         android:layout_marginStart="72dp"
         android:background="@color/divider_color"/>
-
 </LinearLayout>

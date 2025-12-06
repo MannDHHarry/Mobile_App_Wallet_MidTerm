@@ -96,6 +96,7 @@ public class TransactionWithCategory {
     public void setWalletId(int walletId) { this.walletId = walletId; }
 
     public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+
     public void setDescription(String description) { this.description = description; }
 
     public void setAmount(double amount) { this.amount = amount; }
