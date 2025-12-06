@@ -74,7 +74,7 @@ public final class CategoryWalletManager {
 
 
     /* -------------------  ADD CATEGORY ------------------- */
-    public static void callAddCategoryDialog(
+   /* public static void callAddCategoryDialog(
             Context ctx,
             TransactionViewModel vm,
             boolean isIncome,
@@ -93,7 +93,24 @@ public final class CategoryWalletManager {
                 toast(ctx, "Category already exists or failed to create");
             }
         });
+    } */
+
+    public static void callAddCategoryDialog(Context ctx, TransactionViewModel vm, boolean isIncomeFlag, Runnable onAdded) {
+        PickersAndDialog.showAddCategoryDialog(ctx, (name, isIncome, iconRes, colorRes) -> {
+            Long result = isIncome
+                    ? vm.addIncomeCategory(name, iconRes, colorRes)
+                    : vm.addExpenseCategory(name, iconRes, colorRes);
+
+            if (result != null && result > 0) {
+                toast(ctx, "Category added successfully!");
+                if (onAdded != null) onAdded.run();
+            } else {
+                toast(ctx, "Category already exists!");
+            }
+        });
     }
+
+
 
     public static void callEditCategoryDialog(
             Context ctx,

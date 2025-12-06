@@ -9,6 +9,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +17,8 @@ import y3.mobiledev.mywallet.adapters.ItemDialogAdapter;
 import y3.mobiledev.mywallet.models.Category;
 import y3.mobiledev.mywallet.models.Wallet;
 import y3.mobiledev.mywallet.R;
+import y3.mobiledev.mywallet.adapters.ColorAdapter;
+import y3.mobiledev.mywallet.adapters.IconAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +34,13 @@ public class PickersAndDialog {
         void onComplete();
     }
 
+    /*
     public interface OnCategoryCreatedListener {
         void onCategoryCreated(String categoryName, boolean isIncome);
+    } */
+
+    public interface OnCategoryCreatedListener {
+        void onCategoryCreated(String categoryName, boolean isIncome, int iconResId, int colorResId);
     }
 
     public interface OnWalletCreatedListener {
@@ -150,7 +158,7 @@ public class PickersAndDialog {
 
     // ===== CATEGORY OPERATIONS =====
 
-    public static void showAddCategoryDialog(Context context, OnCategoryCreatedListener listener) {
+    /*public static void showAddCategoryDialog(Context context, OnCategoryCreatedListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Add New Category");
 
@@ -172,6 +180,48 @@ public class PickersAndDialog {
                 listener.onCategoryCreated(categoryName, isIncome);
             }
         });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    } */
+
+    public static void showAddCategoryDialog(Context context, OnCategoryCreatedListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_add_category, null);
+        builder.setView(view);
+
+        // Find views
+        EditText etName = view.findViewById(R.id.etCategoryName);
+        RadioGroup rgType = view.findViewById(R.id.rgCategoryType);
+        RecyclerView rvIcons = view.findViewById(R.id.rvIcons);
+        RecyclerView rvColors = view.findViewById(R.id.rvColors);
+
+        // Default selections
+        final int[] selectedIcon = {R.drawable.food};     // replace with your default
+        final int[] selectedColor = {R.color.cat_orange};
+
+        // Setup Icon Picker
+        rvIcons.setLayoutManager(new GridLayoutManager(context, 5));
+        rvIcons.setAdapter(new IconAdapter(context, iconResId -> selectedIcon[0] = iconResId));
+
+        // Setup Color Picker
+        rvColors.setLayoutManager(new GridLayoutManager(context, 5));
+        rvColors.setAdapter(new ColorAdapter(context, colorResId -> selectedColor[0] = colorResId));
+
+        builder.setPositiveButton("Add Category", (dialog, which) -> {
+            String name = etName.getText().toString().trim();
+            if (name.isEmpty()) {
+                Toast.makeText(context, "Please enter category name", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            boolean isIncome = rgType.getCheckedRadioButtonId() == R.id.rbCategoryIncome;
+
+            // Pass name + income + icon + color via your existing listener
+            if (listener != null) {
+                listener.onCategoryCreated(name, isIncome, selectedIcon[0], selectedColor[0]);
+            }
+        });
+
         builder.setNegativeButton("Cancel", null);
         builder.show();
     }
