@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add New Category"
+            android:text="@string/add_new_category"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/text_black"
@@ -35,7 +35,7 @@
                 android:id="@+id/etCategoryName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Category name"
+                android:hint="@string/category_name"
                 android:inputType="textCapWords"
                 android:textColor="@color/text_black"
                 android:textSize="16sp"/>
@@ -45,7 +45,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Choose Icon"
+            android:text="@string/choose_icon"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_black"
@@ -64,7 +64,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Choose Color"
+            android:text="@string/choose_color"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_black"
@@ -83,7 +83,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Type"
+            android:text="@string/type"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_black"
@@ -101,7 +101,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Income"
+                android:text="@string/income"
                 android:textColor="@color/text_black"/>
 
             <RadioButton
@@ -109,7 +109,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Expense"
+                android:text="@string/expense"
                 android:checked="true"
                 android:textColor="@color/text_black"/>
         </RadioGroup>
@@ -125,7 +125,7 @@
                 android:id="@+id/btnCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:textColor="@color/colorPrimary"
                 style="@style/Widget.MaterialComponents.Button.TextButton"/>
 
@@ -133,7 +133,7 @@
                 android:id="@+id/btnAdd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add Category"
+                android:text="@string/add_category"
                 style="@style/Widget.MaterialComponents.Button"/>
         </LinearLayout>
 

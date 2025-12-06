@@ -107,7 +107,7 @@ public class StatisticsFragment extends Fragment {
 
     private void setupLineChart() {
         lineChart.getDescription().setEnabled(false);
-        lineChart.setNoDataText("No data for this period");
+        lineChart.setNoDataText(getString(R.string.no_data_period));
         lineChart.getAxisRight().setEnabled(false);
 
         XAxis xAxis = lineChart.getXAxis();
@@ -341,7 +341,7 @@ public class StatisticsFragment extends Fragment {
             entries.add(new Entry(i, value));
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, isExpense ? "Daily Expenses" : "Daily Income");
+        LineDataSet dataSet = new LineDataSet(entries, isExpense ? getString(R.string.daily_expenses) : getString(R.string.daily_income));
         dataSet.setLineWidth(2f);
         dataSet.setCircleRadius(3f);
         dataSet.setDrawValues(false);
@@ -384,7 +384,7 @@ public class StatisticsFragment extends Fragment {
             return;
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, isExpense ? "Expenses" : "Income");
+        PieDataSet dataSet = new PieDataSet(entries, isExpense ? getString(R.string.expenses) : getString(R.string.income));
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(5f);
         dataSet.setColors(getColors());
@@ -451,17 +451,17 @@ public class StatisticsFragment extends Fragment {
         tvSummaryNet.setText(CurrencyUtils.formatPlainAmount(net));
 
         SimpleDateFormat format = new SimpleDateFormat("MMMM yyyy", Locale.US);
-        String dateRange = "(" + format.format(currentMonthCalendar.getTime()) + ")";
+        String dateRange = format.format(currentMonthCalendar.getTime());
 
-        tvSummaryTitle.setText((isExpense ? "Expense" : "Income") + " Summary " + dateRange);
-        tvTotalAmount.setText("Total: " + CurrencyUtils.formatPlainAmount(totalAmount));
+        tvSummaryTitle.setText(String.format(isExpense ? getString(R.string.expense_summary) : getString(R.string.income_summary), dateRange));
+        tvTotalAmount.setText(String.format(getString(R.string.total_amount), CurrencyUtils.formatPlainAmount(totalAmount)));
 
         if (totalAmount == 0) {
-            tvCategoryBreakdown.setText("No transactions in this period");
+            tvCategoryBreakdown.setText(getString(R.string.no_transactions_period));
             return;
         }
 
-        StringBuilder breakdown = new StringBuilder("Breakdown:\n");
+        StringBuilder breakdown = new StringBuilder(getString(R.string.breakdown) + "\n");
         for (Map.Entry<String, Float> entry : categoryAmounts.entrySet()) {
             float percentage = (entry.getValue() / totalAmount) * 100;
             breakdown.append(String.format(Locale.US, "• %s: %s (%.1f%%)\n",
@@ -570,7 +570,7 @@ public class StatisticsFragment extends Fragment {
                 String text = TextUtils.join("\n\n", alerts);
                 tvAIInsights.setText(text);
             } else {
-                tvAIInsights.setText("Add transactions to see this month's alerts.");
+                tvAIInsights.setText(getString(R.string.add_transactions_alerts));
             }
         });
     }

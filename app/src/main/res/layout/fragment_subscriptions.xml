@@ -22,7 +22,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Subscriptions"
+                android:text="@string/subscription_title"
                 android:textColor="@color/text_white"
                 android:textSize="25sp"
                 android:textStyle="bold" />
@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Total Monthly: $0.00"
+                android:text="@string/total_monthly"
                 android:textColor="@color/text_white"
                 android:textSize="16sp" />
 
@@ -53,7 +53,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Active Subscriptions"
+                    android:text="@string/active_subscriptions"
                     android:textColor="@color/text_black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -85,7 +85,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No Subscriptions"
+                        android:text="@string/no_subscriptions"
                         android:textColor="@color/text_black"
                         android:textSize="18sp"
                         android:textStyle="bold"
@@ -94,7 +94,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Add your first subscription using the + button below"
+                        android:text="@string/no_subscriptions_message"
                         android:textColor="@color/text_gray"
                         android:textSize="14sp"
                         android:textAlignment="center"

@@ -36,7 +36,7 @@
         android:id="@+id/btnAddFirstWallet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add"
+        android:text="@string/add"
         android:textColor="@color/text_white"
         android:background="@color/colorAccent"
         android:paddingStart="@dimen/padding_large"

@@ -1,5 +1,6 @@
 package y3.mobiledev.mywallet;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import y3.mobiledev.mywallet.helpers.LocaleHelper;
 import y3.mobiledev.mywallet.helpers.SessionManager;
 import y3.mobiledev.mywallet.fragments.LoginFragment;
 import y3.mobiledev.mywallet.models.User;
@@ -17,6 +19,11 @@ public class AuthActivity extends AppCompatActivity {
     private static final String TAG = "AuthActivity";
     private AuthViewModel authViewModel;
     private TransactionViewModel transactionViewModel;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

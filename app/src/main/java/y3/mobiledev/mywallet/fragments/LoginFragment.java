@@ -1,5 +1,6 @@
 package y3.mobiledev.mywallet.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,12 +19,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import y3.mobiledev.mywallet.AuthViewModel;
 import y3.mobiledev.mywallet.R;
+import y3.mobiledev.mywallet.helpers.LocaleHelper;
 
 public class LoginFragment extends Fragment {
 
     private EditText etEmail, etPassword;
     private Button btnLogin;
-    private TextView tvRegister;
+    private TextView tvRegister, tvChangeLanguage;
     private CheckBox cbRememberMe;
     private ProgressBar progressBar;
     private AuthViewModel viewModel;
@@ -37,6 +39,7 @@ public class LoginFragment extends Fragment {
         initViews(view);
         setupListeners();
         observeViewModel();
+        updateLanguageDisplay();
 
         return view;
     }
@@ -46,6 +49,7 @@ public class LoginFragment extends Fragment {
         etPassword = view.findViewById(R.id.etPassword);
         btnLogin = view.findViewById(R.id.btnLogin);
         tvRegister = view.findViewById(R.id.tvRegister);
+        tvChangeLanguage = view.findViewById(R.id.tvChangeLanguage);
         cbRememberMe = view.findViewById(R.id.cbRememberMe);
         progressBar = view.findViewById(R.id.progressBar);
     }
@@ -53,6 +57,7 @@ public class LoginFragment extends Fragment {
     private void setupListeners() {
         btnLogin.setOnClickListener(v -> performLogin());
         tvRegister.setOnClickListener(v -> navigateToRegister());
+        tvChangeLanguage.setOnClickListener(v -> showLanguageDialog());
 
         // Clear error when user starts typing
         etEmail.addTextChangedListener(new android.text.TextWatcher() {
@@ -106,13 +111,13 @@ public class LoginFragment extends Fragment {
 
         // Basic client-side validation
         if (email.isEmpty()) {
-            etEmail.setError("Email is required");
+            etEmail.setError(getString(R.string.email_required));
             etEmail.requestFocus();
             return;
         }
 
         if (password.isEmpty()) {
-            etPassword.setError("Password is required");
+            etPassword.setError(getString(R.string.password_required));
             etPassword.requestFocus();
             return;
         }
@@ -131,6 +136,33 @@ public class LoginFragment extends Fragment {
                 .replace(R.id.fragmentContainer, new RegisterFragment())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private void showLanguageDialog() {
+        String[] languages = {"English", "Tiếng Việt"};
+        int currentSelection = LocaleHelper.isVietnamese(requireContext()) ? 1 : 0;
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.select_language))
+                .setSingleChoiceItems(languages, currentSelection, (dialog, which) -> {
+                    String selectedLang = (which == 0) ? LocaleHelper.ENGLISH : LocaleHelper.VIETNAMESE;
+
+                    if (!selectedLang.equals(LocaleHelper.getLanguage(requireContext()))) {
+                        LocaleHelper.setLocale(requireContext(), selectedLang);
+                        dialog.dismiss();
+                        // Recreate activity to apply new language
+                        requireActivity().recreate();
+                    } else {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show();
+    }
+
+    private void updateLanguageDisplay() {
+        String currentLang = LocaleHelper.isVietnamese(requireContext()) ? "🌐 Tiếng Việt" : "🌐 English";
+        tvChangeLanguage.setText(currentLang);
     }
 
     @Override

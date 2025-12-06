@@ -70,18 +70,18 @@ public class SubscriptionAdapter extends RecyclerView.Adapter<SubscriptionAdapte
 
         // Set next billing date
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d", Locale.US);
-        String nextBillingText = "Next: " +
-                dateFormat.format(new Date(subscription.getNextBillingDate()));
+        String nextBillingText = context.getString(R.string.next_billing,
+                dateFormat.format(new Date(subscription.getNextBillingDate())));
         holder.tvNextBilling.setText(nextBillingText);
 
         // Set status
         if (subscription.isActive()) {
-            holder.tvStatus.setText("Active");
+            holder.tvStatus.setText(context.getString(R.string.active));
             holder.tvStatus.setBackgroundTintList(
                     ContextCompat.getColorStateList(context, R.color.income_green));
             holder.btnToggle.setImageResource(android.R.drawable.ic_media_pause);
         } else {
-            holder.tvStatus.setText("Paused");
+            holder.tvStatus.setText(context.getString(R.string.paused));
             holder.tvStatus.setBackgroundTintList(
                     ContextCompat.getColorStateList(context, R.color.text_gray));
             holder.btnToggle.setImageResource(android.R.drawable.ic_media_play);

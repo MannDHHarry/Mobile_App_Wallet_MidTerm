@@ -151,13 +151,13 @@ public class TransfersFragment extends Fragment {
         dialog.setOnActionListener(transferToDelete -> {
             // Show confirmation dialog
             new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                    .setTitle("Delete Transfer")
-                    .setMessage("Are you sure you want to delete this transfer? Wallet balances will be reversed.")
-                    .setPositiveButton("Delete", (d, w) -> {
+                    .setTitle(getString(R.string.delete_transfer))
+                    .setMessage(getString(R.string.delete_transfer_confirm))
+                    .setPositiveButton(getString(R.string.delete), (d, w) -> {
                         viewModel.deleteTransfer(transferToDelete);
-                        Toast.makeText(requireContext(), "Transfer deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), getString(R.string.transfer_deleted), Toast.LENGTH_SHORT).show();
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(getString(R.string.cancel), null)
                     .show();
         });
         dialog.show();

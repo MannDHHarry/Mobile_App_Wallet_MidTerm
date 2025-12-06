@@ -1,9 +1,18 @@
 package y3.mobiledev.mywallet.helpers;
 
+import android.content.Context;
+
+import y3.mobiledev.mywallet.R;
+
 import java.util.Calendar;
 import java.util.Date;
 
 public class DateManager {
+
+    // Keys for grouping (internal use - not for display)
+    public static final String KEY_TODAY = "TODAY";
+    public static final String KEY_YESTERDAY = "YESTERDAY";
+    public static final String KEY_EARLIER = "EARLIER";
 
     public static Calendar normalizeToMidnight(Calendar cal) {
         Calendar normalized = (Calendar) cal.clone();
@@ -43,10 +52,47 @@ public class DateManager {
     }
 
     /**
+     * Determines the group key for a transaction date.
+     * @param date Transaction date
+     * @return KEY_TODAY, KEY_YESTERDAY, or KEY_EARLIER
+     */
+    public static String getGroupKey(Date date) {
+        Calendar transCal = Calendar.getInstance();
+        transCal.setTime(date);
+        if (isSameDay(transCal, getTodayMidnight())) {
+            return KEY_TODAY;
+        }
+        if (isSameDay(transCal, getYesterdayMidnight())) {
+            return KEY_YESTERDAY;
+        }
+        return KEY_EARLIER;
+    }
+
+    /**
+     * Gets localized display text for a group key
+     * @param context Context for string resources
+     * @param key Group key (KEY_TODAY, KEY_YESTERDAY, KEY_EARLIER)
+     * @return Localized display string
+     */
+    public static String getLocalizedHeader(Context context, String key) {
+        switch (key) {
+            case KEY_TODAY:
+                return context.getString(R.string.today);
+            case KEY_YESTERDAY:
+                return context.getString(R.string.yesterday);
+            case KEY_EARLIER:
+            default:
+                return context.getString(R.string.earlier);
+        }
+    }
+
+    /**
+     * @deprecated Use getGroupKey() and getLocalizedHeader() instead
      * Determines the group header for a transaction date.
      * @param date Transaction date
-     * @return "Today", "Yesterday", or "Earlier"
+     * @return "Today", "Yesterday", or "Earlier" (English only)
      */
+    @Deprecated
     public static String getGroupHeader(Date date) {
         Calendar transCal = Calendar.getInstance();
         transCal.setTime(date);

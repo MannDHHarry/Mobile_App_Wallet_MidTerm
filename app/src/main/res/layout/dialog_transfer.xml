@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Transfer Money"
+            android:text="@string/transfer_money"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/text_black"
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="From Wallet"
+            android:text="@string/from_wallet"
             android:textSize="14sp"
             android:textColor="@color/text_black"
             android:layout_marginBottom="8dp"/>
@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:text="Select Wallet"
+                android:text="@string/select_wallet"
                 android:textColor="@color/colorDarkPurple"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
@@ -68,7 +68,7 @@
             android:id="@+id/tvFromBalance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Balance: $0.00"
+            android:text="@string/balance_display"
             android:textSize="12sp"
             android:textColor="@color/text_gray"
             android:layout_marginBottom="16dp"
@@ -78,7 +78,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="To Wallet"
+            android:text="@string/to_wallet"
             android:textSize="14sp"
             android:textColor="@color/text_black"
             android:layout_marginBottom="8dp"/>
@@ -99,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:text="Select Wallet"
+                android:text="@string/select_wallet"
                 android:textColor="@color/colorDarkPurple"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
@@ -117,7 +117,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Amount"
+            android:text="@string/amount"
             android:textSize="14sp"
             android:textColor="@color/text_black"
             android:layout_marginBottom="8dp"/>
@@ -140,7 +140,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date"
+            android:text="@string/date"
             android:textSize="14sp"
             android:textColor="@color/text_black"
             android:layout_marginBottom="8dp"/>
@@ -161,7 +161,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:text="Today, Jan 5"
+                android:text="@string/today"
                 android:textColor="@color/colorDarkPurple"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
@@ -188,7 +188,7 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/rounded_button_purple"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:textAllCaps="false"
                 android:textColor="@color/colorWhite"
                 android:textSize="15sp"
@@ -201,7 +201,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/rounded_button_purple"
-                android:text="Transfer Money"
+                android:text="@string/transfer_money"
                 android:textAllCaps="false"
                 android:textColor="@color/colorWhite"
                 android:textSize="15sp"
