@@ -149,11 +149,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         updateNavHeader(user);
         btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
-        // THIRD: Load fragment AFTER data is ready
-        loadFragment(new HomeFragment());
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
+        // THIRD: Load fragment AFTER data is ready - check for notification navigation first
+        handleNotificationNavigation();
 
-        Log.d("MainActivity", "HomeFragment loaded");
+        Log.d("MainActivity", "Initial fragment loaded");
         scheduleNotificationIfNeeded();
 
         //Subscription Schedular
@@ -165,6 +164,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SubscriptionNotificationHelper.createNotificationChannel(this);
         SubscriptionScheduler.scheduleDailyCheck(this);
         Log.d("MainActivity", "Subscription scheduler initialized");
+    }
+
+    private void handleNotificationNavigation() {
+        String navigateTo = getIntent().getStringExtra("navigate_to");
+        if ("statistics".equals(navigateTo)) {
+            Log.d("MainActivity", "Navigating to Statistics from notification");
+            loadFragment(new StatisticsFragment());
+            bottomNavigation.setSelectedItemId(R.id.nav_more);
+            fabAddTransaction.hide();
+            getIntent().removeExtra("navigate_to"); // Prevent re-navigation on config change
+        } else {
+            // Default: load Home fragment
+            loadFragment(new HomeFragment());
+            bottomNavigation.setSelectedItemId(R.id.nav_home);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(@NonNull Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        
+        // Handle notification click when app is already running
+        String navigateTo = intent.getStringExtra("navigate_to");
+        if ("statistics".equals(navigateTo) && isInitialized) {
+            Log.d("MainActivity", "Navigating to Statistics from notification (app was running)");
+            loadFragment(new StatisticsFragment());
+            bottomNavigation.setSelectedItemId(R.id.nav_more);
+            fabAddTransaction.hide();
+            intent.removeExtra("navigate_to");
+        }
     }
 
     private void initViews() {
