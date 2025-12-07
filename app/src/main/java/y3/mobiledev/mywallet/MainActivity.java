@@ -56,7 +56,11 @@ import y3.mobiledev.mywallet.helpers.LocaleHelper;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private TextView tvUserName;
-    private FloatingActionButton fabAddTransaction;
+    private FloatingActionButton fabMain, fabAddTransaction, fabAddTransfer;
+    private TextView tvAddTransaction, tvAddTransfer;
+    private View dimOverlay;
+    private boolean isFabMenuOpen = false;
+
     private BottomNavigationView bottomNavigation;
 
     private Fragment currentFragment;
@@ -207,8 +211,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initViews() {
+
         tvUserName = findViewById(R.id.tvUserName);
+        // FAB views
+        fabMain = findViewById(R.id.fabMain);
         fabAddTransaction = findViewById(R.id.fabAddTransaction);
+        fabAddTransfer = findViewById(R.id.fabAddTransfer);
+        tvAddTransaction = findViewById(R.id.tvAddTransaction);
+        tvAddTransfer = findViewById(R.id.tvAddTransfer);
+        dimOverlay = findViewById(R.id.dimOverlay);
+
         bottomNavigation = findViewById(R.id.bottomNavigation);
         btnMenu = findViewById(R.id.btnMenu);
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -242,23 +254,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Fragment selectedFragment = null;
             int id = item.getItemId();
 
+            if (isFabMenuOpen) {
+                closeFabMenu();
+            }
+
             if (id == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
-                fabAddTransaction.show();
+                fabMain.show();
             } else if (id == R.id.nav_statistics) {
                 selectedFragment = new TransactionHistoryFragment();
-                fabAddTransaction.hide();
+                fabMain.hide();
             } else if (id == R.id.nav_categories) {
                 selectedFragment = new CategoriesFragment();
-                fabAddTransaction.hide();
+                fabMain.hide();
             } else if (id == R.id.nav_more) {
                 selectedFragment = new StatisticsFragment();
-                fabAddTransaction.hide();
+                fabMain.hide();
             }
 
             return loadFragment(selectedFragment);
         });
     }
+
 
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {
@@ -273,32 +290,140 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupListeners() {
-        fabAddTransaction.setOnClickListener(v -> showAddOptionsDialog());
+        fabMain.setOnClickListener(v -> toggleFabMenu());
+        fabAddTransaction.setOnClickListener(v -> {
+            closeFabMenu();
+            navigateToAddTransaction();
+        });
+        fabAddTransfer.setOnClickListener(v -> {
+            closeFabMenu();
+            openTransferDialog();
+        });
+        dimOverlay.setOnClickListener(v -> closeFabMenu());
     }
 
-    // ADD this new method after setupListeners():
-    private void showAddOptionsDialog() {
-        String[] options = {getString(R.string.transaction), getString(R.string.transfer)};
-
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.add_new))
-                .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
-                        // Transaction
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragmentContainer, new AddTransactionFragment())
-                                .addToBackStack(null)
-                                .commit();
-                    } else if (which == 1) {
-                        // Transfer
-                        TransferDialogFragment transferDialog = new TransferDialogFragment();
-                        transferDialog.show(getSupportFragmentManager(), "TransferDialog");
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), null)
-                .show();
+    // Add these new methods for FAB animation:
+    private void toggleFabMenu() {
+        if (isFabMenuOpen) {
+            closeFabMenu();
+        } else {
+            openFabMenu();
+        }
     }
+
+    private void openFabMenu() {
+        isFabMenuOpen = true;
+
+        // Show dim overlay
+        dimOverlay.setVisibility(View.VISIBLE);
+        dimOverlay.animate()
+                .alpha(1f)
+                .setDuration(200)
+                .start();
+
+        // Rotate main FAB
+        fabMain.animate()
+                .rotation(45f)
+                .setDuration(200)
+                .start();
+
+        // Show and animate Transaction FAB
+        fabAddTransaction.setVisibility(View.VISIBLE);
+        fabAddTransaction.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(200)
+                .start();
+
+        tvAddTransaction.setVisibility(View.VISIBLE);
+        tvAddTransaction.animate()
+                .alpha(1f)
+                .setDuration(200)
+                .start();
+
+        // Show and animate Transfer FAB (with delay)
+        fabAddTransfer.setVisibility(View.VISIBLE);
+        fabAddTransfer.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(200)
+                .setStartDelay(50)
+                .start();
+
+        tvAddTransfer.setVisibility(View.VISIBLE);
+        tvAddTransfer.animate()
+                .alpha(1f)
+                .setDuration(200)
+                .setStartDelay(50)
+                .start();
+    }
+
+    private void closeFabMenu() {
+        isFabMenuOpen = false;
+
+        // Hide dim overlay
+        dimOverlay.animate()
+                .alpha(0f)
+                .setDuration(200)
+                .withEndAction(() -> dimOverlay.setVisibility(View.GONE))
+                .start();
+
+        // Rotate main FAB back
+        fabMain.animate()
+                .rotation(0f)
+                .setDuration(200)
+                .start();
+
+        // Hide Transaction FAB
+        fabAddTransaction.animate()
+                .scaleX(0f)
+                .scaleY(0f)
+                .setDuration(200)
+                .withEndAction(() -> fabAddTransaction.setVisibility(View.GONE))
+                .start();
+
+        tvAddTransaction.animate()
+                .alpha(0f)
+                .setDuration(200)
+                .withEndAction(() -> tvAddTransaction.setVisibility(View.GONE))
+                .start();
+
+        // Hide Transfer FAB
+        fabAddTransfer.animate()
+                .scaleX(0f)
+                .scaleY(0f)
+                .setDuration(200)
+                .withEndAction(() -> fabAddTransfer.setVisibility(View.GONE))
+                .start();
+
+        tvAddTransfer.animate()
+                .alpha(0f)
+                .setDuration(200)
+                .withEndAction(() -> tvAddTransfer.setVisibility(View.GONE))
+                .start();
+    }
+
+    private void navigateToAddTransaction() {
+
+        // Create an instance of your actual fragment
+        AddTransactionFragment addTransactionFragment = new AddTransactionFragment();
+
+        // Use a FragmentTransaction to display it
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, addTransactionFragment)
+                // THIS IS CRUCIAL: It allows the user to press the back button to return
+                .addToBackStack(null)
+                .commit();
+    }
+
+
+    private void openTransferDialog() {
+        TransferDialogFragment dialog = new TransferDialogFragment();
+        dialog.show(getSupportFragmentManager(), "TransferDialog");
+    }
+
+
+
 
 
     private void showLogoutConfirmation() {

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -163,13 +164,17 @@ public class PickersAndDialog {
         builder.setView(view);
 
         // Find views
+        TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
         EditText etName = view.findViewById(R.id.etCategoryName);
         RadioGroup rgType = view.findViewById(R.id.rgCategoryType);
         RecyclerView rvIcons = view.findViewById(R.id.rvIcons);
         RecyclerView rvColors = view.findViewById(R.id.rvColors);
 
+        // Set title
+        tvTitle.setText(context.getString(R.string.add_new_category));
+
         // Default selections
-        final int[] selectedIcon = {R.drawable.cat_food};     // replace with your default
+        final int[] selectedIcon = {R.drawable.cat_food};
         final int[] selectedColor = {R.color.cat_orange};
 
         // Setup Icon Picker
@@ -180,7 +185,14 @@ public class PickersAndDialog {
         rvColors.setLayoutManager(new GridLayoutManager(context, 5));
         rvColors.setAdapter(new ColorAdapter(context, colorResId -> selectedColor[0] = colorResId));
 
-        builder.setPositiveButton(context.getString(R.string.add_category), (dialog, which) -> {
+        // Create dialog
+        AlertDialog dialog = builder.create();
+
+        // Setup cancel button
+        view.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+
+        // Setup add button
+        view.findViewById(R.id.btnAdd).setOnClickListener(v -> {
             String name = etName.getText().toString().trim();
             if (name.isEmpty()) {
                 Toast.makeText(context, context.getString(R.string.please_enter_category_name), Toast.LENGTH_SHORT).show();
@@ -189,35 +201,67 @@ public class PickersAndDialog {
 
             boolean isIncome = rgType.getCheckedRadioButtonId() == R.id.rbCategoryIncome;
 
-            // Pass name + income + icon + color via your existing listener
             if (listener != null) {
                 listener.onCategoryCreated(name, isIncome, selectedIcon[0], selectedColor[0]);
             }
+
+            dialog.dismiss();
         });
 
-        builder.setNegativeButton(context.getString(R.string.cancel), null);
-        builder.show();
+        dialog.show();
     }
 
 
     public static void showEditCategoryDialog(Context context, Category category,
                                               OnOperationCompleteListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(R.string.edit_category));
 
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_category, null);
+
+        // Find all views
+        TextView tvTitle = dialogView.findViewById(R.id.tvDialogTitle);
         EditText etCategoryName = dialogView.findViewById(R.id.etCategoryName);
         RadioGroup rgCategoryType = dialogView.findViewById(R.id.rgCategoryType);
+        RecyclerView rvIcons = dialogView.findViewById(R.id.rvIcons);
+        RecyclerView rvColors = dialogView.findViewById(R.id.rvColors);
 
+        // Set title to "Edit Category"
+        tvTitle.setText(context.getString(R.string.edit_category));
+
+        // Pre-fill existing data
         etCategoryName.setText(category.getName());
+
         if (category.isIncome()) {
             rgCategoryType.check(R.id.rbCategoryIncome);
         } else {
             rgCategoryType.check(R.id.rbCategoryExpense);
         }
 
+        // Current selections
+        final int[] selectedIcon = {category.getIconResId()};
+        final int[] selectedColor = {category.getColorResId()};
+
+        // Setup Icon Picker
+        rvIcons.setLayoutManager(new GridLayoutManager(context, 5));
+        IconAdapter iconAdapter = new IconAdapter(context, iconResId -> selectedIcon[0] = iconResId);
+        iconAdapter.setSelectedIcon(category.getIconResId()); // Pre-select current icon
+        rvIcons.setAdapter(iconAdapter);
+
+        // Setup Color Picker
+        rvColors.setLayoutManager(new GridLayoutManager(context, 5));
+        ColorAdapter colorAdapter = new ColorAdapter(context, colorResId -> selectedColor[0] = colorResId);
+        colorAdapter.setSelectedColor(category.getColorResId()); // Pre-select current color
+        rvColors.setAdapter(colorAdapter);
+
         builder.setView(dialogView);
-        builder.setPositiveButton(context.getString(R.string.update), (dialog, which) -> {
+
+        // Create dialog first
+        AlertDialog dialog = builder.create();
+
+        // Setup buttons manually
+        dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+
+        dialogView.findViewById(R.id.btnAdd).setOnClickListener(v -> {
             String newName = etCategoryName.getText().toString().trim();
             boolean isIncome = rgCategoryType.getCheckedRadioButtonId() == R.id.rbCategoryIncome;
 
@@ -226,17 +270,26 @@ public class PickersAndDialog {
                 return;
             }
 
+            // Update category
             category.setName(newName);
             category.setIncome(isIncome);
+            category.setIconResId(selectedIcon[0]);
+            category.setColorResId(selectedColor[0]);
 
             Toast.makeText(context, context.getString(R.string.category_updated), Toast.LENGTH_SHORT).show();
+
+            dialog.dismiss();
 
             if (listener != null) {
                 listener.onComplete();
             }
         });
-        builder.setNegativeButton(context.getString(R.string.cancel), null);
-        builder.show();
+
+        // Change button text to "Update" for edit mode
+        ((com.google.android.material.button.MaterialButton) dialogView.findViewById(R.id.btnAdd))
+                .setText(context.getString(R.string.update));
+
+        dialog.show();
     }
 
     public static void showDeleteCategoryDialog(Context context, Category category,

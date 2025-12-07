@@ -262,4 +262,7 @@
     <string name="transfer_details">Transfer Details</string>
     <string name="from_label">FROM</string>
     <string name="to_label">TO</string>
+    <string name="transaction_details">Transaction Details</string>
+
+
 </resources>

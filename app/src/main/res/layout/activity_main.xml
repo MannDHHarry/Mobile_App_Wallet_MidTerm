@@ -14,7 +14,6 @@
             android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:background="@color/colorWhite"
             android:padding="16dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +61,6 @@
 
         </RelativeLayout>
 
-
         <!-- Fragment Container -->
         <FrameLayout
             android:id="@+id/fragmentContainer"
@@ -71,21 +69,105 @@
             app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
             app:layout_constraintTop_toBottomOf="@id/topBar" />
 
-        <!-- FAB (Consistent, but behavior changes per fragment) -->
+        <!-- Dim Overlay (for FAB menu) -->
+        <View
+            android:id="@+id/dimOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="#80000000"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- FAB Menu Items -->
+
+        <!-- Add Transaction FAB -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAddTransaction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/padding_standard"
-            android:layout_marginBottom="80dp"
+            android:layout_marginBottom="260dp"
             android:src="@android:drawable/ic_input_add"
-            android:tint="@color/colorDark"
-            app:backgroundTint="@color/colorTea"
+            android:visibility="gone"
+            android:scaleX="0"
+            android:scaleY="0"
+            app:backgroundTint="@color/cat_green"
             app:fabSize="normal"
+            app:tint="@color/colorWhite"
             app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Bottom Navigation (Consistent across all fragments) -->
+        <TextView
+            android:id="@+id/tvAddTransaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="80dp"
+            android:layout_marginBottom="270dp"
+            android:background="@drawable/fab_label_background"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="@string/transaction"
+            android:textColor="@color/colorWhite"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:alpha="0"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- Add Transfer FAB -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddTransfer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_standard"
+            android:layout_marginBottom="180dp"
+            android:src="@drawable/transactionhee"
+            android:visibility="gone"
+            android:scaleX="0"
+            android:scaleY="0"
+            app:backgroundTint="@color/cat_red"
+            app:fabSize="normal"
+            app:tint="@color/colorWhite"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tvAddTransfer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="80dp"
+            android:layout_marginBottom="190dp"
+            android:background="@drawable/fab_label_background"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="@string/transfer"
+            android:textColor="@color/colorWhite"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:alpha="0"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- Main FAB (Toggle) -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabMain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_standard"
+            android:layout_marginBottom="80dp"
+            android:src="@android:drawable/ic_input_add"
+            app:backgroundTint="@color/transfer_blue"
+            app:fabSize="normal"
+            app:tint="@color/colorWhite"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Bottom Navigation -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigation"
             android:layout_width="match_parent"
