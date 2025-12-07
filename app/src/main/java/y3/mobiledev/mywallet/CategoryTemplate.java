@@ -77,7 +77,7 @@ public class CategoryTemplate {
 
         categories.add(new Category(
                 userId, "Freelance",
-                R.drawable.cat_owl,
+                R.drawable.cat_plant,
                 R.color.category_blue,
                 true, true
         ));

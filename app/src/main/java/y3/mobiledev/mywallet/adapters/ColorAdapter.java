@@ -27,6 +27,7 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> 
     public ColorAdapter(Context context, OnColorSelectedListener listener) {
         this.context = context;
         this.listener = listener;
+        // Sample colors - replace with your actual color resources
         this.colors = Arrays.asList(
                 R.color.cat_red,
                 R.color.cat_pink,
@@ -41,6 +42,20 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> 
         );
     }
 
+    /**
+     * Set the currently selected color (for edit mode)
+     * @param colorResId The resource ID of the color to pre-select
+     */
+    public void setSelectedColor(int colorResId) {
+        int position = colors.indexOf(colorResId);
+        if (position != -1) {
+            int oldPosition = selectedPosition;
+            selectedPosition = position;
+            notifyItemChanged(oldPosition);
+            notifyItemChanged(selectedPosition);
+        }
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -52,30 +67,33 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         int colorRes = colors.get(position);
         holder.vColor.setBackgroundColor(ContextCompat.getColor(context, colorRes));
-        holder.itemView.setBackgroundResource(position == selectedPosition ? R.drawable.bg_selected : 0);
+
+        // Show selection indicator
+        holder.itemView.setBackgroundResource(
+                position == selectedPosition ? R.drawable.bg_selected : 0
+        );
 
         holder.itemView.setOnClickListener(v -> {
-            // --- FIX STARTS HERE ---
-
-            // Get the current position at the moment of the click
+            // Get the current, reliable position at the moment of the click
             int currentPosition = holder.getAdapterPosition();
 
-            // Safety check: RecyclerView can return NO_POSITION if an item is being removed.
+            // Always check for NO_POSITION
             if (currentPosition == RecyclerView.NO_POSITION) {
                 return;
             }
 
-            int oldPos = selectedPosition;
-            selectedPosition = currentPosition; // Use the reliable current position
+            // Update selection if different
+            if (currentPosition != selectedPosition) {
+                int oldPos = selectedPosition;
+                selectedPosition = currentPosition;
 
-            // Notify the adapter about the old and new selections
-            notifyItemChanged(oldPos);
-            notifyItemChanged(selectedPosition); // Use the reliable current position
+                // Notify the adapter about the changes
+                notifyItemChanged(oldPos);
+                notifyItemChanged(selectedPosition);
+            }
 
-            // Get the color for the correct position
+            // Send the color for the correctly selected position to the listener
             listener.onColorSelected(colors.get(selectedPosition));
-
-            // --- FIX ENDS HERE ---
         });
     }
 
