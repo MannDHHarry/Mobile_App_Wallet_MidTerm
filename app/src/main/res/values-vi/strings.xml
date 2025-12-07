@@ -147,6 +147,10 @@
     <string name="wallet">Ví</string>
     <string name="transaction">Giao Dịch</string>
     <string name="add_new">Thêm Mới</string>
+    <string name="transactions_tab">Giao Dịch</string>
+    <string name="transfers_tab">Chuyển Khoản</string>
+    <string name="search_transaction_hint">Tìm kiếm giao dịch</string>
+    <string name="search_transfer_hint">Tìm kiếm chuyển khoản...</string>
 
     <!-- Transaction Detail -->
     <string name="description">MÔ TẢ</string>
@@ -215,6 +219,7 @@
     <string name="subscription_deleted">Đã xóa đăng ký</string>
     <string name="subscription_resumed">Đã tiếp tục đăng ký</string>
     <string name="subscription_paused">Đã tạm dừng đăng ký</string>
+    <string name="subscription_updated">Đã cập nhật đăng ký</string>
 
     <!-- Authentication -->
     <string name="login">Đăng Nhập</string>
@@ -247,6 +252,7 @@
     <string name="next_billing">Tiếp theo: %s</string>
     <string name="pause">Tạm dừng</string>
     <string name="resume">Tiếp tục</string>
+
 
     <!-- Transaction Detail Extended -->
     <string name="delete_transaction">Xóa Giao Dịch</string>

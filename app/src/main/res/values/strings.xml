@@ -147,6 +147,10 @@
     <string name="wallet">Wallet</string>
     <string name="transaction">Transaction</string>
     <string name="add_new">Add New</string>
+    <string name="transactions_tab">Transactions</string>
+    <string name="transfers_tab">Transfers</string>
+    <string name="search_transaction_hint">Search transaction</string>
+    <string name="search_transfer_hint">Search transfers...</string>
 
     <!-- Transaction Detail -->
     <string name="description">DESCRIPTION</string>
@@ -247,6 +251,7 @@
     <string name="next_billing">Next: %s</string>
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
+    <string name="subscription_updated">Subscription updated</string>
 
     <!-- Transaction Detail Extended -->
     <string name="delete_transaction">Delete Transaction</string>

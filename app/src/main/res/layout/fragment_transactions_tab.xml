@@ -31,7 +31,7 @@
                     android:id="@+id/etSearchTransaction"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:hint="Search transaction"
+                    android:hint="@string/search_transaction_hint"
                     android:inputType="text"
                     android:paddingStart="48dp"
                     android:paddingEnd="48dp"
