@@ -21,6 +21,7 @@ import y3.mobiledev.mywallet.R;
 import y3.mobiledev.mywallet.adapters.ColorAdapter;
 import y3.mobiledev.mywallet.adapters.IconAdapter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -332,23 +333,35 @@ public class PickersAndDialog {
 
     public static void showAddWalletDialog(Context context, int userId,
                                            OnWalletCreatedListener listener) {
+        // 1. Use a standard AlertDialog.Builder but without setting its buttons
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(R.string.add_new_wallet));
-
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_wallet, null);
+        builder.setView(dialogView);
+
+        // 2. Find the views from your custom layout
         EditText etWalletName = dialogView.findViewById(R.id.etWalletName);
         EditText etInitialBalance = dialogView.findViewById(R.id.etInitialBalance);
+        // These are the new custom buttons from your layout
+        androidx.appcompat.widget.AppCompatButton btnCancel = dialogView.findViewById(R.id.btnCancel);
+        androidx.appcompat.widget.AppCompatButton btnAdd = dialogView.findViewById(R.id.btnAdd);
 
-        builder.setView(dialogView);
-        builder.setPositiveButton(context.getString(R.string.create), (dialog, which) -> {
+        // 3. Create the dialog but don't show it yet
+        AlertDialog dialog = builder.create();
+
+        // 4. Set OnClickListeners for your custom buttons
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnAdd.setOnClickListener(v -> {
             String walletName = etWalletName.getText().toString().trim();
             String balanceStr = etInitialBalance.getText().toString().trim();
 
             if (walletName.isEmpty()) {
                 Toast.makeText(context, context.getString(R.string.wallet_name_empty), Toast.LENGTH_SHORT).show();
+                // Don't dismiss, let the user correct the mistake
                 return;
             }
 
+            // Default to "0" if the user leaves the balance field empty
             if (balanceStr.isEmpty()) {
                 balanceStr = "0";
             }
@@ -357,70 +370,94 @@ public class PickersAndDialog {
                 double balance = Double.parseDouble(balanceStr);
                 if (balance < 0) {
                     Toast.makeText(context, context.getString(R.string.balance_negative), Toast.LENGTH_SHORT).show();
-                    return;
+                    return; // Don't dismiss
                 }
 
+                // Create the new wallet object
                 int walletId = (int) System.currentTimeMillis();
                 Wallet newWallet = new Wallet(walletId, userId, walletName,
                         android.R.drawable.ic_menu_myplaces, balance, 0);
 
+                // Use the listener to send the new wallet back
                 if (listener != null) {
                     listener.onWalletCreated(newWallet);
                 }
 
                 Toast.makeText(context, context.getString(R.string.wallet_created), Toast.LENGTH_SHORT).show();
 
+                // Success! Now dismiss the dialog.
+                dialog.dismiss();
+
             } catch (NumberFormatException e) {
                 Toast.makeText(context, context.getString(R.string.invalid_balance), Toast.LENGTH_SHORT).show();
             }
         });
-        builder.setNegativeButton(context.getString(R.string.cancel), null);
-        builder.show();
+
+        // 5. Finally, show the dialog
+        dialog.show();
     }
 
     public static void showEditWalletDialog(Context context, Wallet wallet,
                                             OnOperationCompleteListener listener) {
+        // 1. Use a standard AlertDialog.Builder
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(R.string.edit_wallet));
-
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_edit_wallet, null);
+        builder.setView(dialogView);
+
+        // 2. Find all the views from your custom layout
         EditText etWalletName = dialogView.findViewById(R.id.etWalletName);
         EditText etWalletBalance = dialogView.findViewById(R.id.etWalletBalance);
+        androidx.appcompat.widget.AppCompatButton btnCancel = dialogView.findViewById(R.id.btnCancel);
+        androidx.appcompat.widget.AppCompatButton btnUpdate = dialogView.findViewById(R.id.btnUpdate);
 
+        // 3. Pre-fill the fields with existing wallet data
         etWalletName.setText(wallet.getName());
-        etWalletBalance.setText(String.format(Locale.US, "%.2f", wallet.getBalance()));
+        // Using toPlainString() is safer to avoid scientific notation for large numbers
+        etWalletBalance.setText(new BigDecimal(wallet.getBalance()).toPlainString());
 
-        builder.setView(dialogView);
-        builder.setPositiveButton(context.getString(R.string.update), (dialog, which) -> {
+        // 4. Create the dialog
+        AlertDialog dialog = builder.create();
+
+        // 5. Set OnClickListeners for your custom buttons
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnUpdate.setOnClickListener(v -> {
             String newName = etWalletName.getText().toString().trim();
             String balanceStr = etWalletBalance.getText().toString().trim();
 
             if (newName.isEmpty() || balanceStr.isEmpty()) {
                 Toast.makeText(context, context.getString(R.string.please_fill_all_fields), Toast.LENGTH_SHORT).show();
-                return;
+                return; // Don't dismiss, let user fix it
             }
 
             try {
                 double newBalance = Double.parseDouble(balanceStr);
                 if (newBalance < 0) {
                     Toast.makeText(context, context.getString(R.string.balance_negative), Toast.LENGTH_SHORT).show();
-                    return;
+                    return; // Don't dismiss
                 }
 
+                // Update the existing wallet object
                 wallet.setName(newName);
                 wallet.setBalance(newBalance);
 
                 Toast.makeText(context, context.getString(R.string.wallet_updated), Toast.LENGTH_SHORT).show();
 
+                // Notify the listener that the operation is complete
                 if (listener != null) {
                     listener.onComplete();
                 }
+
+                // Success! Now dismiss the dialog.
+                dialog.dismiss();
+
             } catch (NumberFormatException e) {
                 Toast.makeText(context, context.getString(R.string.invalid_balance), Toast.LENGTH_SHORT).show();
             }
         });
-        builder.setNegativeButton(context.getString(R.string.cancel), null);
-        builder.show();
+
+        // 6. Finally, show the dialog
+        dialog.show();
     }
 
     public static void showDeleteWalletDialog(Context context, Wallet wallet,

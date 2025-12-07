@@ -147,7 +147,7 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:text="@string/cancel"
-                    android:textColor="@color/text_gray"
+                    android:textColor="@color/colorGrey"
                     android:textAllCaps="false"
                     android:textSize="15sp"
                     android:background="@drawable/rounded_button_purple"/>

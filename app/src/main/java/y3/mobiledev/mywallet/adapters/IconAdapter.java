@@ -27,9 +27,8 @@ public class IconAdapter extends RecyclerView.Adapter<IconAdapter.ViewHolder> {
     public IconAdapter(Context context, OnIconSelectedListener listener) {
         this.context = context;
         this.listener = listener;
-        // Sample icons - replace with your actual drawables
         this.icons = Arrays.asList(
-               R.drawable.cat_512,
+                R.drawable.cat_512,
                 R.drawable.cat_award,
                 R.drawable.cat_bag,
                 R.drawable.cat_bill,
@@ -50,7 +49,6 @@ public class IconAdapter extends RecyclerView.Adapter<IconAdapter.ViewHolder> {
                 R.drawable.cat_grocery,
                 R.drawable.cat_gym,
                 R.drawable.cat_leaf,R.drawable.cat_health,
-                R.drawable.cat_leaf,
                 R.drawable.cat_lines,
                 R.drawable.cat_luggage,
                 R.drawable.cat_moneh,
@@ -64,7 +62,6 @@ public class IconAdapter extends RecyclerView.Adapter<IconAdapter.ViewHolder> {
                 R.drawable.cat_school,
                 R.drawable.cat_shop,
                 R.drawable.cat_sunglass,
-                R.drawable.cat_sunglass,
                 R.drawable.cat_train,
                 R.drawable.cat_transport,
                 R.drawable.cat_travel,R.drawable.cat_tree
@@ -72,10 +69,6 @@ public class IconAdapter extends RecyclerView.Adapter<IconAdapter.ViewHolder> {
         );
     }
 
-    /**
-     * Set the currently selected icon (for edit mode)
-     * @param iconResId The resource ID of the icon to pre-select
-     */
     public void setSelectedIcon(int iconResId) {
         int position = icons.indexOf(iconResId);
         if (position != -1) {
@@ -97,28 +90,23 @@ public class IconAdapter extends RecyclerView.Adapter<IconAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         int iconRes = icons.get(position);
         holder.ivIcon.setImageResource(iconRes);
-        holder.itemView.setBackgroundResource(position == selectedPosition ? R.drawable.bg_selected : 0);
+
+        // Show selection border
+        holder.vIconBackground.setBackgroundResource(
+                position == selectedPosition ? R.drawable.bg_selected : R.drawable.icon_square_background
+        );
 
         holder.itemView.setOnClickListener(v -> {
-            // Get the current, reliable position at the moment of the click
             int currentPosition = holder.getAdapterPosition();
+            if (currentPosition == RecyclerView.NO_POSITION) return;
 
-            // Always check for NO_POSITION in case the item was deleted during an animation
-            if (currentPosition == RecyclerView.NO_POSITION) {
-                return;
-            }
-
-            // Proceed only if the position is valid
             if (currentPosition != selectedPosition) {
                 int oldPos = selectedPosition;
                 selectedPosition = currentPosition;
-
-                // Notify the adapter about the changes
                 notifyItemChanged(oldPos);
                 notifyItemChanged(selectedPosition);
             }
 
-            // Send the icon for the correctly selected position to the listener
             listener.onIconSelected(icons.get(selectedPosition));
         });
     }
@@ -129,10 +117,12 @@ public class IconAdapter extends RecyclerView.Adapter<IconAdapter.ViewHolder> {
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+        View vIconBackground;
         ImageView ivIcon;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+            vIconBackground = itemView.findViewById(R.id.vIconBackground);
             ivIcon = itemView.findViewById(R.id.ivIcon);
         }
     }
