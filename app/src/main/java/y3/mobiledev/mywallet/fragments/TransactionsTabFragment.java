@@ -243,32 +243,31 @@
         }
 
         private void showTransactionDetail(TransactionWithCategory transaction) {
-            TransactionDetailDialog dialog = new TransactionDetailDialog(requireContext(), transaction);
+            // 1. Pass getChildFragmentManager() as the second argument
+            TransactionDetailDialog dialog = new TransactionDetailDialog(requireContext(), getChildFragmentManager(), transaction);
+
+            // 2. Update the listener to match the new interface (no onEdit)
             dialog.setOnActionListener(new TransactionDetailDialog.OnActionListener() {
                 @Override
-                public void onEdit(Transaction transaction) {
-                    // TODO: Navigate to edit transaction
-                    Toast.makeText(requireContext(), getString(R.string.edit_feature_coming_soon), Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onDelete(Transaction transaction) {
+                public void onDelete(Transaction transactionToDelete) { // Renamed for clarity
                     // Show confirmation dialog
                     new androidx.appcompat.app.AlertDialog.Builder(requireContext())
                             .setTitle(getString(R.string.delete_transaction))
                             .setMessage(getString(R.string.delete_transaction_confirm))
                             .setPositiveButton(getString(R.string.delete), (d, w) -> {
-                                // Delete receipt photo if exists
-                                if (transaction.getReceiptPhotoUri() != null) {
-                                    PhotoManager.deleteReceiptPhoto(transaction.getReceiptPhotoUri());
+                                // Delete receipt photo if it exists
+                                if (transactionToDelete.getReceiptPhotoUri() != null) {
+                                    PhotoManager.deleteReceiptPhoto(transactionToDelete.getReceiptPhotoUri());
                                 }
-                                viewModel.deleteTransaction(transaction);
+                                // Perform the delete operation
+                                viewModel.deleteTransaction(transactionToDelete);
                                 Toast.makeText(requireContext(), getString(R.string.transaction_deleted), Toast.LENGTH_SHORT).show();
                             })
                             .setNegativeButton(getString(R.string.cancel), null)
                             .show();
                 }
             });
+
             dialog.show();
         }
 

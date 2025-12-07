@@ -263,6 +263,9 @@
     <string name="from_label">FROM</string>
     <string name="to_label">TO</string>
     <string name="transaction_details">Transaction Details</string>
+    <string name="add_transaction">Add transaction</string>
+    <string name="edit_transaction">Edit Transaction</string>
+    <string name="transaction_updated">Your transaction is updated</string>
 
 
 </resources>

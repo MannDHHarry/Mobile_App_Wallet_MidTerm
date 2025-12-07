@@ -83,7 +83,7 @@ public class HomeFragment extends Fragment {
         displayedWallets = new ArrayList<>();
 
         walletAdapter = new WalletAdapter(requireContext(), displayedWallets, wallet ->
-                Toast.makeText(requireContext(), "Clicked: " + wallet.getName(), Toast.LENGTH_SHORT).show());
+                Toast.makeText(requireContext(), "To make changes move to Management Page" , Toast.LENGTH_SHORT).show());
         rvWallets.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvWallets.setAdapter(walletAdapter);
         rvWallets.setNestedScrollingEnabled(false);
@@ -91,7 +91,7 @@ public class HomeFragment extends Fragment {
         //Setting up Transaction RecyclerView
 
         transactionAdapter = new TransactionAdapter(requireContext(), new ArrayList<>(), transaction ->
-                Toast.makeText(requireContext(), "Clicked: " + transaction.getCategory(), Toast.LENGTH_SHORT).show());
+                Toast.makeText(requireContext(), "To Edit move to Transaction History Page", Toast.LENGTH_SHORT).show());
         rvTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvTransactions.setAdapter(transactionAdapter);
         rvTransactions.setNestedScrollingEnabled(false);
@@ -110,6 +110,8 @@ public class HomeFragment extends Fragment {
             btnAddFirstWallet.setOnClickListener(v -> onAddWallet());
         }
     }
+
+
 
     //Data Observation in Live Data
     private void observeData() {

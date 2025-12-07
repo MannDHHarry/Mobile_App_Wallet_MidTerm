@@ -6,6 +6,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.Date;
 
@@ -37,7 +39,7 @@ import java.util.Date;
                 @Index("date")
         })
 
-public class Transaction {
+public class Transaction implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "transaction_id")
@@ -117,6 +119,51 @@ public class Transaction {
         this.isExpense = isExpense;
         this.createdAt = System.currentTimeMillis();
     }
+
+    protected Transaction(Parcel in) {
+        transactionId = in.readInt();
+        userId = in.readInt();
+        walletId = in.readInt();
+        categoryId = in.readInt();
+        description = in.readString();
+        amount = in.readDouble();
+        date = in.readLong();
+        isExpense = in.readByte() != 0;
+        createdAt = in.readLong();
+        receiptPhotoUri = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(transactionId);
+        dest.writeInt(userId);
+        dest.writeInt(walletId);
+        dest.writeInt(categoryId);
+        dest.writeString(description);
+        dest.writeDouble(amount);
+        dest.writeLong(date);
+        dest.writeByte((byte) (isExpense ? 1 : 0));
+        dest.writeLong(createdAt);
+        dest.writeString(receiptPhotoUri);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Transaction> CREATOR = new Creator<Transaction>() {
+        @Override
+        public Transaction createFromParcel(Parcel in) {
+            return new Transaction(in);
+        }
+
+        @Override
+        public Transaction[] newArray(int size) {
+            return new Transaction[size];
+        }
+    };
+
 
     // Getters
     public int getTransactionId() { return transactionId; }

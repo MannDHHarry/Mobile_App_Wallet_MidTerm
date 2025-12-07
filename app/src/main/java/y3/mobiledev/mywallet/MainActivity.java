@@ -36,6 +36,8 @@ import y3.mobiledev.mywallet.fragments.StatisticsFragment;
 import y3.mobiledev.mywallet.fragments.TransactionHistoryFragment;
 import y3.mobiledev.mywallet.fragments.TransactionsTabFragment;
 import y3.mobiledev.mywallet.fragments.TransferDialogFragment;
+import y3.mobiledev.mywallet.fragments.AddTransactionDialogFragment;
+
 
 
 
@@ -403,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .start();
     }
 
-    private void navigateToAddTransaction() {
+    /*private void navigateToAddTransaction() {
 
         // Create an instance of your actual fragment
         AddTransactionFragment addTransactionFragment = new AddTransactionFragment();
@@ -414,6 +416,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // THIS IS CRUCIAL: It allows the user to press the back button to return
                 .addToBackStack(null)
                 .commit();
+    }*/
+
+    private void navigateToAddTransaction() {
+        AddTransactionDialogFragment dialog = AddTransactionDialogFragment.newInstance();
+        dialog.show(getSupportFragmentManager(), "AddTransactionDialog");
     }
 
 
