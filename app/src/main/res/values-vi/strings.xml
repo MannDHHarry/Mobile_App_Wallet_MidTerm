@@ -198,6 +198,22 @@
     <string name="enable_notifications">Bật Thông Báo</string>
     <string name="notification_prompt">Bạn có muốn nhận tóm tắt giao dịch hàng ngày lúc 10:00 PM?</string>
 
+    <!-- Notification Strings -->
+    <string name="notification_daily_summary_title">Tóm Tắt Tài Chính Hôm Nay</string>
+    <string name="notification_daily_summary_no_transactions">Không có giao dịch nào được ghi nhận hôm nay.\nNhấn để thêm giao dịch đầu tiên!</string>
+    <string name="notification_daily_summary_income">Thu nhập: %s (%d giao dịch)</string>
+    <string name="notification_daily_summary_expenses">Chi tiêu: %s (%d giao dịch)</string>
+    <string name="notification_daily_summary_saved">Bạn đã tiết kiệm %s hôm nay!</string>
+    <string name="notification_daily_summary_overspent">Bạn đã chi vượt %s hôm nay</string>
+    <string name="notification_daily_summary_short_no_transactions">Không có giao dịch hôm nay. Nhấn để thêm!</string>
+    <string name="notification_daily_summary_short">Thu nhập: %s | Chi tiêu: %s | Ròng: %s%s</string>
+    <string name="notification_welcome_title">Chào mừng đến với MyWallet!</string>
+    <string name="notification_welcome_content">Bạn đã sẵn sàng! Chúng tôi sẽ gửi cho bạn tóm tắt giao dịch hàng ngày lúc 10:00 PM.</string>
+    <string name="notification_channel_name">Tóm Tắt Tài Chính Hàng Ngày</string>
+    <string name="notification_channel_description">Hiển thị tóm tắt thu nhập và chi tiêu hàng ngày lúc 10 PM</string>
+    <string name="notification_spending_alert_channel_name">Cảnh Báo Chi Tiêu</string>
+    <string name="notification_spending_alert_channel_description">Cảnh báo về các mẫu chi tiêu bất thường</string>
+
     <!-- Subscription Operations -->
     <string name="subscription_title">Đăng Ký Dịch Vụ</string>
     <string name="total_monthly">Tổng Hàng Tháng: %s</string>

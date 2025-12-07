@@ -198,6 +198,22 @@
     <string name="enable_notifications">Enable Notifications</string>
     <string name="notification_prompt">Would you like to receive daily summaries of your transactions at 10:00 PM?</string>
 
+    <!-- Notification Strings -->
+    <string name="notification_daily_summary_title">Today\'s Financial Summary</string>
+    <string name="notification_daily_summary_no_transactions">No transactions recorded today.\nTap to add your first transaction!</string>
+    <string name="notification_daily_summary_income">Income: %s (%d transaction%s)</string>
+    <string name="notification_daily_summary_expenses">Expenses: %s (%d transaction%s)</string>
+    <string name="notification_daily_summary_saved">You saved %s today!</string>
+    <string name="notification_daily_summary_overspent">You overspent by %s today</string>
+    <string name="notification_daily_summary_short_no_transactions">No transactions today. Tap to add one!</string>
+    <string name="notification_daily_summary_short">Income: %s | Expenses: %s | Net: %s%s</string>
+    <string name="notification_welcome_title">Welcome to MyWallet!</string>
+    <string name="notification_welcome_content">You\'re all set! We\'ll send you a daily summary of your transactions at 10:00 PM.</string>
+    <string name="notification_channel_name">Daily Financial Summary</string>
+    <string name="notification_channel_description">Shows daily income and expense summary at 10 PM</string>
+    <string name="notification_spending_alert_channel_name">Spending Alerts</string>
+    <string name="notification_spending_alert_channel_description">Alerts about unusual spending patterns</string>
+
     <!-- Subscription Operations -->
     <string name="subscription_title">Subscriptions</string>
     <string name="total_monthly">Total Monthly: %s</string>
