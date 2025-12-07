@@ -15,10 +15,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager; // Import FragmentManager
 
 import y3.mobiledev.mywallet.R;
-import y3.mobiledev.mywallet.helpers.CurrencyUtils;
-import y3.mobiledev.mywallet.helpers.PhotoManager;
+import y3.mobiledev.mywallet.fragments.AddTransactionDialogFragment;
 import y3.mobiledev.mywallet.models.Transaction;
 import y3.mobiledev.mywallet.models.TransactionWithCategory;
 
@@ -27,12 +27,14 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Dialog to show full transaction details including receipt photo
+ * Dialog to show full transaction details including receipt photo.
+ * This dialog can now launch the edit screen directly.
  */
 public class TransactionDetailDialog extends Dialog {
 
-    private TransactionWithCategory transaction;
+    private final TransactionWithCategory transaction;
     private OnActionListener actionListener;
+    private final FragmentManager fragmentManager; // Variable to hold the FragmentManager
 
     // Views
     private ImageView ivCategoryIcon, ivReceipt;
@@ -43,12 +45,20 @@ public class TransactionDetailDialog extends Dialog {
     private LinearLayout layoutNoReceipt;
 
     public interface OnActionListener {
-        void onEdit(Transaction transaction);
+        // onEdit is no longer needed here as this dialog handles it.
         void onDelete(Transaction transaction);
     }
 
-    public TransactionDetailDialog(@NonNull Context context, TransactionWithCategory transaction) {
+    /**
+     * Updated constructor to accept a FragmentManager.
+     *
+     * @param context         The context.
+     * @param fragmentManager The FragmentManager from the calling Fragment/Activity.
+     * @param transaction     The transaction data to display.
+     */
+    public TransactionDetailDialog(@NonNull Context context, FragmentManager fragmentManager, TransactionWithCategory transaction) {
         super(context);
+        this.fragmentManager = fragmentManager; // Store the FragmentManager
         this.transaction = transaction;
     }
 
@@ -62,7 +72,7 @@ public class TransactionDetailDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_transaction_detail);
 
-        // Make dialog full width
+        // Make dialog full width and transparent background
         if (getWindow() != null) {
             getWindow().setLayout(
                     (int) (getContext().getResources().getDisplayMetrics().widthPixels * 0.95),
@@ -99,10 +109,8 @@ public class TransactionDetailDialog extends Dialog {
         tvCategoryName.setText(transaction.getCategoryName());
         ivCategoryIcon.setImageResource(transaction.getCategoryIcon());
 
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.OVAL);
+        GradientDrawable drawable = (GradientDrawable) vIconBackground.getBackground();
         drawable.setColor(ContextCompat.getColor(getContext(), transaction.getCategoryColor()));
-        vIconBackground.setBackground(drawable);
 
         // Description
         String description = transaction.getDescription();
@@ -114,7 +122,7 @@ public class TransactionDetailDialog extends Dialog {
             tvDescription.setTextColor(ContextCompat.getColor(getContext(), R.color.text_black));
         }
 
-        // Amount (VND, compact)
+        // Amount
         String amountText = CurrencyUtils.formatTransactionAmount(transaction.getAmount(), transaction.isExpense());
         if (transaction.isExpense()) {
             tvAmount.setTextColor(ContextCompat.getColor(getContext(), R.color.expense_red));
@@ -142,8 +150,6 @@ public class TransactionDetailDialog extends Dialog {
                 ivReceipt.setVisibility(View.VISIBLE);
                 layoutNoReceipt.setVisibility(View.GONE);
                 tvReceiptHint.setVisibility(View.VISIBLE);
-
-                // Allow full-screen view on click
                 cvReceipt.setOnClickListener(v -> showFullScreenImage(bitmap));
             } else {
                 showNoReceipt();
@@ -165,16 +171,10 @@ public class TransactionDetailDialog extends Dialog {
         fullScreenDialog.setContentView(R.layout.dialog_fullscreen_image);
 
         ImageView ivFullscreen = fullScreenDialog.findViewById(R.id.ivFullscreenImage);
-        Button btnCloseFullscreen = fullScreenDialog.findViewById(R.id.btnCloseFullscreen);
-
         ivFullscreen.setImageBitmap(bitmap);
-
-        // Close on button click
-        btnCloseFullscreen.setOnClickListener(v -> fullScreenDialog.dismiss());
 
         // Close on image click
         ivFullscreen.setOnClickListener(v -> fullScreenDialog.dismiss());
-
         fullScreenDialog.show();
     }
 
@@ -182,9 +182,13 @@ public class TransactionDetailDialog extends Dialog {
         btnClose.setOnClickListener(v -> dismiss());
 
         btnEdit.setOnClickListener(v -> {
-            if (actionListener != null) {
-                actionListener.onEdit(transaction.toTransaction());
-            }
+            // 1. Create the dialog for editing
+            AddTransactionDialogFragment editDialog = AddTransactionDialogFragment.newInstanceForEdit(transaction.toTransaction());
+
+            // 2. Show the new edit dialog using the stored fragmentManager
+            editDialog.show(fragmentManager, "EditTransactionDialog");
+
+            // 3. Immediately dismiss the current detail dialog
             dismiss();
         });
 

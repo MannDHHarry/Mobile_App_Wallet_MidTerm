@@ -15,6 +15,7 @@
         android:padding="16dp">
 
         <!-- Wallet Icon with Purple Background -->
+
         <FrameLayout
             android:layout_width="48dp"
             android:layout_height="48dp"
