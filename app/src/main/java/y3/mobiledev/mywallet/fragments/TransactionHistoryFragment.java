@@ -50,10 +50,10 @@ public class TransactionHistoryFragment extends Fragment {
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0:
-                    tab.setText("Transactions");
+                    tab.setText(getString(R.string.transactions_tab));
                     break;
                 case 1:
-                    tab.setText("Transfers");
+                    tab.setText(getString(R.string.transfers_tab));
                     break;
             }
         }).attach();

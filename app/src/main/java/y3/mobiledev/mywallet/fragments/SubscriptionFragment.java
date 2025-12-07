@@ -234,9 +234,147 @@ public class SubscriptionFragment extends Fragment {
     }
 
     private void showEditSubscriptionDialog(Subscription subscription) {
-        // Similar to add dialog but pre-filled with subscription data
-        Toast.makeText(requireContext(), getString(R.string.edit) + ": " + subscription.getName(),
-                Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_add_subscription, null);
+
+        EditText etName = dialogView.findViewById(R.id.etSubscriptionName);
+        EditText etAmount = dialogView.findViewById(R.id.etAmount);
+        RelativeLayout layoutWalletPicker = dialogView.findViewById(R.id.layoutWalletPicker);
+        TextView tvSelectedWallet = dialogView.findViewById(R.id.tvSelectedWallet);
+        RelativeLayout layoutDatePicker = dialogView.findViewById(R.id.layoutDatePicker);
+        TextView tvSelectedDate = dialogView.findViewById(R.id.tvSelectedDate);
+        EditText etNotes = dialogView.findViewById(R.id.etNotes);
+
+        // Pre-fill with existing subscription data
+        etName.setText(subscription.getName());
+        etAmount.setText(String.valueOf(subscription.getAmount()));
+        if (subscription.getNotes() != null && !subscription.getNotes().isEmpty()) {
+            etNotes.setText(subscription.getNotes());
+        }
+
+        // Find and set the wallet
+        List<Wallet> wallets = viewModel.getWallets().getValue();
+        Wallet currentWallet = null;
+        if (wallets != null) {
+            for (Wallet wallet : wallets) {
+                if (wallet.getWalletId() == subscription.getWalletId()) {
+                    currentWallet = wallet;
+                    break;
+                }
+            }
+        }
+
+        final Wallet[] selectedWallet = {currentWallet};
+        final Date[] selectedDate = {new Date(subscription.getStartDate())};
+
+        // Update displays
+        if (currentWallet != null) {
+            tvSelectedWallet.setText(currentWallet.getName());
+        } else {
+            tvSelectedWallet.setText(getString(R.string.select_wallet));
+        }
+        updateDateDisplay(tvSelectedDate, selectedDate[0]);
+
+        // Wallet picker
+        layoutWalletPicker.setOnClickListener(v -> {
+            List<Wallet> walletList = viewModel.getWallets().getValue();
+            if (walletList != null && !walletList.isEmpty()) {
+                PickersAndDialog.showWalletPicker(requireContext(), walletList, item -> {
+                    if (item instanceof Wallet) {
+                        selectedWallet[0] = (Wallet) item;
+                        tvSelectedWallet.setText(selectedWallet[0].getName());
+                    }
+                });
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.please_create_wallet_first),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Date picker
+        layoutDatePicker.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(selectedDate[0]);
+
+            new DatePickerDialog(requireContext(),
+                    (view, year, month, dayOfMonth) -> {
+                        Calendar cal = Calendar.getInstance();
+                        cal.set(year, month, dayOfMonth);
+                        selectedDate[0] = cal.getTime();
+                        updateDateDisplay(tvSelectedDate, selectedDate[0]);
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            ).show();
+        });
+
+        // Update dialog title
+        TextView tvDialogTitle = dialogView.findViewById(R.id.tvDialogTitle);
+        if (tvDialogTitle != null) {
+            tvDialogTitle.setText(getString(R.string.edit_subscription));
+        }
+
+        builder.setView(dialogView);
+        builder.setPositiveButton(getString(R.string.update), (dialog, which) -> {
+            String name = etName.getText().toString().trim();
+            String amountStr = etAmount.getText().toString().trim();
+            String notes = etNotes.getText().toString().trim();
+
+            if (name.isEmpty()) {
+                Toast.makeText(requireContext(), getString(R.string.please_enter_subscription_name),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (amountStr.isEmpty()) {
+                Toast.makeText(requireContext(), getString(R.string.please_enter_amount),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (selectedWallet[0] == null) {
+                Toast.makeText(requireContext(), getString(R.string.please_select_wallet),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                double amount = Double.parseDouble(amountStr);
+                if (amount <= 0) {
+                    Toast.makeText(requireContext(), getString(R.string.amount_greater_than_zero),
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Create updated subscription object
+                Subscription updatedSubscription = new Subscription(
+                        subscription.getSubscriptionId(),
+                        subscription.getUserId(),
+                        selectedWallet[0].getWalletId(),
+                        name,
+                        amount,
+                        selectedDate[0].getTime(),
+                        subscription.getNextBillingDate(), // Keep existing next billing date
+                        notes,
+                        subscription.isActive(),
+                        subscription.getCreatedAt()
+                );
+
+                viewModel.updateSubscription(updatedSubscription);
+
+                Toast.makeText(requireContext(), getString(R.string.subscription_updated),
+                        Toast.LENGTH_SHORT).show();
+
+            } catch (NumberFormatException e) {
+                Toast.makeText(requireContext(), getString(R.string.invalid_amount),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton(getString(R.string.cancel), null);
+        builder.show();
     }
 
     private void toggleSubscriptionStatus(Subscription subscription) {

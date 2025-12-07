@@ -78,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final String PREFS_NAME = "welcome_prefs";
     private static final String PREF_WELCOME_SHOWN = "welcome_notification_shown";
+    private static final String PREF_FRAGMENT_STATE = "saved_fragment_state";
+    private static final String PREF_NAV_ITEM_ID = "saved_nav_item_id";
 
     //Permission Request laucher for notification
 
@@ -188,10 +190,67 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fabAddTransaction.hide();
             getIntent().removeExtra("navigate_to"); // Prevent re-navigation on config change
         } else {
-            // Default: load Home fragment
-            loadFragment(new HomeFragment());
-            bottomNavigation.setSelectedItemId(R.id.nav_home);
+            // Check if we need to restore fragment state after language change
+            restoreFragmentState();
         }
+    }
+    
+    private void restoreFragmentState() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int savedNavItemId = prefs.getInt(PREF_NAV_ITEM_ID, -1);
+        
+        if (savedNavItemId != -1) {
+            Log.d("MainActivity", "Restoring fragment state: nav_item_id=" + savedNavItemId);
+            
+            Fragment fragmentToLoad = null;
+            boolean shouldShowFab = false;
+            
+            if (savedNavItemId == R.id.nav_home) {
+                fragmentToLoad = new HomeFragment();
+                shouldShowFab = true;
+            } else if (savedNavItemId == R.id.nav_statistics) {
+                fragmentToLoad = new TransactionHistoryFragment();
+            } else if (savedNavItemId == R.id.nav_categories) {
+                fragmentToLoad = new CategoriesFragment();
+            } else if (savedNavItemId == R.id.nav_more) {
+                fragmentToLoad = new StatisticsFragment();
+            } else {
+                // Check for drawer menu items
+                String savedFragmentState = prefs.getString(PREF_FRAGMENT_STATE, null);
+                if (savedFragmentState != null) {
+                    if (savedFragmentState.equals(SubscriptionFragment.class.getName())) {
+                        fragmentToLoad = new SubscriptionFragment();
+                        shouldShowFab = false; // Hide FAB for SubscriptionFragment
+                    } else if (savedFragmentState.equals(ExchangeRateFragment.class.getName())) {
+                        fragmentToLoad = new ExchangeRateFragment();
+                        shouldShowFab = false; // Hide FAB for ExchangeRateFragment
+                    }
+                }
+            }
+            
+            if (fragmentToLoad != null) {
+                loadFragment(fragmentToLoad);
+                if (savedNavItemId != -1 && savedNavItemId != 0) {
+                    bottomNavigation.setSelectedItemId(savedNavItemId);
+                }
+                if (shouldShowFab) {
+                    fabMain.show();
+                } else {
+                    fabMain.hide();
+                }
+                
+                // Clear saved state after restoration
+                prefs.edit()
+                    .remove(PREF_FRAGMENT_STATE)
+                    .remove(PREF_NAV_ITEM_ID)
+                    .apply();
+                return;
+            }
+        }
+        
+        // Default: load Home fragment
+        loadFragment(new HomeFragment());
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
     }
 
     @Override
@@ -541,7 +600,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // loadFragment(new ProfileFragment());
         } else if (id == R.id.nav_subscriptions){
             loadFragment(new SubscriptionFragment());
-            fabAddTransaction.hide();
+            fabMain.hide();
         } else if (id == R.id.nav_exchange_rates) {
             loadFragment(new ExchangeRateFragment());
             fabAddTransaction.hide();
@@ -567,6 +626,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     String selectedLang = (which == 0) ? LocaleHelper.ENGLISH : LocaleHelper.VIETNAMESE;
 
                     if (!selectedLang.equals(LocaleHelper.getLanguage(this))) {
+                        // Save current fragment state before recreating
+                        saveFragmentState();
                         LocaleHelper.setLocale(this, selectedLang);
                         dialog.dismiss();
                         // Recreate activity to apply new language
@@ -577,6 +638,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+    
+    private void saveFragmentState() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        
+        if (currentFragment != null) {
+            // Save fragment class name
+            editor.putString(PREF_FRAGMENT_STATE, currentFragment.getClass().getName());
+            Log.d("MainActivity", "Saving fragment state: " + currentFragment.getClass().getName());
+            
+            // Determine and save navigation item ID based on fragment type
+            int navItemId = -1;
+            if (currentFragment instanceof HomeFragment) {
+                navItemId = R.id.nav_home;
+            } else if (currentFragment instanceof TransactionHistoryFragment) {
+                navItemId = R.id.nav_statistics;
+            } else if (currentFragment instanceof CategoriesFragment) {
+                navItemId = R.id.nav_categories;
+            } else if (currentFragment instanceof StatisticsFragment) {
+                navItemId = R.id.nav_more;
+            }
+            // SubscriptionFragment and ExchangeRateFragment don't have bottom nav items
+            
+            if (navItemId != -1) {
+                editor.putInt(PREF_NAV_ITEM_ID, navItemId);
+                Log.d("MainActivity", "Saving nav item ID: " + navItemId);
+            }
+        }
+        
+        editor.apply();
     }
 
 }
