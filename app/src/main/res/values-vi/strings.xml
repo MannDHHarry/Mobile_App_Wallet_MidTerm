@@ -284,4 +284,24 @@
     <string name="transfer_details">Chi Tiết Chuyển Khoản</string>
     <string name="from_label">TỪ</string>
     <string name="to_label">ĐẾN</string>
+
+    <!-- Profile -->
+    <string name="account_information">Thông Tin Tài Khoản</string>
+    <string name="account_created">Tài Khoản Được Tạo</string>
+    <string name="user_id">ID Người Dùng</string>
+    <string name="not_available">Không Có Sẵn</string>
+    <string name="edit_profile">Chỉnh Sửa Hồ Sơ</string>
+    <string name="change_name">Đổi Tên</string>
+    <string name="change_password">Đổi Mật Khẩu</string>
+    <string name="change_profile_picture">Đổi Ảnh Đại Diện</string>
+    <string name="new_name">Tên Mới</string>
+    <string name="current_password">Mật Khẩu Hiện Tại</string>
+    <string name="new_password">Mật Khẩu Mới</string>
+    <string name="name_updated">Đã cập nhật tên thành công</string>
+    <string name="password_updated">Đã cập nhật mật khẩu thành công</string>
+    <string name="profile_picture_updated">Đã cập nhật ảnh đại diện thành công</string>
+    <string name="failed_to_save_profile_picture">Không thể lưu ảnh đại diện</string>
+    <string name="current_password_required">Vui lòng nhập mật khẩu hiện tại</string>
+    <string name="new_password_required">Vui lòng nhập mật khẩu mới</string>
+    <string name="menu">Menu</string>
 </resources>

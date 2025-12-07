@@ -204,6 +204,118 @@ public class AuthViewModel extends AndroidViewModel {
         errorMessage.setValue(null);
     }
 
+    /**
+     * Update user name
+     */
+    public void updateUserName(String newName) {
+        if (staticUser == null) {
+            postError("User not logged in");
+            return;
+        }
+
+        if (newName == null || newName.trim().isEmpty()) {
+            postError("Name cannot be empty");
+            return;
+        }
+
+        isLoading.setValue(true);
+        errorMessage.setValue(null);
+
+        executorService.execute(() -> {
+            try {
+                staticUser.setName(newName.trim());
+                userRepository.updateUser(staticUser);
+                currentUser.postValue(staticUser);
+                errorMessage.postValue(null);
+            } catch (Exception e) {
+                postError("Failed to update name: " + e.getMessage());
+            } finally {
+                isLoading.postValue(false);
+            }
+        });
+    }
+
+    /**
+     * Update user password
+     */
+    public void updatePassword(String currentPassword, String newPassword) {
+        if (staticUser == null) {
+            postError("User not logged in");
+            return;
+        }
+
+        if (currentPassword == null || currentPassword.isEmpty()) {
+            postError("Current password is required");
+            return;
+        }
+
+        if (newPassword == null || newPassword.isEmpty()) {
+            postError("New password cannot be empty");
+            return;
+        }
+
+        if (newPassword.length() < 6) {
+            postError("New password must be at least 6 characters");
+            return;
+        }
+
+        // Verify current password
+        if (!staticUser.getPassword().equals(currentPassword)) {
+            postError("Current password is incorrect");
+            return;
+        }
+
+        isLoading.setValue(true);
+        errorMessage.setValue(null);
+
+        executorService.execute(() -> {
+            try {
+                staticUser.setPassword(newPassword);
+                userRepository.updateUser(staticUser);
+                currentUser.postValue(staticUser);
+                errorMessage.postValue(null);
+            } catch (Exception e) {
+                postError("Failed to update password: " + e.getMessage());
+            } finally {
+                isLoading.postValue(false);
+            }
+        });
+    }
+
+    /**
+     * Update user profile picture
+     */
+    public void updateProfilePicture(String picturePath) {
+        if (staticUser == null) {
+            postError("User not logged in");
+            return;
+        }
+
+        isLoading.setValue(true);
+        errorMessage.setValue(null);
+
+        executorService.execute(() -> {
+            try {
+                // Delete old profile picture if exists
+                if (staticUser.getProfilePicturePath() != null && !staticUser.getProfilePicturePath().isEmpty()) {
+                    java.io.File oldFile = new java.io.File(staticUser.getProfilePicturePath());
+                    if (oldFile.exists()) {
+                        oldFile.delete();
+                    }
+                }
+
+                staticUser.setProfilePicturePath(picturePath);
+                userRepository.updateUser(staticUser);
+                currentUser.postValue(staticUser);
+                errorMessage.postValue(null);
+            } catch (Exception e) {
+                postError("Failed to update profile picture: " + e.getMessage());
+            } finally {
+                isLoading.postValue(false);
+            }
+        });
+    }
+
     //Helpers
     private void postError(String message) {
         errorMessage.postValue(message);

@@ -32,6 +32,7 @@ import y3.mobiledev.mywallet.fragments.AddTransactionFragment;
 import y3.mobiledev.mywallet.fragments.CategoriesFragment;
 import y3.mobiledev.mywallet.fragments.ExchangeRateFragment;
 import y3.mobiledev.mywallet.fragments.HomeFragment;
+import y3.mobiledev.mywallet.fragments.ProfileFragment;
 import y3.mobiledev.mywallet.fragments.StatisticsFragment;
 import y3.mobiledev.mywallet.fragments.TransactionHistoryFragment;
 import y3.mobiledev.mywallet.fragments.TransactionsTabFragment;
@@ -226,6 +227,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     } else if (savedFragmentState.equals(ExchangeRateFragment.class.getName())) {
                         fragmentToLoad = new ExchangeRateFragment();
                         shouldShowFab = false; // Hide FAB for ExchangeRateFragment
+                    } else if (savedFragmentState.equals(ProfileFragment.class.getName())) {
+                        fragmentToLoad = new ProfileFragment();
+                        shouldShowFab = false; // Hide FAB for ProfileFragment
                     }
                 }
             }
@@ -603,8 +607,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loadFragment(new HomeFragment());
             bottomNavigation.setSelectedItemId(R.id.nav_home);
         } else if (id == R.id.nav_profile) {
-            // TODO: Open profile fragment or activity
-            // loadFragment(new ProfileFragment());
+            loadFragment(new ProfileFragment());
+            fabMain.hide();
         } else if (id == R.id.nav_subscriptions){
             loadFragment(new SubscriptionFragment());
             fabMain.hide();
@@ -667,7 +671,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (currentFragment instanceof StatisticsFragment) {
                 navItemId = R.id.nav_more;
             }
-            // SubscriptionFragment and ExchangeRateFragment don't have bottom nav items
+            // SubscriptionFragment, ExchangeRateFragment, and ProfileFragment don't have bottom nav items
             
             if (navItemId != -1) {
                 editor.putInt(PREF_NAV_ITEM_ID, navItemId);
