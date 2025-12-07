@@ -26,13 +26,17 @@ public class User {
     @ColumnInfo(name = "created_at")
     private long createdAt;
 
+    @ColumnInfo(name = "profile_picture_path")
+    private String profilePicturePath;
+
     // Primary Constructor - for Room Db
-    public User(int userId, String email, String name, String password, long createdAt) {
+    public User(int userId, String email, String name, String password, long createdAt, String profilePicturePath) {
         this.userId = userId;
         this.email = email;
         this.name = name;
         this.password = password;
         this.createdAt = createdAt;
+        this.profilePicturePath = profilePicturePath;
     }
 
     //Constructor for creating new users
@@ -42,6 +46,7 @@ public class User {
         this.name = name;
         this.password = password;
         this.createdAt = System.currentTimeMillis();
+        this.profilePicturePath = null;
     }
 
     // Getters
@@ -53,6 +58,7 @@ public class User {
 
     public String getPassword() { return password; }
     public long getCreatedAt() { return createdAt; }
+    public String getProfilePicturePath() { return profilePicturePath; }
 
     // Setters
     public void setUserId(int userId) { this.userId = userId; }
@@ -63,4 +69,5 @@ public class User {
 
     public void setPassword(String password) { this.password = password; }
     public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+    public void setProfilePicturePath(String profilePicturePath) { this.profilePicturePath = profilePicturePath; }
 }

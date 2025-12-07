@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Corrected: Changed 'src' to 'icon' and removed extra quote. -->
-    <!-- Updated: Pointing to a local PNG file in your drawable folder. -->
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/home"
+        android:icon="@drawable/ic_home"
         android:title="@string/nav_home"/>
 
     <item
         android:id="@+id/nav_statistics"
-        android:icon="@drawable/trend"
+        android:icon="@drawable/ic_history"
         android:title="@string/nav_transition_History"/>
 
     <item
         android:id="@+id/nav_categories"
-        android:icon="@drawable/application"
+        android:icon="@drawable/ic_grid_view"
         android:title="@string/nav_management"/>
 
     <item
         android:id="@+id/nav_more"
-        android:icon="@drawable/user"
+        android:icon="@drawable/ic_bar_chart"
         android:title="@string/nav_statistics"/>
 
 </menu>

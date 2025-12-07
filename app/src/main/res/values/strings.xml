@@ -288,5 +288,24 @@
     <string name="edit_transaction">Edit Transaction</string>
     <string name="transaction_updated">Your transaction is updated</string>
 
+    <!-- Profile -->
+    <string name="account_information">Account Information</string>
+    <string name="account_created">Account Created</string>
+    <string name="user_id">User ID</string>
+    <string name="not_available">Not Available</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_name">Change Name</string>
+    <string name="change_password">Change Password</string>
+    <string name="change_profile_picture">Change Profile Picture</string>
+    <string name="new_name">New Name</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="name_updated">Name updated successfully</string>
+    <string name="password_updated">Password updated successfully</string>
+    <string name="profile_picture_updated">Profile picture updated successfully</string>
+    <string name="failed_to_save_profile_picture">Failed to save profile picture</string>
+    <string name="current_password_required">Current password is required</string>
+    <string name="new_password_required">New password is required</string>
+    <string name="menu">Menu</string>
 
 </resources>

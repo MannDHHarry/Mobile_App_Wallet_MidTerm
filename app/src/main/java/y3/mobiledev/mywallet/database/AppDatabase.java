@@ -36,7 +36,7 @@ import y3.mobiledev.mywallet.models.Wallet;
                 Subscription.class,
                 Transfer.class  // ← NEW
         },
-        version = 4,  // ← Increment from 3 to 4
+        version = 5,  // ← Increment from 4 to 5 (adds profile_picture_path to users)
         exportSchema = false
 )
 @TypeConverters({Converters.class})
@@ -113,6 +113,14 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    // Migration 4 → 5 (Add profile_picture_path to users table)
+    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE users ADD COLUMN profile_picture_path TEXT");
+        }
+    };
+
 
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
@@ -122,7 +130,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     context.getApplicationContext(),
                                     AppDatabase.class,
                                     "mywallet_database")
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3 ,MIGRATION_3_4) // ← Now works perfectly
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                             .addCallback(roomCallback)
                             .build();
                 }
