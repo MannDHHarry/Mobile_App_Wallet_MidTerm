@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
+    android:layout_margin="16dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="8dp"
     app:cardBackgroundColor="@color/colorWhite">
@@ -13,53 +13,98 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="20dp">
 
+        <!-- Title: Added to match the style guide -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_wallet"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_black"
+            android:layout_marginBottom="24dp"/>
 
-        <!-- Wallet Name -->
+        <!-- Wallet Name: Restyled to match label/value format -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/wallet_name"
-            android:textColor="@color/text_black"
-            android:textSize="16sp"
+            android:textSize="11sp"
+            android:textColor="@color/text_gray"
             android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:letterSpacing="0.05"/>
 
         <EditText
             android:id="@+id/etWalletName"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:hint="@string/enter_wallet_name"
-            android:inputType="text"
+            android:inputType="textCapWords"
             android:textColor="@color/text_black"
-            android:textColorHint="@color/text_light_gray"
-            android:background="@drawable/rounded_edit_text"
-            android:paddingHorizontal="16dp"
+            android:textColorHint="@color/text_gray"
+            android:textSize="15sp"
+            android:background="@color/colorPainAu"
             android:paddingVertical="12dp"
+            android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Wallet Balance -->
+        <!-- Wallet Balance: Restyled to match label/value format -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/balance"
-            android:textColor="@color/text_black"
-            android:textSize="16sp"
+            android:textSize="11sp"
+            android:textColor="@color/text_gray"
             android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:letterSpacing="0.05"/>
 
         <EditText
             android:id="@+id/etWalletBalance"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:hint="@string/enter_balance"
             android:inputType="numberDecimal"
             android:textColor="@color/text_black"
-            android:textColorHint="@color/text_light_gray"
-            android:background="@drawable/rounded_edit_text"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"/>
+            android:textColorHint="@color/text_gray"
+            android:textSize="15sp"
+            android:background="@color/colorPainAu"
+            android:paddingVertical="12dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Action Buttons: Added to match the style guide -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCancel"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/rounded_button_purple"
+                android:text="@string/cancel"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnUpdate"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/rounded_button_purple"
+                android:text="@string/update"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
     </LinearLayout>
 
