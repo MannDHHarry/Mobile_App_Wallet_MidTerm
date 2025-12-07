@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import y3.mobiledev.mywallet.helpers.LocaleHelper;
 import y3.mobiledev.mywallet.helpers.NotificationDataManager;
 import y3.mobiledev.mywallet.helpers.NotificationHelper;
 import y3.mobiledev.mywallet.helpers.NotificationScheduler;
@@ -24,28 +25,31 @@ public class DailyNotificationReceiver extends BroadcastReceiver {
             return;
         }
 
+        // Wrap context with locale to get localized strings for notifications
+        Context localizedContext = LocaleHelper.onAttach(context);
+
         Log.d(TAG, "Daily summary alarm triggered");
 
         // Step 1: Check if we have valid user data
-        if (!NotificationDataManager.hasData(context)) {
+        if (!NotificationDataManager.hasData(localizedContext)) {
             Log.d(TAG, "No user data → skipping notification (will reschedule anyway)");
-            rescheduleNext(context);
+            rescheduleNext(localizedContext);
             return;
         }
 
-        int userId = NotificationDataManager.getUserId(context);
+        int userId = NotificationDataManager.getUserId(localizedContext);
         Log.d(TAG, "Processing daily summary for user ID: " + userId);
 
         // Step 2: Fetch FRESH data from database (not cached!)
         TransactionRepository repository = new TransactionRepository(
-                (Application) context.getApplicationContext()
+                (Application) localizedContext.getApplicationContext()
         );
         
         List<TransactionWithCategory> todayTransactions = repository.getTodayTransactionsSync(userId);
         
         if (todayTransactions == null || todayTransactions.isEmpty()) {
             Log.d(TAG, "No transactions today (fresh from database)");
-            showEmptySummaryAndReschedule(context);
+            showEmptySummaryAndReschedule(localizedContext);
             return;
         }
 
@@ -73,9 +77,9 @@ public class DailyNotificationReceiver extends BroadcastReceiver {
                 totalIncome - totalExpense));
 
         // Step 4: Show notification
-        NotificationHelper.createNotificationChannel(context);
+        NotificationHelper.createNotificationChannel(localizedContext);
         NotificationHelper.showDailySummaryNotification(
-                context,
+                localizedContext,
                 totalIncome,
                 totalExpense,
                 incomeCount,
@@ -85,7 +89,7 @@ public class DailyNotificationReceiver extends BroadcastReceiver {
         Log.d(TAG, "Daily summary notification shown with fresh data");
 
         // Step 5: Always reschedule for tomorrow (critical!)
-        rescheduleNext(context);
+        rescheduleNext(localizedContext);
     }
 
     private static void showEmptySummaryAndReschedule(Context context) {

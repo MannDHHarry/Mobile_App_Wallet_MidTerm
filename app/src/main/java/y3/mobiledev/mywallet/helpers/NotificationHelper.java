@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Locale;
 
 import y3.mobiledev.mywallet.MainActivity;
+import y3.mobiledev.mywallet.R;
+import y3.mobiledev.mywallet.helpers.LocaleHelper;
 
 public class NotificationHelper {
     public static final String CHANNEL_ID = "daily_summary_channel";
@@ -20,19 +22,16 @@ public class NotificationHelper {
     public static final int SPENDING_ALERT_NOTIFICATION_ID = 1002;
     public static final int WELCOME_NOTIFICATION_ID = 1003;
 
-    private static final String CHANNEL_NAME = "Daily Financial Summary";
-    private static final String CHANNEL_DESCRIPTION = "Shows daily income and expense summary at 10 PM";
-    private static final String SPENDING_ALERT_CHANNEL_NAME = "Spending Alerts";
-    private static final String SPENDING_ALERT_CHANNEL_DESCRIPTION = "Alerts about unusual spending patterns";
-
     public static void createNotificationChannel(Context context) {
+        // Wrap context with locale to get localized strings
+        Context localizedContext = LocaleHelper.onAttach(context);
 
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_NAME,
+                localizedContext.getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
         );
-        channel.setDescription(CHANNEL_DESCRIPTION);
+        channel.setDescription(localizedContext.getString(R.string.notification_channel_description));
         channel.enableVibration(true);
         channel.enableLights(true);
 
@@ -44,10 +43,10 @@ public class NotificationHelper {
         // Create spending alert channel
         NotificationChannel spendingChannel = new NotificationChannel(
                 SPENDING_ALERT_CHANNEL_ID,
-                SPENDING_ALERT_CHANNEL_NAME,
+                localizedContext.getString(R.string.notification_spending_alert_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
         );
-        spendingChannel.setDescription(SPENDING_ALERT_CHANNEL_DESCRIPTION);
+        spendingChannel.setDescription(localizedContext.getString(R.string.notification_spending_alert_channel_description));
         spendingChannel.enableVibration(true);
         spendingChannel.enableLights(true);
 
@@ -61,11 +60,13 @@ public class NotificationHelper {
                                                     double totalExpense,
                                                     int incomeCount,
                                                     int expenseCount) {
+        // Wrap context with locale to get localized strings
+        Context localizedContext = LocaleHelper.onAttach(context);
 
         double netAmount = totalIncome - totalExpense;
-        String title = "Today's Financial Summary";
-        String content = buildNotificationContent(totalIncome, totalExpense, incomeCount, expenseCount, netAmount);
-        String shortContent = getShortContent(totalIncome, totalExpense, netAmount);
+        String title = localizedContext.getString(R.string.notification_daily_summary_title);
+        String content = buildNotificationContent(localizedContext, totalIncome, totalExpense, incomeCount, expenseCount, netAmount);
+        String shortContent = getShortContent(localizedContext, totalIncome, totalExpense, netAmount);
 
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -92,47 +93,50 @@ public class NotificationHelper {
         }
     }
 
-    protected static String buildNotificationContent(double income,
+    protected static String buildNotificationContent(Context context,
+                                           double income,
                                            double expense,
                                            int incomeCount,
                                            int expenseCount,
                                            double netAmount) {
 
         if (incomeCount == 0 && expenseCount == 0) {
-            return "No transactions recorded today.\nTap to add your first transaction!";
+            return context.getString(R.string.notification_daily_summary_no_transactions);
         }
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format(Locale.US, " Income: %s (%d transaction%s)\n",
+        String incomeText = context.getString(R.string.notification_daily_summary_income,
                 CurrencyUtils.formatPlainAmount(income),
                 incomeCount,
-                incomeCount == 1 ? "" : "s"));
+                incomeCount == 1 ? "" : "s");
+        sb.append(" ").append(incomeText).append("\n");
 
-        sb.append(String.format(Locale.US, " Expenses: %s (%d transaction%s)\n",
+        String expenseText = context.getString(R.string.notification_daily_summary_expenses,
                 CurrencyUtils.formatPlainAmount(expense),
                 expenseCount,
-                expenseCount == 1 ? "" : "s"));
+                expenseCount == 1 ? "" : "s");
+        sb.append(" ").append(expenseText).append("\n");
 
         if (netAmount >= 0) {
-            sb.append(String.format(Locale.US, " You saved %s today!",
+            sb.append(" ").append(context.getString(R.string.notification_daily_summary_saved,
                     CurrencyUtils.formatPlainAmount(netAmount)));
         } else {
-            sb.append(String.format(Locale.US, " You overspent by %s today",
+            sb.append(" ").append(context.getString(R.string.notification_daily_summary_overspent,
                     CurrencyUtils.formatPlainAmount(Math.abs(netAmount))));
         }
 
         return sb.toString();
     }
 
-    protected static String getShortContent(double income, double expense, double netAmount) {
+    protected static String getShortContent(Context context, double income, double expense, double netAmount) {
         if (income == 0 && expense == 0) {
-            return "No transactions today. Tap to add one!";
+            return context.getString(R.string.notification_daily_summary_short_no_transactions);
         }
 
         String netSign = netAmount >= 0 ? "+" : "-";
-        return String.format(Locale.US,
-                "Income: %s | Expenses: %s | Net: %s%s",
+        return String.format(Locale.getDefault(),
+                context.getString(R.string.notification_daily_summary_short),
                 CurrencyUtils.formatPlainAmount(income),
                 CurrencyUtils.formatPlainAmount(expense),
                 netSign,
@@ -213,8 +217,11 @@ public class NotificationHelper {
     public static void showWelcomeNotification(Context context) {
         createNotificationChannel(context);
 
-        String title = "Welcome to MyWallet!";
-        String content = "You're all set! We'll send you a daily summary of your transactions at 10:00 PM.";
+        // Wrap context with locale to get localized strings
+        Context localizedContext = LocaleHelper.onAttach(context);
+
+        String title = localizedContext.getString(R.string.notification_welcome_title);
+        String content = localizedContext.getString(R.string.notification_welcome_content);
 
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
